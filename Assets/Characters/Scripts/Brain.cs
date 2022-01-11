@@ -1,0 +1,505 @@
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
+
+public enum CreatureState {
+    Roam,
+    Follow,
+    FollowOffensive,
+    Station,
+    Execute,
+    Pair
+}
+
+[Serializable]
+public class BrainConfig {
+    public AIDirections numMovementDirections;
+    public float movementSpeed;
+    public float reconsiderRateRoam = 5;
+    public float reconsiderRateTarget = 2.5f;
+    public float reconsiderRatePursuit = 1f;
+    public float scanningRate = 1f;
+    public bool hasAttack = false;
+    public float timidity = .75f;
+
+    public enum AIDirections {
+        Infinite,
+        Four,
+        Eight,
+        Twelve
+    }
+    public static Dictionary<AIDirections, Vector2[]> AIDirectionVectors = new Dictionary<AIDirections, Vector2[]>() {
+        [AIDirections.Twelve] = new Vector2[] {
+            Vct.F(1f, 0.2679491924f), // tan(15)
+            Vct.F(0.7071067812f, 0.7071067812f),
+            Vct.F(0.2679491924f, 1f)
+        }
+    };
+}
+
+//                 | Scanning | Investigating | Focused | attackDir. | executeDir. | pairDir.
+// ----------------+----------+---------------+---------+------------+-------------+----------
+// Roam            | ALWAYS   | defensively   | defens. |            |             |
+// Follow          | hasAtta. | defensively   | defens. |            |             |
+// FollowOffensive | ALWAYS   | ifnt dir/vis  | ifnt dv | if directd |             |
+// Station         | ALWAYS   | defensively   | defens. |            |             |
+// Execute         |          |               |         |            | ALWAYS      |
+// Pair            |          |               |         |            |             | ALWAYS
+
+public class Brain {
+    protected BrainConfig general;
+    protected Species species;
+    protected Creature creature;
+    protected Terrain terrain;
+    protected Transform grid { get => terrain.transform; }
+    protected int team { get => GetComponentStrict<Team>().TeamId; }
+
+    protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
+    protected Transform transform { get => species.transform; }
+
+    public Vector2 velocity = Vector2.zero;
+
+    public CreatureState State {
+        get => state;
+        set {
+            creature.stateForEditorDebugging = value;
+            state = value;
+            TriggerStateChange();
+        }
+    }
+    // focus is (C#) Really Null iff Focused == false.
+    // Here we only care if we set it to null, not whether Unity did.
+    // To avoid Unity Null, you must check Focused first.
+    public Transform Focus {
+        get {
+            return focus;
+        }
+        set {
+            if (ReferenceEquals(focus, value)) return;
+            ClearFocus();
+            focus = value;
+            if (!ReferenceEquals(value, null)) FocusedBehavior.Start();
+            TriggerStateChange();
+        }
+    }
+    public bool Focused {
+        get {
+            if (focus == null && !ReferenceEquals(focus, null)) {
+                // focus = null;
+                // TriggerStateChange();
+                Debug.Log("Focus died");
+                badState = true;
+            }
+            return focus != null;
+        }
+    }
+    public Vector3? Investigation { // trying to focus but cannot see
+        get => investigation;
+        set {
+            if (GetComponent<Team>().TeamId == 1) Debug.Log("Investigation set");
+            investigationCancel?.Stop();
+            investigation = value;
+            if (investigation != null) investigationCancel =
+                RunOnce.Run(species, Creature.neighborhood * general.movementSpeed,
+                    () => Investigation = null);
+            TriggerStateChange();
+        }
+    }
+    public bool Investigating { // trying to focus but cannot see
+        get => investigation != null;
+    }
+    protected bool Scanning {
+        get =>
+            state == CreatureState.Roam ||
+            state == CreatureState.Station ||
+            state == CreatureState.FollowOffensive ||
+            (state == CreatureState.Follow && general.hasAttack);
+    }
+    private CreatureState state = CreatureState.Roam;
+    private bool badState = false; // wait one frame for CleanUpState()
+    private bool stateIsDirty = false;
+    private Transform focus = null; // when Focused
+    private Vector2? investigation = null; // focus character not identified, only location
+    private RunOnce investigationCancel = null;
+    protected Transform threat = null; // for Follow
+    protected Transform followDirective = null; // for Follow
+    protected Vector3 stationDirective = Vector3.zero; // for Station
+    protected Transform attackDirective = null; // for FollowOffensive, can be null
+    protected Transform executeDirectiveCharacter = null; // for Execute, if a character
+
+    public Brain(Species species, BrainConfig general) {
+        this.species = species;
+        this.general = general;
+    }
+    public Brain InitializeAll() {
+        creature = GetComponentStrict<Creature>();
+        terrain = GameObject.FindObjectOfType<Terrain>();
+        GetComponentStrict<Team>().changed += OnTeamChanged;
+        Health health = GetComponent<Health>();
+        if (health != null) health.Died += HandleDeath;
+        TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
+        ScanningBehavior = new CoroutineWrapper(ScanningBehaviorE, species);
+        FocusedBehavior = new CoroutineWrapper(FocusedBehaviorE, species);
+        OnStateChange();
+        Initialize();
+        return this;
+    }
+    virtual protected void Initialize() {}
+    virtual public List<CreatureAction> Actions() { return new List<CreatureAction>(); }
+    virtual protected void OnTeamChanged(int team) {}
+    virtual protected void Attack() {}
+
+    protected CoroutineWrapper ScanningBehavior;
+    virtual protected IEnumerator ScanningBehaviorE() { yield break; }
+    protected CoroutineWrapper FocusedBehavior;
+    virtual protected IEnumerator FocusedBehaviorE() { yield break; }
+
+    protected T GetComponent<T>() => species.GetComponent<T>();
+    protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
+
+    protected Vector2 RandomVelocity() {
+        Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
+        return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
+    }
+    protected Vector2 IndexedVelocity(Vector2 targetDirection) {
+        int index = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, targetDirection) + 360) % 360 / (90 / aiDirections.Length));
+        int rotation = index / aiDirections.Length;
+        int subIndex = index % aiDirections.Length;
+        return aiDirections[subIndex].RotateRightAngles(rotation) * general.movementSpeed;
+    }
+
+    private void ClearFocus() {
+        this.focus = null;
+        this.investigation = null;
+        FocusedBehavior.Stop();
+    }
+    protected void OnStateChange() {
+        Debug.Log(species + " (team " + GetComponentStrict<Team>().TeamId + "): STATE CHANGED! " + state + " " + focus + " " + Scanning + Focused);
+        ScanningBehavior.RunIf(Scanning);
+        TrekkingBehavior.RunIf(!Focused);
+    }
+
+    protected void ClearDirectives() {
+        followDirective = null;
+        attackDirective = null;
+        executeDirectiveCharacter = null;
+        stationDirective = Vector2.zero;
+    }
+    public void CommandFollow(Transform directive) {
+        ClearDirectives();
+        followDirective = directive;
+        ClearFocus();
+        State = CreatureState.Follow;
+    }
+    public void CommandAttack(Transform directive) {
+        if (!general.hasAttack) throw new ArgumentException(species + " cannot attack");
+        executeDirectiveCharacter = directive;
+        State = CreatureState.Execute;
+    }
+    public void CommandStation(Vector2Int directive) {
+        ClearDirectives();
+        stationDirective = terrain.CellCenter(directive);
+        ClearFocus();
+        State = CreatureState.Station;
+    }
+
+    public void DisableFollowOffensive() {
+        if (State == CreatureState.FollowOffensive) {
+            attackDirective = null;
+            State = CreatureState.Follow;
+            Debug.Log("DISABLED");
+        }
+    }
+    public bool EnableFollowOffensive() {
+        if (!general.hasAttack) throw new InvalidOperationException(species + " cannot attack");
+        if (State == CreatureState.FollowOffensive) {
+            attackDirective = null;
+            return true;
+        } else if (State == CreatureState.Follow) {
+            attackDirective = null;
+            State = CreatureState.FollowOffensive;
+            return true;
+        } else return false;
+    }
+    public void EnableFollowOffensiveNoTarget() {
+        Transform threat = NearestThreat();
+        if (threat == null || !EnableFollowOffensive()) return;
+        Focus = threat;
+    }
+    public void EnableFollowOffensiveWithTarget(Transform target) {
+        if (attackDirective != null) {
+            Debug.Log("But " + species.gameObject + " is already attacking " + attackDirective.gameObject);
+            return;
+        }
+        if (!EnableFollowOffensive()) return;
+        Debug.Log(species.gameObject + " is following attack directive");
+        attackDirective = target;
+        TryIndicateAttack(attackDirective, true);
+        // If attackDirective already exists, it will be updated, but Focus will not necessarily.
+        // If attackDirective cannot be seen and there is no Focus, Investigation will be updated.
+    }
+    public void TryIndicateAttack(Transform assailant, bool forceUpdateInvestigation) {
+        bool canSee = CanSee(assailant);
+        if (GetComponentStrict<Team>().TeamId == 1) {
+            Debug.Log(species.gameObject + (canSee ? " can see " : " is investigating ") + assailant.gameObject);
+        }
+        if (canSee) IndicateAttack(assailant);
+        else IndicateAttack(assailant.position, forceUpdateInvestigation);
+    }
+    public void IndicateAttack(Transform assailant) { // initiates Focused
+        if (general.hasAttack && !Focused) Focus = assailant;
+    }
+    public void IndicateAttack(Vector3 source, bool forceUpdateInvestigation) { // initiates Investigating
+        if (general.hasAttack && !Focused &&
+            (forceUpdateInvestigation || !Investigating || (transform.position - source).sqrMagnitude <
+                               (transform.position - Investigation)?.sqrMagnitude))
+            Investigation = source;
+    }
+
+    // Runs when not Focused
+    protected CoroutineWrapper TrekkingBehavior;
+    public IEnumerator TrekkingBehaviorE() {
+        if (GetComponent<Team>().TeamId == 1) Debug.Log("Starting trek");
+        Vector3 targetDirection;
+
+        for (int i = 0; i < 10_000; i++) {
+            if (Investigating) {
+                velocity = IndexedVelocity((Vector3)Investigation - transform.position);
+                yield return new WaitForSeconds(general.reconsiderRatePursuit);
+                if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
+                        general.reconsiderRatePursuit * general.movementSpeed) { // arrived at point, found nothing
+                    DisableFollowOffensive();
+                    Investigation = null;
+                }
+            } else switch (state) {
+                case CreatureState.Roam:
+                    velocity = RandomVelocity();
+                    yield return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
+                break;
+                case CreatureState.Follow:
+                    targetDirection = FollowTargetDirection(followDirective.position);
+                    velocity = IndexedVelocity(targetDirection);
+                    yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
+                break;
+                case CreatureState.FollowOffensive:
+                    if (!badState && !stateIsDirty) Debug.LogError(species + ": FollowOffensive state must have Focus or Investigation. Please call UpdateFollowOffensive()");
+                    badState = true;
+                    yield return null;
+                break;
+                case CreatureState.Station:
+                    targetDirection = stationDirective - transform.position;
+                    if (targetDirection.magnitude < 1f / Creature.subGridUnit) {
+                        velocity = Vector2.zero;
+                        yield return new WaitForSeconds(general.reconsiderRateTarget);
+                        continue;
+                    }
+                    velocity = IndexedVelocity(targetDirection);
+                    if (targetDirection.magnitude > general.reconsiderRateTarget * general.movementSpeed)
+                        yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
+                    else yield return null;
+                break;
+                default:
+                    Debug.LogError("Weird state: " + state);
+                    yield break;
+            }
+        }
+        Debug.LogError("Forgot to add a yield return on some branch :P");
+    }
+
+    protected Vector3 FollowTargetDirection(Vector3 targetPosition) {
+        Vector3 toTarget = targetPosition - transform.position;
+
+        Transform nearestThreat = NearestThreat();
+        if (nearestThreat == null) return toTarget;
+        Vector3 toThreat = nearestThreat.position - transform.position;
+        Vector3 toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
+        // Debug.Log("Target: " + toTarget.magnitude + toTarget + " / Threat: " + toThreat.magnitude + toThreat + " / Corrected: " + toThreatCorrected.magnitude + toThreatCorrected + " / Follow: " + (toTarget - toThreatCorrected));
+        return toTarget - toThreatCorrected;
+    }
+
+    public virtual bool CanSee(Transform seen) {
+        if (Vector2.Distance(transform.position, seen.position) > Creature.neighborhood) {
+            if (GetComponentStrict<Team>().TeamId == 1) Debug.DrawLine(transform.position, (seen.position - transform.position).normalized * Creature.neighborhood + transform.position, Color.red, 1f);
+            return false;
+        } else if (GetComponentStrict<Team>().TeamId == 1) Debug.DrawLine(transform.position, (seen.position - transform.position).normalized * Creature.neighborhood + transform.position, Color.yellow, 1f);
+        SpriteSorter seenSprite = seen.GetComponentInChildren<SpriteSorter>();
+        if (seenSprite == null)
+            return true;
+        else {
+            bool result = terrain.concealment.CanSee(transform, seenSprite);
+            return result;
+        }
+    }
+
+    // Sanity check for NearestThreat to avoid contradiction
+    // OverlapCircleAll may produce colliders with center slightly outside Creature.neighborhood
+    protected bool IsThreat(Transform threat) {
+        return !GetComponentStrict<Team>().SameTeam(threat) && CanSee(threat);
+    }
+
+    protected Transform NearestThreat() {
+        return NearestThreat(null);
+    }
+    protected Transform NearestThreat(Func<Collider2D, bool> filter) {
+        Collider2D[] charactersNearby =
+            Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
+        List<Transform> threats = new List<Transform>();
+        foreach (Collider2D character in charactersNearby) {
+            if (IsThreat(character.transform) && (filter?.Invoke(character) != false))
+                if (character.GetComponent<Creature>()?.brainConfig?.hasAttack == true ||
+                        character.GetComponent<PlayerCharacter>() != null)
+                    threats.Add(character.transform);
+        }
+        if (threats.Count == 0) return null;
+        return threats.MinBy(threat => (threat.position - transform.position).sqrMagnitude);
+    }
+
+    private void HandleDeath() {
+        GameObject.Destroy(creature.gameObject);
+    }
+
+    // Call when in FollowOffensive but not Focused or Investigating.
+    protected void UpdateFollowOffensive() {
+        if (!ReferenceEquals(attackDirective, null) && attackDirective == null) { // target died
+            Debug.Log("KILLED IT!");
+            DisableFollowOffensive();
+            Focus = null;
+        } else if (attackDirective == null) {
+            Focus = NearestThreat(); // no target
+            if (Focus == null) DisableFollowOffensive();
+        } else if (CanSee(attackDirective)) Focus = attackDirective; // found target
+        else {
+            if (!Investigating) DisableFollowOffensive(); // unless we have no leads
+            Focus = null; // keep looking
+        }
+    }
+
+    public void TriggerStateChange() {
+        Debug.Log(species + " (team " + GetComponentStrict<Team>().TeamId + "): TRIGGER STATE CHANGE " + state + " " + focus);
+        stateIsDirty = true;
+    }
+
+    public void Update() {
+        StatePreChecks();
+        StatePostChecks();
+        if (stateIsDirty) {
+            stateIsDirty = false;
+            OnStateChange();
+        }
+        StateAssumptions();
+    }
+
+    // Clean up state
+    public void StatePreChecks() {
+        if (focus == null && !ReferenceEquals(focus, null)) { // focus died
+            Debug.Log("Cleanup pre-check: focus died");
+            Focus = null;
+            TriggerStateChange();
+        }
+        if (attackDirective == null && !ReferenceEquals(attackDirective, null)) {
+            Debug.Log("Cleanup pre-check: attackDirective died");
+            DisableFollowOffensive();
+        }
+    }
+
+    // Clean up state
+    public void StatePostChecks() {
+        if (state == CreatureState.FollowOffensive && focus == null && investigation == null) {
+            Debug.Log("Cleanup post-check: follow offensive lost target");
+            UpdateFollowOffensive();
+        }
+    }
+
+    // Check for things that should never happen
+    public void StateAssumptions() {
+        // Coroutines
+        if (focus == null && FocusedBehavior.IsRunning) {
+            Debug.LogError("Focus null but FocusedBehavior running");
+            FocusedBehavior.Stop();
+        }
+        if (focus != null && TrekkingBehavior.IsRunning) {
+            Debug.LogError("Focus nonnull but TrekkingBehavior running");
+            TrekkingBehavior.Stop();
+        }
+        if (Scanning == false && ScanningBehavior.IsRunning) {
+            Debug.LogError("Scanning false but ScanningBehavior running");
+            ScanningBehavior.Stop();
+        }
+        // Directives
+        if (state == CreatureState.Follow && followDirective == null) {
+            Debug.LogError("Following without followDirective");
+            State = CreatureState.Roam;
+        }
+        if (state == CreatureState.Station && stationDirective == Vector3.zero) {
+            Debug.LogError("Stationed without stationDirective");
+            State = CreatureState.Roam;
+        }
+        // Invalid focus combinations
+        if (focus != null && investigation != null) {
+            Debug.LogError("Focus and investigation at the same time: " + focus + " " + investigation);
+            Investigation = null;
+        }
+        badState = false;
+    }
+}
+
+public class CoroutineWrapper {
+    protected Func<IEnumerator> enumeratorGenerator;
+    protected Coroutine coroutine;
+    protected MonoBehaviour attachedScript;
+    protected bool isRunning;
+
+    protected CoroutineWrapper() {}
+
+    public CoroutineWrapper(Func<IEnumerator> enumeratorGenerator, MonoBehaviour attachedScript) {
+        this.enumeratorGenerator = enumeratorGenerator;
+        this.attachedScript = attachedScript;
+    }
+
+    public void RunIf(bool on) {
+        if (on) Start();
+        else Stop();
+    }
+
+    public void Start() {
+        Stop();
+        isRunning = true;
+        coroutine = attachedScript.StartCoroutine(enumeratorGenerator.Invoke());
+    }
+
+    public void Stop() {
+        isRunning = false;
+        if (coroutine != null) attachedScript.StopCoroutine(coroutine);
+    }
+
+    public bool IsRunning {
+        get => isRunning;
+    }
+}
+
+public class RunOnce : CoroutineWrapper {
+    private Action action;
+    private float seconds;
+
+    public RunOnce(MonoBehaviour attachedScript, float seconds, Action action) {
+        this.action = action;
+        this.seconds = seconds;
+        this.attachedScript = attachedScript;
+        this.enumeratorGenerator = RunOnceE;
+    }
+
+    public static RunOnce Run(MonoBehaviour attachedScript, float seconds, Action action) {
+        RunOnce runOnce = new RunOnce(attachedScript, seconds, action);
+        runOnce.Start();
+        return runOnce;
+    }
+
+    private IEnumerator RunOnceE() {
+        yield return new WaitForSeconds(seconds);
+        action();
+        yield break;
+    }
+}
