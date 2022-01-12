@@ -18,13 +18,19 @@ public class Material {
     };
 
     private Type type;
-    private int max;
+    private Bucket bucket;
     private int quantity;
     public Action<int> Changed;
 
-    public Material(Type type, int max) {
+    private Material(Type type, Bucket bucket) {
         this.type = type;
-        this.max = max;
+        this.bucket = bucket;
+    }
+
+    public static Material InBucket(Type type, Bucket bucket) {
+        Material result = new Material(type, bucket);
+        bucket.AddMaterial(result);
+        return result;
     }
 
     public Type MaterialType { get => type; }
@@ -38,11 +44,13 @@ public class Material {
         return result;
     }
 
-    public int ChangeQuantity(int delta) {
-        int oldQuantity = quantity;
-        quantity = Mathf.Clamp(quantity + delta, 0, max);
+    public int TryAdd(int delta) {
+        int space = bucket.SpaceAvailable;
+        if (space == 0) return 0;
+        int actualDelta = Math.Min(delta, space);
+        quantity += actualDelta;
         if (Changed != null) Changed(quantity);
-        return quantity - oldQuantity;
+        return actualDelta;
     }
 
     public void Clear() {
@@ -51,6 +59,6 @@ public class Material {
     }
 
     public bool IsFull {
-        get => max == quantity;
+        get => bucket.SpaceAvailable == 0;
     }
 }

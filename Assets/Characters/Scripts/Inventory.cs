@@ -1,10 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+[Serializable] public class Bucket {
+    [SerializeField] public int max = 60;
+
+    private List<Material> materials = new List<Material>();
+
+    public Bucket(int max) {
+        this.max = max;
+    }
+
+    public int Size {
+        get => (from material in materials select material.Quantity).Sum();
+    }
+    public int SpaceAvailable {
+        get => max - Size;
+    }
+
+    public void AddMaterial(Material material) {
+        materials.Add(material);
+    }
+}
+
 public class Inventory : MonoBehaviour {
-    public int maxLures = 20;
-    public int maxTools = 60;
+    public Bucket lureBucket = new Bucket(10);
+    public Bucket soilBucket = new Bucket(10);
+    public Bucket buildBucket = new Bucket(30);
+    public Bucket arrowBucket = new Bucket(30);
 
     public Sprite scale;
     public Sprite wood;
@@ -16,23 +40,21 @@ public class Inventory : MonoBehaviour {
     public Action itemsClearedEventHandler;
 
     public void Awake() {
-        materials[Material.Type.Scale] = new Material(Material.Type.Scale, maxLures);
-        materials[Material.Type.PondApple] = new Material(Material.Type.PondApple, maxLures);
-        materials[Material.Type.ForestBlossom] = new Material(Material.Type.ForestBlossom, maxLures);
-        materials[Material.Type.Glass] = new Material(Material.Type.Glass, maxLures);
-        materials[Material.Type.Huckleberry] = new Material(Material.Type.Huckleberry, maxLures);
-        materials[Material.Type.Gemstone] = new Material(Material.Type.Gemstone, maxLures);
-        materials[Material.Type.Sword] = new Material(Material.Type.Sword, maxTools);
-        materials[Material.Type.Arrow] = new Material(Material.Type.Arrow, maxTools);
-        materials[Material.Type.Praxel] = new Material(Material.Type.Praxel, maxTools);
-        materials[Material.Type.Wood] = new Material(Material.Type.Wood, maxTools);
-        materials[Material.Type.Stone] = new Material(Material.Type.Stone, maxTools);
-        materials[Material.Type.Soil] = new Material(Material.Type.Soil, maxTools);
+        materials[Material.Type.Scale] = Material.InBucket(Material.Type.Scale, lureBucket);
+        materials[Material.Type.PondApple] = Material.InBucket(Material.Type.PondApple, lureBucket);
+        materials[Material.Type.ForestBlossom] = Material.InBucket(Material.Type.ForestBlossom, lureBucket);
+        materials[Material.Type.Glass] = Material.InBucket(Material.Type.Glass, lureBucket);
+        materials[Material.Type.Huckleberry] = Material.InBucket(Material.Type.Huckleberry, lureBucket);
+        materials[Material.Type.Gemstone] = Material.InBucket(Material.Type.Gemstone, lureBucket);
+        materials[Material.Type.Arrow] = Material.InBucket(Material.Type.Arrow, arrowBucket);
+        materials[Material.Type.Wood] = Material.InBucket(Material.Type.Wood, buildBucket);
+        materials[Material.Type.Stone] = Material.InBucket(Material.Type.Stone, buildBucket);
+        materials[Material.Type.Soil] = Material.InBucket(Material.Type.Soil, soilBucket);
     }
 
     public int Add(Material.Type material, int quantity, Sprite sprite) {
-        int added = materials[material].ChangeQuantity(quantity);
-        if (itemsAddedEventHandler != null) itemsAddedEventHandler(material, added, sprite);
+        int added = materials[material].TryAdd(quantity);
+        if (added > 0 && itemsAddedEventHandler != null) itemsAddedEventHandler(material, added, sprite);
         return added;
     }
 
