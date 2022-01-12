@@ -38,14 +38,6 @@ public class Fountain : MonoBehaviour {
         enemy = other;
     }
 
-    // void OnTriggerExit2D(Collider2D other) {
-    //     PlayerCharacter target = other.GetComponent<PlayerCharacter>();
-    //     if (target == null) return;
-    //     int targetTeam = target.GetComponent<Team>().teamId;
-    //     if (targetTeam == team) return;
-    //     enemiesPresent = false;
-    // }
-
     void FixedUpdate() {
         if (enemyPresent) {
             if (collider.IsTouching(enemy))

@@ -21,10 +21,6 @@ public class WallTile : SimpleTile {
         }
     }
 
-    // public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject instantiatedGameObject) {
-    //     return base.StartUp(position, tilemap, instantiatedGameObject);
-    // }
-
     public override void GetTileData(Vector3Int position, ITilemap tilemap, ref TileData tileData) {
         base.GetTileData(position, tilemap, ref tileData);
         tileData.sprite = (ViewOrientation.IsLeftOrRight() ^ isX) ? xWallTile : yWallTile;

@@ -66,8 +66,6 @@ public class Ranged {
     }
 
     private float Interpolate(float currentAngle, float targetAngle) {
-        // float sinceKeypress = (Time.time - timeKeypressChanged) / config.aimInstantTime;
-        // float accelFactor =  sinceKeypress * sinceKeypress * sinceKeypress * sinceKeypress;
         if (angleKeypressChanged == null) return config.aimMinRate; // I don't care
         float startAngle = (float) angleKeypressChanged;
         float rampUp = Mathf.Clamp01(1 + (Mathf.Abs(Mathf.DeltaAngle(startAngle, currentAngle)) - 45) / config.aimTransitionAngle);
@@ -106,20 +104,4 @@ public class Ranged {
         direction = pointerDirection;
         config.target.localScale = Vector3.one;
     }
-
-    // public void UpdatePointerToKeys() {
-    //     if (direction is float d) {
-    //         float totalAimRotation = Mathf.DeltaAngle(d, pointerDirection);
-    //         if (Mathf.Abs(totalAimRotation) < config.aimMinRate * Time.deltaTime) {
-    //             UpdateInputDirection(null);
-    //             return;
-    //         }
-    //         bool rotateLeft = totalAimRotation > 0;
-    //         bool overshoot = rotateLeft
-    //             ? Mathf.FloorToInt(pointerDirection / 45) == Mathf.FloorToInt(d / 45)
-    //             : Mathf.CeilToInt(pointerDirection / 45) == Mathf.CeilToInt(d / 45);
-    //         if (rotateLeft == overshoot) UpdateInputDirection(Mathf.Ceil(pointerDirection / 45) * 45);
-    //         else UpdateInputDirection(Mathf.Floor(pointerDirection / 45) * 45);
-    //     } else UpdateInputDirection(Mathf.Round(pointerDirection / 45) * 45);
-    // }
 }

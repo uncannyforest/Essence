@@ -10,13 +10,9 @@ public class CustomRuleTile : IsometricRuleTile<CustomRuleTile.Neighbor> {
     public bool canMirrorX = false;
     public bool mirrorX = false;
     public TileBase[] tilesToConnect;
-    // public TileBase tileThree;
-
-    // private RotationManager rotationManager;
+    
     public Orientation ViewOrientation {
         get {
-        //     if (rotationManager == null) CacheRotationManager();
-        //     if (rotationManager == null) {Debug.Log("Aaaauugh!");}
             return Orientor.Rotation;
         }
     }
@@ -24,15 +20,9 @@ public class CustomRuleTile : IsometricRuleTile<CustomRuleTile.Neighbor> {
     public class Neighbor : RuleTile.TilingRule.Neighbor {
         new public const int This = 1;
         new public const int NotThis = 2;
-        // public const int Three = 3;
     }
 
-    // public void CacheRotationManager() {
-    //     rotationManager = GameObject.FindObjectOfType<RotationManager>();
-    // }
-
     public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject instantiatedGameObject) {
-        // CacheRotationManager();
         return base.StartUp(position, tilemap, instantiatedGameObject);
     }
 
@@ -70,7 +60,6 @@ public class CustomRuleTile : IsometricRuleTile<CustomRuleTile.Neighbor> {
         switch (neighbor) {
             case Neighbor.This: return Check_This(tile);
             case Neighbor.NotThis: return Check_NotThis(tile);
-            // case Neighbor.Three: return Check_Three(tile);
         }
         return base.RuleMatch(neighbor, tile);
     }
@@ -82,8 +71,4 @@ public class CustomRuleTile : IsometricRuleTile<CustomRuleTile.Neighbor> {
     bool Check_NotThis(TileBase tile) {
         return !Check_This(tile);
     }
-
-    // bool Check_Three(TileBase tile) {
-    //     return tile == tileThree;
-    // }
 }

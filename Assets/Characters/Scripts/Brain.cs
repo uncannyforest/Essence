@@ -88,8 +88,6 @@ public class Brain {
     public bool Focused {
         get {
             if (focus == null && !ReferenceEquals(focus, null)) {
-                // focus = null;
-                // TriggerStateChange();
                 Debug.Log("Focus died");
                 badState = true;
             }
@@ -316,7 +314,6 @@ public class Brain {
         if (nearestThreat == null) return toTarget;
         Vector3 toThreat = nearestThreat.position - transform.position;
         Vector3 toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
-        // Debug.Log("Target: " + toTarget.magnitude + toTarget + " / Threat: " + toThreat.magnitude + toThreat + " / Corrected: " + toThreatCorrected.magnitude + toThreatCorrected + " / Follow: " + (toTarget - toThreatCorrected));
         return toTarget - toThreatCorrected;
     }
 

@@ -22,11 +22,6 @@ public class ClickManager {
     public Vector2 PointerPosition {
         get {
             Vector3 mouse = Input.mousePosition;
-            // RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            //     worldView, mouse, null, out Vector2 screenPoint
-            // );
-            // Vector2 normalizedPoint = Rect.PointToNormalized(worldView.rect, screenPoint);
-            // Vector3 world = interactionScript.camera.ViewportToWorldPoint(normalizedPoint);
             return Camera.main.ScreenToWorldPoint(mouse);
         }
     } 

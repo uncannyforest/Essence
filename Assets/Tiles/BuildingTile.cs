@@ -27,10 +27,6 @@ public class BuildingTile : CustomRuleTile {
         }
     }
 
-    // public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject instantiatedGameObject) {
-    //     return base.StartUp(position, tilemap, instantiatedGameObject);
-    // }
-
     // ignores rotation and reflection
     public override bool RuleMatches(TilingRule rule, Vector3Int position, ITilemap tilemap, ref Matrix4x4 transform) {
         bool result = RuleMatchesSimple(rule, position, tilemap);

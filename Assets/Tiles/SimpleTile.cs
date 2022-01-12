@@ -10,11 +10,9 @@ public class SimpleTile : Tile {
 
     public Orientation ViewOrientation {
         get {
-    //         if (rotationManager == null) rotationManager = GameObject.FindObjectOfType<RotationManager>();
             return Orientor.Rotation;
         }
     }
-    // private RotationManager rotationManager;
 
     public override void GetTileData(Vector3Int position, ITilemap tilemap, ref TileData tileData) {
         base.GetTileData(position, tilemap, ref tileData);
