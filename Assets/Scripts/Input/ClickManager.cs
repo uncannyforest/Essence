@@ -13,13 +13,9 @@ public class ClickManager {
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
             interactionScript.PointerMove(PointerPosition);
         }
-
-		if (SimpleInput.GetButtonDown("Fire")) {
-			interactionScript.Confirm(PointerPosition);
-		}
 	}
 
-    public Vector2 PointerPosition {
+    public static Vector2 PointerPosition {
         get {
             Vector3 mouse = Input.mousePosition;
             return Camera.main.ScreenToWorldPoint(mouse);

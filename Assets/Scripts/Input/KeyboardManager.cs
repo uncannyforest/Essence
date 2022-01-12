@@ -6,13 +6,26 @@ using UnityEngine;
 public class KeyboardManager {
     private PlayerCharacter playerScript;
     private WorldInteraction world;
+    private TextDisplay textDisplay;
 
-    public KeyboardManager(PlayerCharacter playerScript, WorldInteraction world) {
+    public KeyboardManager(PlayerCharacter playerScript, WorldInteraction world, TextDisplay textDisplay) {
         this.playerScript = playerScript;
         this.world = world;
+        this.textDisplay = textDisplay;
     }
 
     public void Update() {
+        if (SimpleInput.GetButtonDown("Pause")) {
+            textDisplay.ToggleFullText();
+        }
+		if (SimpleInput.GetButtonDown("Fire")) {
+            if (textDisplay.IsFullTextUp) {
+                textDisplay.HideFullText();
+            } else {
+			    world.Confirm(ClickManager.PointerPosition);
+            }
+		}
+
         if (Input.GetKeyDown("1")) {
             world.PlayerAction = WorldInteraction.Mode.Sword;
         }
