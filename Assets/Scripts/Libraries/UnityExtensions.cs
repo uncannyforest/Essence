@@ -35,6 +35,14 @@ public static class GameObjectExtensions {
         return go.GetComponent<T>() ?? throw new ArgumentException
             ("GameObject " + go + " in layer " + go.layer + " has no " + typeof(T));
     }
+
+    public static bool Contains(this LayerMask mask, int layer) {
+        return mask == (mask | (1 << layer));
+    }
+
+    public static bool LayerIsIn(this GameObject go, params string[] layerNames) {
+        return ((LayerMask)LayerMask.GetMask(layerNames)).Contains(go.layer);
+    }
 }
 
 public static class VectorExtensions {

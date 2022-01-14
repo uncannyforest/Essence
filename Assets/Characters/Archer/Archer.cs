@@ -6,6 +6,7 @@ using Random = UnityEngine.Random;
 
 [Serializable]
 public class ArcherConfig {
+    public Sprite attackAction;
     public Arrow arrowPrefab;
 }
 
@@ -23,6 +24,17 @@ public class ArcherBrain : Brain {
         this.archer = archer;
     }
 
+    override public List<CreatureAction> Actions() {
+        return new List<CreatureAction>() {
+            CreatureAction.WithObject(archer.attackAction,
+                new CoroutineWrapper(AttackBehaviorE, species),
+                new TeleFilter(TeleFilter.Terrain.NONE, (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
+                    c.GetComponent<Health>() != null &&
+                    c.GetComponentStrict<Team>().TeamId != team ;}
+                ))
+        };
+    }
+
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);
@@ -37,15 +49,25 @@ public class ArcherBrain : Brain {
 
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            if (Vector2.Distance(Focus.position, transform.position) < archer.arrowPrefab.reach) {
-                velocity = Vector2.zero;
-                Arrow.Instantiate(archer.arrowPrefab, grid, transform, Focus.position);
-            } else if (State != CreatureState.Station) {
-                velocity = IndexedVelocity(Focus.position - transform.position);
-            }
-            yield return new WaitForSeconds(general.reconsiderRatePursuit);
+            yield return Attack(Focus);
         }
         Debug.Log("Focus just ended, exiting FocusedBehavior");
     }
     
+    private IEnumerator AttackBehaviorE() {
+        while (((SpriteSorter)executeDirective) != null) {
+            yield return Attack(((SpriteSorter)executeDirective).Character);
+        }
+        Debug.Log("Attack just ended, exiting AttackBehavior");
+    }
+
+    private WaitForSeconds Attack(Transform target) {
+        if (Vector2.Distance(target.position, transform.position) < archer.arrowPrefab.reach) {
+            velocity = Vector2.zero;
+            Arrow.Instantiate(archer.arrowPrefab, grid, transform, target.position);
+        } else if (State != CreatureState.Station) {
+            velocity = IndexedVelocity(target.position - transform.position);
+        }
+        return new WaitForSeconds(general.reconsiderRatePursuit);
+    }
 }

@@ -9,9 +9,7 @@ public class Material {
         Glass,
         Huckleberry,
         Gemstone,
-        Sword,
         Arrow,
-        Praxel,
         Wood,
         Stone,
         Soil

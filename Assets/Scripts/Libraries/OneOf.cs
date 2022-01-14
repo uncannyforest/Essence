@@ -59,6 +59,9 @@ public class OneOf<T, U> {
         return false;
     }
 
+    public bool IsNeither {
+        get => which == Which.Neither;
+    }
 }
 
 public class OneOfTest {

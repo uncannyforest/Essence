@@ -25,11 +25,13 @@ public struct CreatureAction {
     }
 
     public static CreatureAction Instant(Sprite icon, Action<Creature> instantDirective) =>
-        new CreatureAction(icon, instantDirective, null, null, false, false);
+        new CreatureAction(icon, instantDirective, null,  null, false, false);
     public static CreatureAction WithObject(Sprite icon,
-            Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective,
+            CoroutineWrapper executingBehavior,
             TeleFilter filter) =>
-        new CreatureAction(icon, null, pendingDirective, filter, false, false);
+        new CreatureAction(icon, null,
+            (creature, target) => creature.Execute(executingBehavior, target),
+            filter, false, false);
     public static CreatureAction Roam =
         new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, true, false);
     public static CreatureAction Station =
@@ -122,6 +124,11 @@ public class Creature : MonoBehaviour {
     public void WitnessAttack(Transform assailant) => brain.TryIndicateAttack(assailant, false);
 
     public void Station(Vector2Int location) => brain.CommandStation(location);
+
+    public void Execute(CoroutineWrapper executingBehavior,
+            OneOf<Terrain.Position, SpriteSorter> target) {
+        brain.CommandExecute(executingBehavior, target);
+    }
 
     private Coroutine cMaybeDespawn;
     private IEnumerator MaybeDespawn() {

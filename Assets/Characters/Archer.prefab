@@ -523,6 +523,7 @@ MonoBehaviour:
   icon: {fileID: -7132172409892320828, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   breastplate: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   personalBubble: 0.25
+  stateForEditorDebugging: 0
 --- !u!114 &4481103850635713288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -536,6 +537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesConfig:
+    attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     arrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
 --- !u!114 &4481103850635713293
 MonoBehaviour:

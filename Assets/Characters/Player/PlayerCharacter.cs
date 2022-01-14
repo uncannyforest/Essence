@@ -35,6 +35,10 @@ public class PlayerCharacter : MonoBehaviour {
         health.Died += HandleDeath;
     }
 
+    public WorldInteraction Interaction { // Implmentation will change when I add multiplayer
+        get => GameObject.FindObjectOfType<WorldInteraction>();
+    }
+
     // input x and y are from {-1, 0, 1}: 9 possibilities
     public Vector2Int InputVelocity {
         get => inputVelocity;

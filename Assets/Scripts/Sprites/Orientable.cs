@@ -29,7 +29,7 @@ public class OrientableChild {
         set => transform.position = value.WithZ(transform.position.z);
     } 
     public Vector3 position3 { set => transform.position = value; }
-    public Orientable rootParent { get => transform.GetComponentInParent<Orientable>(); }
+    public Orientable rootParent { get => transform.parent.GetComponentInParent<Orientable>(); }
     public int childCount { get => transform.childCount; }
     public IEnumerable<OrientableChild> children {
         get => from child in transform.Cast<Transform>()

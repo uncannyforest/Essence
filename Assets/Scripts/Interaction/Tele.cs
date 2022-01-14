@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -66,12 +67,14 @@ public class Tele {
 
     public SpriteSorter SelectCharacterWithFilter(Vector2 point, Func<Transform, bool> characterFilter) {
         Collider2D[] colliders = Physics2D.OverlapPointAll(point, LayerMask.GetMask("Clickable"));
-        if (colliders.Length > 0) return colliders
+        if (colliders.Length == 0) return null;
+        IEnumerable<Transform> charactersFiltered = colliders
                 .Select(collider => collider.transform.parent)
-                .Where(characterFilter)
+                .Where(characterFilter);
+        if (charactersFiltered.Count() == 0) return null;
+        return charactersFiltered
                 .MinBy(transform => Vector2.Distance((Vector2)transform.position, point))
                 .GetComponentInChildren<SpriteSorter>();
-        return null;
     }
 
     public Terrain.Position? SelectBuildLoc(Vector2 point) {

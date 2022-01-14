@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -58,4 +59,15 @@ public class SpriteSorter : MonoBehaviour {
         result.transform.localPosition = new Vector3(0, 0, z);
         return result;
     }
+
+    public Transform Character {
+        get => orientable.rootParent.transform;
+    }
+    public T GetCharacterComponent<T>() where T : Component =>
+        orientable.rootParent.GetComponentStrict<T>();
+
+    new public T GetComponent<T>() where T : Component =>
+        throw new InvalidOperationException("You probably didn't want to call GetComponent on a SpriteSorter.  Try GetCharacterComponent?");
+    public T GetComponentStrict<T>() where T : Component =>
+        throw new InvalidOperationException("You probably didn't want to call GetComponent on a SpriteSorter.  Try GetCharacterComponent?");
 }
