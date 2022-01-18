@@ -22,6 +22,7 @@ public class BrainConfig {
     public float reconsiderRateTarget = 2.5f;
     public float reconsiderRatePursuit = 1f;
     public float scanningRate = 1f;
+    public bool scanForFocusWhenFollowing = true;
     public bool hasAttack = false;
     public float timidity = .75f;
 
@@ -32,6 +33,9 @@ public class BrainConfig {
         Twelve
     }
     public static Dictionary<AIDirections, Vector2[]> AIDirectionVectors = new Dictionary<AIDirections, Vector2[]>() {
+        [AIDirections.Four] = new Vector2[] {
+            Vct.F(0.7071067812f, 0.7071067812f),
+        },
         [AIDirections.Twelve] = new Vector2[] {
             Vct.F(1f, 0.2679491924f), // tan(15)
             Vct.F(0.7071067812f, 0.7071067812f),
@@ -43,14 +47,14 @@ public class BrainConfig {
 //                 | Scanning | Investigating | Focused | attackDir. | executeDir. | pairDir.
 // ----------------+----------+---------------+---------+------------+-------------+----------
 // Roam            | ALWAYS   | defensively   | defens. |            |             |
-// Follow          | hasAtta. | defensively   | defens. |            |             |
+// Follow          | sffwf.  | defensively   | defens. |            |             |
 // FollowOffensive | ALWAYS   | ifnt dir/vis  | ifnt dv | if directd |             |
 // Station         | ALWAYS   | defensively   | defens. |            |             |
 // Execute         |          |               |         |            | ALWAYS      |
 // Pair            |          |               |         |            |             | ALWAYS
 
 public class Brain {
-    protected BrainConfig general;
+    public BrainConfig general;
     protected Species species;
     protected Creature creature;
     protected Terrain terrain;
@@ -117,7 +121,7 @@ public class Brain {
             state == CreatureState.Roam ||
             state == CreatureState.Station ||
             state == CreatureState.FollowOffensive ||
-            (state == CreatureState.Follow && general.hasAttack);
+            (state == CreatureState.Follow && general.scanForFocusWhenFollowing);
     }
     private CreatureState state = CreatureState.Roam;
     private bool badState = false; // wait one frame for CleanUpState()

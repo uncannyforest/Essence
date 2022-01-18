@@ -66,7 +66,7 @@ public class Creature : MonoBehaviour {
     public List<CreatureAction> action = new List<CreatureAction>();
 
     private const float despawnTime = 128f;
-    public const float neighborhood = 6;
+    public const float neighborhood = 6.5f;
 
     new private Rigidbody2D rigidbody;
     private SpriteSorter spriteManager;
@@ -113,6 +113,7 @@ public class Creature : MonoBehaviour {
     }
 
     public void FollowOffensive(Transform target) {
+        if (!brain.general.hasAttack) return;
         Debug.Log(gameObject + " received message to attack " + target);
         // Generally offensive, when no target specified
         if (target == null) brain.EnableFollowOffensiveNoTarget();

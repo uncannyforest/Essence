@@ -49,7 +49,7 @@ public class Fauna : MonoBehaviour {
     }
 
     private GameObject IdentifyCreature() {
-        return creatureLibrary.archer;
+        return Randoms.CoinFlip ? creatureLibrary.bunny : creatureLibrary.archer;
     }
 
     private void Populate() {
