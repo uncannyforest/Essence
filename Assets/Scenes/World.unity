@@ -412,7 +412,7 @@ MonoBehaviour:
   rows: 1
   offset: 2
   itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
-  material1: 11
+  material1: 9
   material2: 3
 --- !u!1 &91696533
 GameObject:
@@ -36373,8 +36373,8 @@ MonoBehaviour:
   rows: 1
   offset: 2
   itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
-  material1: 9
-  material2: 10
+  material1: 7
+  material2: 8
 --- !u!1 &1332636168
 GameObject:
   m_ObjectHideFlags: 0
@@ -37289,7 +37289,7 @@ MonoBehaviour:
   rows: 1
   offset: 2
   itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
-  material1: 7
+  material1: 6
   material2: 3
 --- !u!1001 &1892094271
 PrefabInstance:
