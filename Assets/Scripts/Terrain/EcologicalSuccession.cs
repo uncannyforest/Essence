@@ -36,11 +36,11 @@ public class EcologicalSuccession : MonoBehaviour {
 
         Vector2Int location = center;
         Land? attemptedGrowth = null;
-        int seed = Random.Range(0, 4096);
+        int seed = Random.Range(0, 8192);
         while (seed >= 0) {
             location = GetCloseLocation(center, radius);
             attemptedGrowth = MaybeGrow(location, out int probability);
-            seed -= 4096 / probability;
+            seed -= 8192 / probability;
         }
 
         if (attemptedGrowth is Land growth) {
@@ -54,11 +54,11 @@ public class EcologicalSuccession : MonoBehaviour {
     private Land? MaybeGrow(Vector2Int location, out int prob) {
         Construction currentRoof = terrain.Roof[location];
         if (currentRoof == Construction.Wood) {
-            prob = 256;
+            prob = 512;
             return Land.Woodpile;
         }
         if (currentRoof == Construction.Stone) {
-            prob = 256;
+            prob = 512;
             return Land.Rockpile;
         }
 
@@ -67,15 +67,16 @@ public class EcologicalSuccession : MonoBehaviour {
                 IsSurrounded(currentLand, location, (Random.value < 0.5f), out bool includingWater, out int count)
                 is Land surroundingLand) {
             if (currentLand != Land.Ditch) {
+                Land newLand = (Land)(Random.Range((int)ToGrassOrFlora(currentLand), (int)surroundingLand) + 1);
                 if (!includingWater) {
                     if (count >= 3) prob = 1;
-                    else if (count == 2) prob = currentLand == Land.Grass ? 16 : 4;
-                    else prob = currentLand == Land.Grass ? 256 : 128;
+                    else if (count == 2) prob = newLand == Land.Forest ? 32 : newLand == Land.Shrub ? 4 : 8;
+                    else prob = newLand == Land.Shrub ? 128 : 256;
                 } else {
-                    if (count >= 3) prob = 16;
-                    else prob = currentLand == Land.Grass ? 256 : 128;
+                    if (count >= 3) prob = newLand == Land.Forest ? 8 : newLand == Land.Shrub ? 2 : 4;
+                    else prob = newLand == Land.Forest ? 64 : 32;
                 }
-                return (Land)(Random.Range((int)ToGrassOrFlora(currentLand), (int)surroundingLand) + 1);
+                return newLand;
              } else {
                 if (count >= 3) prob = 2;
                 else if (count == 2) prob = 32;
@@ -87,29 +88,29 @@ public class EcologicalSuccession : MonoBehaviour {
         int random;
         switch (currentLand) {
             case Land.Shrub:
-                prob = 256;
+                prob = 512;
                 return Land.Forest;
             case Land.Meadow:
-                prob = 256;
+                prob = 512;
                 return Random.Range(0, 17) == 0 ? Land.Forest : Land.Shrub;
             case Land.Grass:
-                prob = 512;
+                prob = 1024;
                 random = Random.Range(0, 18);
                 return random == 0 ? Land.Forest : random == 1 ? Land.Shrub : Land.Meadow;
             case Land.Ditch:
-                prob = 1024;
+                prob = 2048;
                 random = Random.Range(0, 18);
                 return random == 0 ? Land.Forest : random == 1 ? Land.Shrub : Land.Meadow;
             case Land.Woodpile:
             case Land.Rockpile:
-                prob = 2048;
+                prob = 4096;
                 return Land.Meadow;
             case Land.Road:
-                prob = 4096;
+                prob = 8192;
                 return Land.Meadow;
         }
 
-        prob = 4096;
+        prob = 8192;
         return null;
     }
 
