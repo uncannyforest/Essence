@@ -1,22 +1,90 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
     public PlayerCharacter playerScript;
     public WorldInteraction world;
-    public TextDisplay textDisplay;
+    public TextDisplay textDisplay; 
 
-    private ClickManager clicks;
-    private KeyboardManager keys;
+    public static Vector2 PointerPosition {
+        get {
+            Vector3 mouse = Input.mousePosition;
+            return Camera.main.ScreenToWorldPoint(mouse);
+        }
+    } 
 
-    void Start() {
-        clicks = new ClickManager(world);
-        keys = new KeyboardManager(playerScript, world, textDisplay);
+    private Collider2D CheckForObject(Vector2 mousePos2D) {
+            RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
+            return hit.collider;
     }
 
-    void Update() {
-        clicks.Update();
-        keys.Update();
+    public void Update() {
+        if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
+            world.PointerMove(PointerPosition);
+        }
+
+        if (SimpleInput.GetButtonDown("Pause")) {
+            textDisplay.ToggleFullText();
+        }
+		if (SimpleInput.GetButtonDown("Fire")) {
+            if (textDisplay.IsFullTextUp) {
+                textDisplay.HideFullText();
+            } else {
+			    world.Confirm(PointerPosition);
+            }
+		}
+
+        if (Input.GetKeyDown("1")) {
+            world.PlayerAction = WorldInteraction.Mode.Sword;
+        }
+        if (Input.GetKeyDown("2")) {
+            world.PlayerAction = WorldInteraction.Mode.Arrow;
+        }
+        if (Input.GetKeyDown("3")) {
+            world.PlayerAction = WorldInteraction.Mode.Praxel;
+        }
+        if (Input.GetKeyDown("4")) {
+            world.PlayerAction = WorldInteraction.Mode.WoodBuilding;
+        }
+        if (Input.GetKeyDown("5")) {
+            world.PlayerAction = WorldInteraction.Mode.Sod;
+        }
+        if (Input.GetKeyDown("6")) {
+            world.PlayerAction = WorldInteraction.Mode.Taming;
+        }
+        if (Input.GetKeyDown("7")) {
+            world.MaybeUseCreatureAction(0);
+        }
+        if (Input.GetKeyDown("8")) {
+            world.MaybeUseCreatureAction(1);
+        }
+        if (Input.GetKeyDown("9")) {
+            world.MaybeUseCreatureAction(2);
+        }
+        if (Input.GetKeyDown("0")) {
+            world.MaybeUseCreatureAction(3);
+        }
+
+        float h = Math.Sign(SimpleInput.GetAxis("Horizontal"));
+        float v = Math.Sign(SimpleInput.GetAxis("Vertical"));
+        float ne = Math.Sign(SimpleInput.GetAxis("Diagonal NE"));
+        float nw = Math.Sign(SimpleInput.GetAxis("Diagonal NW"));
+
+        Vector2 move = Orientor.WorldFromScreen(
+            new ScreenVector(new Vector2(h, v) + ne * new Vector2(1, 1) + nw * new Vector2(-1, 1)));
+        Vector2Int moveUnit = new Vector2Int(move.x > .1 ? 1 : move.x < -.1 ? -1 : 0, move.y > .1 ? 1 : move.y < -.1 ? -1 : 0);
+        playerScript.InputVelocity = (Input.GetKey("left shift") || Input.GetKey("right shift"))
+            ? Vector2Int.zero : moveUnit;
+        world.PlayerMove(moveUnit);
+
+        int rotate = 0;
+        if (SimpleInput.GetButtonDown("Camera Right")) {
+            rotate = 270;
+        } else if (SimpleInput.GetButtonDown("Camera Left")) {
+            rotate = 90;
+        } else {
+            return;
+        }
+        Orientor.Rotation = (Orientation)(((int)Orientor.Rotation + rotate) % 360);
     }
 }
