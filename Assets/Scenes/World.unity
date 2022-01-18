@@ -40747,6 +40747,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8f4a38f4686249f890bf523cb7d51b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bunny: {fileID: 4481103850635713290, guid: d4d4ebbc99b91449e90944b5e778759e, type: 3}
   archer: {fileID: 4481103850635713290, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
 --- !u!114 &2120764636
 MonoBehaviour:

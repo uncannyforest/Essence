@@ -71,6 +71,7 @@ public class Creature : MonoBehaviour {
     new private Rigidbody2D rigidbody;
     private SpriteSorter spriteManager;
     public SpriteSorter SpriteManager { get => spriteManager; }
+    private Animator animator; // may be null
 
     void Start() {
         brain = species.Brain(brainConfig).InitializeAll();
@@ -79,6 +80,7 @@ public class Creature : MonoBehaviour {
         rigidbody = GetComponentInChildren<Rigidbody2D>();
         spriteManager = GetComponentInChildren<SpriteSorter>();
         GetComponent<Team>().changed += TeamChangedEventHandler;
+        animator = GetComponentInChildren<Animator>(); // may be null
     }
 
     private void InitializeActionList(Brain brain) {
@@ -147,9 +149,14 @@ public class Creature : MonoBehaviour {
         }
     }
 
+    private Vector2 velocity = Vector2.zero;
     public Vector2 InputVelocity {
-        get => brain.velocity;
-        set => brain.velocity = value;
+        get => velocity;
+        set {
+            velocity = value;
+            animator?.SetFloat("Velocity X", value.x);
+            animator?.SetFloat("Velocity Y", value.y);
+        }
     }
     private float timeDoneMoving = 0;
     public void FixedUpdate() {

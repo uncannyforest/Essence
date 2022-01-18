@@ -64,7 +64,10 @@ public class Brain {
     protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
     protected Transform transform { get => species.transform; }
 
-    public Vector2 velocity = Vector2.zero;
+    public Vector2 velocity {
+        get => creature.InputVelocity;
+        set => creature.InputVelocity = value;
+    }
 
     public CreatureState State {
         get => state;

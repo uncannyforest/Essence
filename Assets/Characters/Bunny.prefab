@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 4481103850635713299}
   - component: {fileID: 6486091420523554066}
   - component: {fileID: -7616915303342351412}
+  - component: {fileID: 3938203489945016266}
   m_Layer: 10
   m_Name: Bunny
   m_TagString: Untagged
@@ -265,6 +266,7 @@ MonoBehaviour:
     reconsiderRateTarget: 2.5
     reconsiderRatePursuit: 1
     scanningRate: 1
+    scanForFocusWhenFollowing: 1
     hasAttack: 0
     timidity: 0.75
   species: {fileID: -7616915303342351412}
@@ -362,6 +364,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     healAction: {fileID: 0}
+    healDistance: 1
+    healQuantity: 10
+    healTime: 0.1
+--- !u!95 &3938203489945016266
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 77cdfe2d2be7a4573a25667c023d1ef0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0
