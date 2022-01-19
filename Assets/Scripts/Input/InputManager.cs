@@ -4,7 +4,8 @@ using UnityEngine;
 public class InputManager : MonoBehaviour {
     public PlayerCharacter playerScript;
     public WorldInteraction world;
-    public TextDisplay textDisplay; 
+    public TextDisplay textDisplay;
+    public bool useWASD;
 
     public static Vector2 PointerPosition {
         get {
@@ -16,6 +17,23 @@ public class InputManager : MonoBehaviour {
     private Collider2D CheckForObject(Vector2 mousePos2D) {
             RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
             return hit.collider;
+    }
+
+    private Vector2Int GetLeftHandDirection() {
+        int x = 0;
+        int y = 0;
+        if (useWASD) {
+            if (Input.GetKey("w")) y += 1;
+            if (Input.GetKey("a")) x -= 1;
+            if (Input.GetKey("s")) y -= 1;
+            if (Input.GetKey("d")) x += 1;
+        } else {
+            if (Input.GetKey("a")) { x -= 1; y -= 1; }
+            if (Input.GetKey("w")) { x -= 1; y += 1; }
+            if (Input.GetKey("e")) { x += 1; y += 1; }
+            if (Input.GetKey("f")) { x += 1; y -= 1; }
+        }
+        return new Vector2Int(x, y);
     }
 
     public void Update() {
@@ -67,11 +85,9 @@ public class InputManager : MonoBehaviour {
 
         float h = Math.Sign(SimpleInput.GetAxis("Horizontal"));
         float v = Math.Sign(SimpleInput.GetAxis("Vertical"));
-        float ne = Math.Sign(SimpleInput.GetAxis("Diagonal NE"));
-        float nw = Math.Sign(SimpleInput.GetAxis("Diagonal NW"));
 
         Vector2 move = Orientor.WorldFromScreen(
-            new ScreenVector(new Vector2(h, v) + ne * new Vector2(1, 1) + nw * new Vector2(-1, 1)));
+            new ScreenVector(new Vector2(h, v) + GetLeftHandDirection()));
         Vector2Int moveUnit = new Vector2Int(move.x > .1 ? 1 : move.x < -.1 ? -1 : 0, move.y > .1 ? 1 : move.y < -.1 ? -1 : 0);
         playerScript.InputVelocity = (Input.GetKey("left shift") || Input.GetKey("right shift"))
             ? Vector2Int.zero : moveUnit;
