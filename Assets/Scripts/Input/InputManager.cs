@@ -6,6 +6,12 @@ public class InputManager : MonoBehaviour {
     public WorldInteraction world;
     public TextDisplay textDisplay;
     public bool useWASD;
+     [TextArea(6, 12)] public string keysTip = "Number keys (<color=#c06000>1</color>-<color=#c06000>0</color>) - select action\n" +
+        "<color=#c06000>space</color> or left click - use action\n" +
+        "<color=#c06000>,</color> (<color=#c06000><</color>) and <color=#c06000>.</color> (<color=#c06000>></color>) - rotate view\n" +
+        "<color=#c06000>Shift</color> - aim with directional keys\n" +
+        "<color=#c06000>P</color> or <color=#c06000>Esc</color> - pause\n" +
+        "<color=#c06000>/</color> - this menu";
 
     void Start() {
         SelectAction2();
@@ -58,6 +64,9 @@ public class InputManager : MonoBehaviour {
 
         if (SimpleInput.GetButtonDown("Pause")) {
             textDisplay.ToggleFullText();
+        }
+        if (SimpleInput.GetButtonDown("Help")) {
+            textDisplay.ShowFullText(keysTip);
         }
 		if (SimpleInput.GetButtonDown("Fire")) {
             if (textDisplay.IsFullTextUp) {

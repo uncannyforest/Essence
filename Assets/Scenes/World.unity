@@ -569,6 +569,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fullText: {fileID: 428603478}
   defaultText: '                           Paused'
+  secondTip: Navigate along the grid using the AWEF keys. You can change this to
+    WASD with the button in the lower left.
 --- !u!1 &114661456
 GameObject:
   m_ObjectHideFlags: 0
@@ -5300,6 +5302,21 @@ MonoBehaviour:
   world: {fileID: 2120764634}
   textDisplay: {fileID: 109813217}
   useWASD: 0
+  keysTip: 'Number keys (<color=#c06000>1</color>-<color=#c06000>0</color>) - select
+    action
+
+    <color=#c06000>space</color> or left click - use action<color=#c06000>
+
+    ,</color>
+    (<color=#c06000><</color>) and <color=#c06000>.</color> (<color=#c06000>></color>)
+    - rotate view
+
+    <color=#c06000>Shift</color> - aim with directional keys
+
+    <color=#c06000>P</color>
+    or <color=#c06000>Esc</color> - pause
+
+    <color=#c06000>/</color> - this menu'
 --- !u!60 &403460087
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -5487,10 +5504,10 @@ RectTransform:
   m_Father: {fileID: 711718557}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1, y: -1}
-  m_SizeDelta: {x: 186, y: 90.41043}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 186, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &428603478
 MonoBehaviour:
@@ -5528,18 +5545,19 @@ MonoBehaviour:
   m_Text: 'Welcome to this alpha build of <color=#00c060>Essence</color>.
 
 
-    Change
-    actions using the number keys; the display at the bottom is not clickable yet. 
-    Execute an action with the spacebar or left mouse click.
+    The
+    4 fountains become spawn points when you capture them.  Your mission is to capture
+    the other 3 by standing under them for 5 seconds.
 
 
-    The 4 fountains
-    become spawn points when you capture them.  The goal is to capture the other
-    3 by standing under them for 5 seconds.
+    Change actions using
+    the number keys; Execute an action with the spacebar or left mouse click.
 
 
-    Tame creatures (action #6) with
-    2 orange scales.
+    You
+    can pause with <color=#c06000>P</color> or <color=#c06000>Esc</color>. Or, press
+    <color=#c06000>/</color> to see even more keybindings you don''t necessarily
+    need.
 
 
     Press space or left click to continue.'
@@ -6010,7 +6028,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &711718557
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6029,7 +6047,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 188, y: 92.41043}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &711718558
 MonoBehaviour:
@@ -38348,7 +38366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

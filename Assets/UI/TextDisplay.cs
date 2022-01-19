@@ -6,10 +6,19 @@ using UnityEngine.UI;
 public class TextDisplay : MonoBehaviour {
     public Text fullText;
     public string defaultText = "Paused";
+    public string secondTip = "Navigate along the grid using the AWEF keys. You can change this to WASD with the button in the lower left.";
 
     private bool isFullTextUp = true;
     public bool IsFullTextUp {
         get => isFullTextUp;
+    }
+
+    private HashSet<string> infoDisplayed = new HashSet<string>();
+
+    public static TextDisplay I;
+
+    void Awake() {
+        I = this;
     }
 
     void Start() {
@@ -23,6 +32,10 @@ public class TextDisplay : MonoBehaviour {
     }
 
     public void HideFullText() {
+        if (!DisplayedYet("second tip")) { // Also how to use DisplayedYet and CheckpointInfo in other classes.
+            CheckpointInfo("second tip", secondTip);
+            return;
+        }
         fullText.transform.parent.gameObject.SetActive(false);
         Time.timeScale = 1;
         isFullTextUp = false;
@@ -34,4 +47,11 @@ public class TextDisplay : MonoBehaviour {
         Time.timeScale = 0;
         isFullTextUp = true;
     }
+
+    public void CheckpointInfo(string key, string content) {
+        infoDisplayed.Add(key);
+        ShowFullText(content);
+    }
+
+    public bool DisplayedYet(string key) => infoDisplayed.Contains(key);
 }
