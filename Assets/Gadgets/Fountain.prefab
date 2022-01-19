@@ -212,8 +212,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 300
+  max: 300
+  startAtMax: 1
+  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
+  statBarColor: {r: 1, g: 1, b: 1, a: 1}
   itemDrop: {fileID: 0}
   itemDropSize: 0
-  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   collectiblePrefab: {fileID: 0}

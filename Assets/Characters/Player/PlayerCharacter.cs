@@ -32,7 +32,7 @@ public class PlayerCharacter : MonoBehaviour {
         rigidbody = GetComponentInChildren<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         health = GetComponent<Health>();
-        health.Died += HandleDeath;
+        health.ReachedZero += HandleDeath;
     }
 
     public WorldInteraction Interaction { // Implmentation will change when I add multiplayer

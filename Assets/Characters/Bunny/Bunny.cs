@@ -29,6 +29,9 @@ public class BunnyBrain : Brain {
         };
     }
 
+    override public bool CanTame(Transform player) => true;
+    override public bool ExtractTamingCost(Transform player) => true;
+
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);

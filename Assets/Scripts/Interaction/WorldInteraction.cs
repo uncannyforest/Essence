@@ -248,7 +248,7 @@ public class WorldInteraction : MonoBehaviour {
 
     }
 
-    public void PointerMove(Vector2 pointer) {
+    public void PointerMove(Vector2 pointer, bool duringPress) {
         switch (PlayerAction) {
             case Mode.Arrow:
                 rangedSelect.PointerToKeys(PointerForRanged(pointer));
@@ -269,6 +269,7 @@ public class WorldInteraction : MonoBehaviour {
                 }
             break;
             case Mode.Taming:
+                if (duringPress) break;
                 SpriteSorter newActiveCharacter = teleSelect.SelectCharacterOnly(pointer);
                 if (newActiveCharacter == activeCharacter) break;
                 if (activeCharacter != null) ClearCharacter();
@@ -277,6 +278,7 @@ public class WorldInteraction : MonoBehaviour {
                     activeCharacterHighlight = NewCharacterHighlight(activeCharacter, true);
             break;
             case Mode.Directing:
+                if (duringPress) break;
                 ClearTile();
                 ClearCharacter();
                 OneOf<Terrain.Position, SpriteSorter> target = teleSelect.SelectDynamic(pointer);
@@ -301,6 +303,7 @@ public class WorldInteraction : MonoBehaviour {
 
     public void Confirm(Vector2 worldPoint) {
         Vector2Int coord;
+        Creature creature;
         switch (PlayerAction) {
             case Mode.Sword:
                 meleeSelect.Damage(player.GetComponent<Team>().TeamId);
@@ -357,25 +360,47 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;
-                if (!activeCharacter.GetCharacterComponent<Team>().SameTeam(player)
-                    && !inventory.Retrieve(Material.Type.Scale, scaleCost)) {
-                        Debug.Log("YOU HAVE INSUFFICIENT SCALES TO TAME");
-                        break;
+                if (activeCharacter.GetCharacterComponent<Team>().SameTeam(player)) {
+                    activeCharacter.GetCharacterComponent<Creature>().Follow(player);
+                    ActiveCharacterToFollowing();
+                } else {
+                    creature = activeCharacter.GetCharacterComponent<Creature>();
+                    if (creature.CanTame(player)) {
+                        GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
+                        if (taste != null) {
+                            taste.StartTaming(player, ActiveCharacterToFollowing);
+                        } else {
+                            bool tamed = creature.TryTame(player);
+                            if (tamed) ActiveCharacterToFollowing();
+                            else Debug.Log(creature.TamingInfo);
+                        }
+                    } else Debug.Log(creature.TamingInfo);
                 }
-                activeCharacter.GetCharacterComponent<Creature>().Tame(player);
-                ActiveCharacterToFollowing();
             break;
             case Mode.Directing:
                 OneOf<Terrain.Position, SpriteSorter> target = teleSelect.SelectDynamic(worldPoint);
                 if (target.IsNeither) return;
                 ClearCharacter();
                 ClearTile();
-                Creature creature = PeekFollowing();
+                creature = PeekFollowing();
                 if (creature != null) {
                     ForcePopFollowing();
                     CurrentAction.CreatureAction.pendingDirective(creature, target);
                 }
                 PlayerAction = Mode.Taming;
+            break;
+        }
+    }
+
+    public void ConfirmComplete(Vector2 worldPoint) {
+        switch (PlayerAction) {
+            case Mode.Taming:
+                if (activeCharacter == null) break;
+                GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
+                if (taste != null) {
+                    string result = taste.StopTaming(player);
+                    if (result != null) Debug.Log(result);
+                }
             break;
         }
     }

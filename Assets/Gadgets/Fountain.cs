@@ -25,7 +25,7 @@ public class Fountain : MonoBehaviour {
     void Start() {
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
-        health.Died += HandleDeath;
+        health.ReachedZero += HandleDeath;
         if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
     }
 
@@ -41,10 +41,10 @@ public class Fountain : MonoBehaviour {
     void FixedUpdate() {
         if (enemyPresent) {
             if (collider.IsTouching(enemy))
-                health.Decrease((int)(health.maxHealth * Time.fixedDeltaTime / timeToCapture), enemy.transform);
+                health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy.transform);
             else enemyPresent = false;
         } else if (!health.IsFull()) {
-            health.Increase((int)(health.maxHealth * Time.fixedDeltaTime / timeToReset));
+            health.Increase((int)(health.max * Time.fixedDeltaTime / timeToReset));
         }
     }
 

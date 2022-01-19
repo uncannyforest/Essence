@@ -516,12 +516,14 @@ MonoBehaviour:
     reconsiderRateTarget: 2.5
     reconsiderRatePursuit: 1
     scanningRate: 1
+    scanForFocusWhenFollowing: 1
     hasAttack: 1
     timidity: 0.5
   species: {fileID: 4481103850635713288}
   creatureName: Archer
   icon: {fileID: -7132172409892320828, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   breastplate: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  tamingInfo: Takes two scales to tame
   personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!114 &4481103850635713288
@@ -538,6 +540,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
+    scaleCost: 2
     arrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
 --- !u!114 &4481103850635713293
 MonoBehaviour:
@@ -551,10 +554,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  max: 100
+  startAtMax: 1
+  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
+  statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   itemDrop: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
   itemDropSize: 1
-  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   collectiblePrefab: {fileID: 0}
 --- !u!50 &4481103850635713295
 Rigidbody2D:

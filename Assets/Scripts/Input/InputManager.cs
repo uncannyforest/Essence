@@ -22,7 +22,10 @@ public class InputManager : MonoBehaviour {
             Vector3 mouse = Input.mousePosition;
             return Camera.main.ScreenToWorldPoint(mouse);
         }
-    } 
+    }
+    public static bool Clicking {
+        get => SimpleInput.GetButton("Fire");
+    }
 
     private Collider2D CheckForObject(Vector2 mousePos2D) {
             RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
@@ -59,7 +62,7 @@ public class InputManager : MonoBehaviour {
 
     public void Update() {
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
-            world.PointerMove(PointerPosition);
+            world.PointerMove(PointerPosition, Clicking);
         }
 
         if (SimpleInput.GetButtonDown("Pause")) {
@@ -75,6 +78,9 @@ public class InputManager : MonoBehaviour {
 			    world.Confirm(PointerPosition);
             }
 		}
+        if (SimpleInput.GetButtonUp("Fire")) {
+            world.ConfirmComplete(PointerPosition);
+        }
 
         if (Input.GetKeyDown("1")) SelectAction1();
         if (Input.GetKeyDown("2")) SelectAction2();

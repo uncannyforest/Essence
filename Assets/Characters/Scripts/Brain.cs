@@ -24,7 +24,7 @@ public class BrainConfig {
     public float scanningRate = 1f;
     public bool scanForFocusWhenFollowing = true;
     public bool hasAttack = false;
-    public float timidity = .75f;
+    public float timidity = .75f;   
 
     public enum AIDirections {
         Infinite,
@@ -145,9 +145,8 @@ public class Brain {
     public Brain InitializeAll() {
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
-        GetComponentStrict<Team>().changed += OnTeamChanged;
         Health health = GetComponent<Health>();
-        if (health != null) health.Died += HandleDeath;
+        if (health != null) health.ReachedZero += HandleDeath;
         TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
         ScanningBehavior = new CoroutineWrapper(ScanningBehaviorE, species);
         FocusedBehavior = new CoroutineWrapper(FocusedBehaviorE, species);
@@ -157,8 +156,9 @@ public class Brain {
     }
     virtual protected void Initialize() {}
     virtual public List<CreatureAction> Actions() { return new List<CreatureAction>(); }
-    virtual protected void OnTeamChanged(int team) {}
     virtual protected void Attack() {}
+    virtual public bool CanTame(Transform player) { return false; }
+    virtual public bool ExtractTamingCost(Transform player) { return false; }
 
     protected CoroutineWrapper ScanningBehavior;
     virtual protected IEnumerator ScanningBehaviorE() { yield break; }
@@ -269,9 +269,6 @@ public class Brain {
     public void TryIndicateAttack(Transform assailant, bool forceUpdateInvestigation) {
         if (Busy) return;
         bool canSee = CanSee(assailant);
-        if (GetComponentStrict<Team>().TeamId == 1) {
-            Debug.Log(species.gameObject + (canSee ? " can see " : " is investigating ") + assailant.gameObject);
-        }
         if (canSee) IndicateAttack(assailant);
         else IndicateAttack(assailant.position, forceUpdateInvestigation);
     }

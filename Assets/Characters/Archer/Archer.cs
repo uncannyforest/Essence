@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 [Serializable]
 public class ArcherConfig {
     public Sprite attackAction;
+    public int scaleCost;
     public Arrow arrowPrefab;
 }
 
@@ -22,6 +23,14 @@ public class ArcherBrain : Brain {
 
     public ArcherBrain(Archer species, BrainConfig general, ArcherConfig archer) : base(species, general) {
         this.archer = archer;
+    }
+
+    override public bool CanTame(Transform player) =>
+        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Scale, archer.scaleCost);
+
+    // Returns true if successful.
+    public override bool ExtractTamingCost(Transform player) {
+        return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Scale, archer.scaleCost);
     }
 
     override public List<CreatureAction> Actions() {

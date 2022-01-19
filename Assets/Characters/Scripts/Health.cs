@@ -2,51 +2,22 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Team))]
-public class Health : MonoBehaviour {
-    public int maxHealth;
+public class Health : StatusQuantity {
     public Collectible itemDrop;
     public int itemDropSize = 0;
-    public GameObject statBarPrefab;
     public Collectible collectiblePrefab;
 
-    private int level;
-    private StatBar healthBar;
     private Transform grid;
-
-    public Action Died;
-
-    public int Level {
-        get => level;
-    }
     
-    void Awake() {
-        level = maxHealth;
-        healthBar = StatBar.Instantiate(statBarPrefab, this, new Color(.8f, 0, .2f));
-        Died += HandleDeath;
+    override protected void Awake() {
+        base.Awake();
+        ReachedZero += HandleDeath;
         grid = GameObject.FindObjectOfType<Grid>().transform;
     }
 
-    public void Reset() {
-        level = maxHealth;
-        healthBar.SetPercentWithoutVisibility((float) level / maxHealth);
-    }
-
-    public bool IsFull() {
-        return level == maxHealth;
-    }
-
     public void Decrease(int quantity, Transform blame) {
-        level -= quantity;
-        if (level > 0) {
-            healthBar.SetPercent((float) level / maxHealth);
-            GetComponent<Team>()?.OnAttack(blame);
-        }
-        else Died();
-    }
-
-    public void Increase(int quantity) {
-        level = Math.Min(maxHealth, level + quantity);
-        healthBar.SetPercent((float) level / maxHealth);
+        GetComponent<Team>()?.OnAttack(blame);
+        Decrease(quantity);
     }
 
     public void HandleDeath() {
@@ -71,9 +42,5 @@ public class Health : MonoBehaviour {
             }
             inventory.Clear();
         }
-    }
-
-    void HideStatBar() {
-        healthBar.Hide();
     }
 }

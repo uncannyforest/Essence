@@ -63,6 +63,8 @@ public class SpriteSorter : MonoBehaviour {
     public Transform Character {
         get => orientable.rootParent.transform;
     }
+    public T MaybeGetCharacterComponent<T>() where T : Component =>
+        orientable.rootParent.GetComponent<T>();
     public T GetCharacterComponent<T>() where T : Component =>
         orientable.rootParent.GetComponentStrict<T>();
 

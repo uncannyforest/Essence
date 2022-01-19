@@ -52,6 +52,7 @@ public class Creature : MonoBehaviour {
     public string creatureName;
     public Sprite icon;
     public Sprite breastplate;
+    public string tamingInfo = "This creature cannot be tamed.";
     public float personalBubble = .25f;
 
     public const int subGridUnit = 8;
@@ -94,10 +95,24 @@ public class Creature : MonoBehaviour {
             GetComponent<Team>().Color;
     }
 
-    public void Tame(Transform player) {
-        StopCoroutine(cMaybeDespawn);
-        GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
+    public void Follow(Transform player) {
         brain.CommandFollow(player);
+    }
+    // Can call without calling CanTame() first; result will indicate whether it succeeded
+    // If false, get TamingInfo for error
+    public bool TryTame(Transform player) {
+        if (brain.ExtractTamingCost(player)) {
+            StopCoroutine(cMaybeDespawn);
+            GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
+            Follow(player);
+            return true;
+        } else return false;
+    }
+    public bool CanTame(Transform player) {
+        return brain.CanTame(player);
+    }
+    public string TamingInfo {
+        get => tamingInfo;
     }
 
     public bool CanSee(Transform seen) => brain.CanSee(seen);

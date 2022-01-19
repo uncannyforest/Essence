@@ -58,6 +58,8 @@ public class Inventory : MonoBehaviour {
         return added;
     }
 
+    public bool CanRetrieve(Material.Type type, int quantity) => materials[type].Quantity >= quantity;
+
     public bool Retrieve(Material.Type type, int quantity) {
         if (materials[type].TryDecrease(quantity)) {
             if (itemsRetrievedEventHandler != null) itemsRetrievedEventHandler(type, quantity);
