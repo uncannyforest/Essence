@@ -355,6 +355,8 @@ public class Brain {
             return true;
         else {
             bool result = terrain.concealment.CanSee(transform, seenSprite);
+            if (!result && !TextDisplay.I.DisplayedYet("hiding")) TextDisplay.I.CheckpointInfo("hiding",
+                "The <color=#6000c0>" + creature.creatureName + "</color> nearby cannot see you.  You are hidden from enemies when deep in trees and buildings, unless they get close.");
             return result;
         }
     }
