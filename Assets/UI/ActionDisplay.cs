@@ -21,8 +21,11 @@ public class ActionDisplay : MonoBehaviour {
     public Image currentCreature;
     public Transform hotbar;
 
-    void Start() {
+    void Awake() {
         interaction.interactionChanged += InteractionChanged;
+    }
+
+    void Start() {
         for (int i = 0; i < 10; i++) {
             Transform creature = hotbar.GetChild(i).Find("Creature");
             creature.Find("Breastplate").GetComponent<Image>().color =

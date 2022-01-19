@@ -133,7 +133,7 @@ public class WorldInteraction : MonoBehaviour {
     }
     public void MaybeUseCreatureAction(int actionIndex) {
         Creature creature = PeekFollowing();
-        if (actionIndex >= creature.action.Count) return;
+        if (creature == null || actionIndex >= creature.action.Count) return;
         CreatureAction action = creature.action[actionIndex];
         if (action.IsInstant) {
             ForcePopFollowing();
