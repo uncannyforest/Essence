@@ -7,6 +7,10 @@ public class InputManager : MonoBehaviour {
     public TextDisplay textDisplay;
     public bool useWASD;
 
+    void Start() {
+        SelectAction2();
+    }
+
     public static Vector2 PointerPosition {
         get {
             Vector3 mouse = Input.mousePosition;
@@ -36,6 +40,17 @@ public class InputManager : MonoBehaviour {
         return new Vector2Int(x, y);
     }
 
+    public void SelectAction1() => world.PlayerAction = WorldInteraction.Mode.Sword;
+    public void SelectAction2() =>  world.PlayerAction = WorldInteraction.Mode.Arrow;
+    public void SelectAction3() =>  world.PlayerAction = WorldInteraction.Mode.Praxel;
+    public void SelectAction4() =>  world.PlayerAction = WorldInteraction.Mode.WoodBuilding;
+    public void SelectAction5() =>  world.PlayerAction = WorldInteraction.Mode.Sod;
+    public void SelectAction6() =>  world.PlayerAction = WorldInteraction.Mode.Taming;
+    public void SelectAction7() =>  world.MaybeUseCreatureAction(0);
+    public void SelectAction8() =>  world.MaybeUseCreatureAction(1);
+    public void SelectAction9() =>  world.MaybeUseCreatureAction(2);
+    public void SelectAction0() =>  world.MaybeUseCreatureAction(3);
+
     public void Update() {
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
             world.PointerMove(PointerPosition);
@@ -52,36 +67,16 @@ public class InputManager : MonoBehaviour {
             }
 		}
 
-        if (Input.GetKeyDown("1")) {
-            world.PlayerAction = WorldInteraction.Mode.Sword;
-        }
-        if (Input.GetKeyDown("2")) {
-            world.PlayerAction = WorldInteraction.Mode.Arrow;
-        }
-        if (Input.GetKeyDown("3")) {
-            world.PlayerAction = WorldInteraction.Mode.Praxel;
-        }
-        if (Input.GetKeyDown("4")) {
-            world.PlayerAction = WorldInteraction.Mode.WoodBuilding;
-        }
-        if (Input.GetKeyDown("5")) {
-            world.PlayerAction = WorldInteraction.Mode.Sod;
-        }
-        if (Input.GetKeyDown("6")) {
-            world.PlayerAction = WorldInteraction.Mode.Taming;
-        }
-        if (Input.GetKeyDown("7")) {
-            world.MaybeUseCreatureAction(0);
-        }
-        if (Input.GetKeyDown("8")) {
-            world.MaybeUseCreatureAction(1);
-        }
-        if (Input.GetKeyDown("9")) {
-            world.MaybeUseCreatureAction(2);
-        }
-        if (Input.GetKeyDown("0")) {
-            world.MaybeUseCreatureAction(3);
-        }
+        if (Input.GetKeyDown("1")) SelectAction1();
+        if (Input.GetKeyDown("2")) SelectAction2();
+        if (Input.GetKeyDown("3")) SelectAction3();
+        if (Input.GetKeyDown("4")) SelectAction4();
+        if (Input.GetKeyDown("5")) SelectAction5();
+        if (Input.GetKeyDown("6")) SelectAction6();
+        if (Input.GetKeyDown("7")) SelectAction7();
+        if (Input.GetKeyDown("8")) SelectAction8();
+        if (Input.GetKeyDown("9")) SelectAction9();
+        if (Input.GetKeyDown("0")) SelectAction0();
 
         float h = Math.Sign(SimpleInput.GetAxis("Horizontal"));
         float v = Math.Sign(SimpleInput.GetAxis("Vertical"));
