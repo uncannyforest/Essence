@@ -409,7 +409,7 @@ MonoBehaviour:
   startAtMax: 0
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
-  timeToTame: 3
+  timeToTame: 5
   insufficientTimeInfoShort: Whistle song (press and hold) to tame
   insufficientTimeInfoLong: The <creature/> will not be tamed unless you whistle
     a song for sufficient time.  Press and hold the left mouse button to whistle
