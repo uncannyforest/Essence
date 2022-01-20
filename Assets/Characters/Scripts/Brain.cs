@@ -69,6 +69,9 @@ public class Brain {
         set => creature.InputVelocity = value;
     }
 
+    ///////////////////
+    // STATE PROPERTIES
+
     public CreatureState State {
         get => state;
         set {
@@ -138,6 +141,9 @@ public class Brain {
     protected Transform attackDirective = null; // for FollowOffensive, can be null
     protected OneOf<Terrain.Position, SpriteSorter> executeDirective = null; // for Execute
 
+    /////////////////////////////////////////////
+    // INITIALIZATION, VIRTUAL, & UTILITY METHODS
+
     public Brain(Species species, BrainConfig general) {
         this.species = species;
         this.general = general;
@@ -168,7 +174,7 @@ public class Brain {
 
     protected T GetComponent<T>() => species.GetComponent<T>();
     protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
-
+    private void HandleDeath() => GameObject.Destroy(creature.gameObject);
     protected Vector2 RandomVelocity() {
         Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
         return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
@@ -179,6 +185,9 @@ public class Brain {
         int subIndex = index % aiDirections.Length;
         return aiDirections[subIndex].RotateRightAngles(rotation) * general.movementSpeed;
     }
+
+    /////////////////////////
+    // STATE UPDATE FUNCTIONS
 
     private void ClearFocus() {
         this.focus = null;
@@ -200,12 +209,12 @@ public class Brain {
             ExecutingBehavior = null;
         }
     }
-
     protected void ClearDirectives() {
         followDirective = null;
         attackDirective = null;
         stationDirective = Vector2.zero;
     }
+
     public void CommandFollow(Transform directive) {
         ClearDirectives();
         followDirective = directive;
@@ -281,6 +290,9 @@ public class Brain {
                                (transform.position - Investigation)?.sqrMagnitude))
             Investigation = source;
     }
+
+    ///////////
+    // BEHAVIOR
 
     // Runs when not Focused
     protected CoroutineWrapper TrekkingBehavior;
@@ -360,13 +372,10 @@ public class Brain {
 
     // Sanity check for NearestThreat to avoid contradiction
     // OverlapCircleAll may produce colliders with center slightly outside Creature.neighborhood
-    protected bool IsThreat(Transform threat) {
-        return !GetComponentStrict<Team>().SameTeam(threat) && CanSee(threat);
-    }
+    protected bool IsThreat(Transform threat) =>
+        !GetComponentStrict<Team>().SameTeam(threat) && CanSee(threat);
 
-    protected Transform NearestThreat() {
-        return NearestThreat(null);
-    }
+    protected Transform NearestThreat() => NearestThreat(null);
     protected Transform NearestThreat(Func<Collider2D, bool> filter) {
         Collider2D[] charactersNearby =
             Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
@@ -379,10 +388,6 @@ public class Brain {
         }
         if (threats.Count == 0) return null;
         return threats.MinBy(threat => (threat.position - transform.position).sqrMagnitude);
-    }
-
-    private void HandleDeath() {
-        GameObject.Destroy(creature.gameObject);
     }
 
     // Call when in FollowOffensive but not Focused or Investigating.
@@ -400,6 +405,9 @@ public class Brain {
             Focus = null; // keep looking
         }
     }
+
+    ////////////////
+    // SANITY CHECKS
 
     public void Update() {
         StatePreChecks();
@@ -507,63 +515,5 @@ public class Brain {
             if (investigation != null) Investigation = null;
         }
         badState = false;
-    }
-}
-
-public class CoroutineWrapper {
-    protected Func<IEnumerator> enumeratorGenerator;
-    protected Coroutine coroutine;
-    protected MonoBehaviour attachedScript;
-    protected bool isRunning;
-
-    protected CoroutineWrapper() {}
-
-    public CoroutineWrapper(Func<IEnumerator> enumeratorGenerator, MonoBehaviour attachedScript) {
-        this.enumeratorGenerator = enumeratorGenerator;
-        this.attachedScript = attachedScript;
-    }
-
-    public void RunIf(bool on) {
-        if (on) Start();
-        else Stop();
-    }
-
-    public void Start() {
-        Stop();
-        isRunning = true;
-        coroutine = attachedScript.StartCoroutine(enumeratorGenerator.Invoke());
-    }
-
-    public void Stop() {
-        isRunning = false;
-        if (coroutine != null) attachedScript.StopCoroutine(coroutine);
-    }
-
-    public bool IsRunning {
-        get => isRunning;
-    }
-}
-
-public class RunOnce : CoroutineWrapper {
-    private Action action;
-    private float seconds;
-
-    public RunOnce(MonoBehaviour attachedScript, float seconds, Action action) {
-        this.action = action;
-        this.seconds = seconds;
-        this.attachedScript = attachedScript;
-        this.enumeratorGenerator = RunOnceE;
-    }
-
-    public static RunOnce Run(MonoBehaviour attachedScript, float seconds, Action action) {
-        RunOnce runOnce = new RunOnce(attachedScript, seconds, action);
-        runOnce.Start();
-        return runOnce;
-    }
-
-    private IEnumerator RunOnceE() {
-        yield return new WaitForSeconds(seconds);
-        action();
-        yield break;
     }
 }
