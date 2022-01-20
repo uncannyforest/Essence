@@ -5,11 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(Team))]
 public class GoodTaste : StatusQuantity {
     public float timeToTame;
-    public string insufficientTimeInfo = "Whistle song (press & hold) to tame";
+    public string insufficientTimeInfoShort = "Whistle song (press and hold) to tame";
+    public string insufficientTimeInfoLong = "The <creature/> will not be tamed unless you whistle a song for sufficient time.  Press and hold the left mouse button to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate it can hear you; when the stat bar reaches the end the <creature/> will be tamed.";
 
     private Transform tamer;
     private Action Tamed;
-    private string error = null;
+    private ExpandableInfo? error = null;
 
     override protected void Awake() {
         base.Awake();
@@ -21,14 +22,14 @@ public class GoodTaste : StatusQuantity {
         this.Tamed = tamedHandler;
     }
 
-    public string StopTaming(Transform tamer) {
-        if (this.tamer != tamer) return null;
+    public ExpandableInfo? StopTaming(Transform tamer) {
         if (tamer != null) {
+            if (this.tamer != tamer) return null;
             this.tamer = null;
             Reset();
-            return insufficientTimeInfo;
+            return Creature.GenerateTamingInfo(gameObject, insufficientTimeInfoShort, insufficientTimeInfoLong);
         } else {
-            string result = error;
+            ExpandableInfo? result = error;
             error = null;
             return result;
         }

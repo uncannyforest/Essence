@@ -274,7 +274,11 @@ MonoBehaviour:
   creatureName: Bunny
   icon: {fileID: 1185625210376227553, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
   breastplate: {fileID: -1622973192143475964, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
-  tamingInfo: Whistle song (press & hold) to tame
+  tamingInfoShort: Whistle song (press and hold) to tame
+  tamingInfoLong: The <creature/> will not be tamed unless you whistle a song for
+    sufficient time.  Press and hold the left mouse button to whistle a song.  A
+    blue stat bar will appear beneath the <creature/> to indicate it can hear you;
+    when the stat bar reaches the end the <creature/> will be tamed.
   personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!50 &4481103850635713295
@@ -405,7 +409,11 @@ MonoBehaviour:
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
   timeToTame: 3
-  insufficientTimeInfo: Whistle song (press & hold) to tame
+  insufficientTimeInfoShort: Whistle song (press and hold) to tame
+  insufficientTimeInfoLong: The <creature/> will not be tamed unless you whistle
+    a song for sufficient time.  Press and hold the left mouse button to whistle
+    a song.  A blue stat bar will appear beneath the <creature/> to indicate it can
+    hear you; when the stat bar reaches the end the <creature/> will be tamed.
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0

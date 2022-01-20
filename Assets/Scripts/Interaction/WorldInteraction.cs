@@ -372,9 +372,9 @@ public class WorldInteraction : MonoBehaviour {
                         } else {
                             bool tamed = creature.TryTame(player);
                             if (tamed) ActiveCharacterToFollowing();
-                            else Debug.Log(creature.TamingInfo);
+                            else TextDisplay.I.ShowTip(creature.TamingInfo);
                         }
-                    } else Debug.Log(creature.TamingInfo);
+                    } else TextDisplay.I.ShowTip(creature.TamingInfo);
                 }
             break;
             case Mode.Directing:
@@ -398,8 +398,8 @@ public class WorldInteraction : MonoBehaviour {
                 if (activeCharacter == null) break;
                 GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
                 if (taste != null) {
-                    string result = taste.StopTaming(player);
-                    if (result != null) Debug.Log(result);
+                    ExpandableInfo? result = taste.StopTaming(player);
+                    if (result is ExpandableInfo info) TextDisplay.I.ShowTip(info);
                 }
             break;
         }

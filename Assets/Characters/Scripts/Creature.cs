@@ -52,7 +52,8 @@ public class Creature : MonoBehaviour {
     public string creatureName;
     public Sprite icon;
     public Sprite breastplate;
-    public string tamingInfo = "This creature cannot be tamed.";
+    public string tamingInfoShort = "You cannot tame any";
+    [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
     public float personalBubble = .25f;
 
     public const int subGridUnit = 8;
@@ -111,8 +112,16 @@ public class Creature : MonoBehaviour {
     public bool CanTame(Transform player) {
         return brain.CanTame(player);
     }
-    public string TamingInfo {
-        get => tamingInfo;
+    public ExpandableInfo TamingInfo {
+        get => GenerateTamingInfo(creatureName, tamingInfoShort, tamingInfoLong);
+    }
+    public static ExpandableInfo GenerateTamingInfo(GameObject creature, string tamingInfoShort, string tamingInfoLong) {
+        string creatureName = creature.GetComponentStrict<Creature>().creatureName;
+        return GenerateTamingInfo(creatureName, tamingInfoShort, tamingInfoLong);
+    }
+    private static ExpandableInfo GenerateTamingInfo(string creatureName, string tamingInfoShort, string tamingInfoLong) {
+        return new ExpandableInfo(tamingInfoShort + " <color=creature>" + creatureName + "</color>",
+            tamingInfoLong.Replace("<creature/>", "<color=creature>" + creatureName + "</color>"));
     }
 
     public bool CanSee(Transform seen) => brain.CanSee(seen);
