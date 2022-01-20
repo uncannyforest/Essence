@@ -4,24 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class BunnyConfig {
-    public Sprite healAction;
-    public float healDistance = 1f;
-    public int healQuantity = 10;
-    public float healTime = .1f;
+public class ArrowwiggleConfig {
+    public float restockDistance = 1f;
+    public int restockQuantity = 10;
+    public float restockTime = .1f;
+    public Sprite arrowCollectibleSprite;
 }
 
-public class Bunny : Species<BunnyConfig> {
+public class Arrowwiggle : Species<ArrowwiggleConfig> {
     override public Brain Brain(BrainConfig generalConfig) {
-        return new BunnyBrain(this, generalConfig, speciesConfig);
+        return new ArrowwiggleBrain(this, generalConfig, speciesConfig);
     }
 }
 
-public class BunnyBrain : Brain {
-    private BunnyConfig bunny;
+public class ArrowwiggleBrain : Brain {
+    private ArrowwiggleConfig arrowwiggle;
 
-    public BunnyBrain(Bunny species, BrainConfig general, BunnyConfig bunny) : base(species, general) {
-        this.bunny = bunny;
+    public ArrowwiggleBrain(Arrowwiggle species, BrainConfig general, ArrowwiggleConfig arrowwiggle) : base(species, general) {
+        this.arrowwiggle = arrowwiggle;
     }
 
     override public List<CreatureAction> Actions() {
@@ -35,27 +35,27 @@ public class BunnyBrain : Brain {
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);
-            if (Focused && ShouldHealPlayer()) continue;
+            if (Focused && ShouldRestockPlayer()) continue;
             
             if ((State == CreatureState.Roam || State == CreatureState.Station || State == CreatureState.Follow)
-                && ShouldHealPlayer()) Focus = GameObject.FindObjectOfType<PlayerCharacter>().transform;
+                && ShouldRestockPlayer()) Focus = GameObject.FindObjectOfType<PlayerCharacter>().transform;
             else Focus = null;
         }
     }
 
-    private bool ShouldHealPlayer() {
+    private bool ShouldRestockPlayer() {
         PlayerCharacter player = GameObject.FindObjectOfType<PlayerCharacter>();
         return player.GetComponentStrict<Team>().TeamId == team &&
-                !player.GetComponentStrict<Health>().IsFull() &&
+                !player.GetComponentStrict<Inventory>().materials[Material.Type.Arrow].IsFull &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }
 
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            if (Vector2.Distance(Focus.position, transform.position) < bunny.healDistance) {
+            if (Vector2.Distance(Focus.position, transform.position) < arrowwiggle.restockDistance) {
                 velocity = Vector2.zero;
-                Focus.GetComponentStrict<Health>().Increase(bunny.healQuantity);
-                yield return new WaitForSeconds(bunny.healTime);
+                Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity, arrowwiggle.arrowCollectibleSprite);
+                yield return new WaitForSeconds(arrowwiggle.restockTime);
             } else {
                 velocity = IndexedVelocity(Focus.position - transform.position);
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
