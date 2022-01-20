@@ -60,6 +60,7 @@ public class Brain {
     protected Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     protected int team { get => GetComponentStrict<Team>().TeamId; }
+    private GoodTaste taste;
 
     protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
     protected Transform transform { get => species.transform; }
@@ -107,7 +108,6 @@ public class Brain {
     public Vector3? Investigation { // trying to focus but cannot see
         get => investigation;
         set {
-            if (GetComponent<Team>().TeamId == 1) Debug.Log("Investigation set");
             investigationCancel?.Stop();
             investigation = value;
             if (investigation != null) investigationCancel =
@@ -128,6 +128,9 @@ public class Brain {
             state == CreatureState.Station ||
             state == CreatureState.FollowOffensive ||
             (state == CreatureState.Follow && general.scanForFocusWhenFollowing);
+    }
+    protected bool Listening {
+        get => taste?.Listening == true;
     }
     private CreatureState state = CreatureState.Roam;
     private bool badState = false; // wait one frame for CleanUpState()
@@ -151,6 +154,8 @@ public class Brain {
     public Brain InitializeAll() {
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
+        taste = GetComponent<GoodTaste>();
+        if (taste != null) taste.TamerChanged += TriggerStateChange;
         Health health = GetComponent<Health>();
         if (health != null) health.ReachedZero += HandleDeath;
         TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
@@ -194,12 +199,29 @@ public class Brain {
         this.investigation = null;
         FocusedBehavior.Stop();
     }
+    public void DebugLogStateChange(bool triggerOnly) {
+        string stateChangeText = triggerOnly ? "): triggered state change, state: " : "): state changed! state: ";
+        string result = species + " (team " + GetComponentStrict<Team>().TeamId + stateChangeText + state;
+        if (Scanning) result += "; scanning";
+        if (Focused) result += "; focus: " + focus;
+        if (Investigating) result += "; investigation: " + investigation;
+        if (Listening) result += "; listening";
+        Debug.Log(result);
+    }
     public void TriggerStateChange() {
-        Debug.Log(species + " (team " + GetComponentStrict<Team>().TeamId + "): TRIGGER STATE CHANGE " + state + " " + focus);
+        DebugLogStateChange(true);
         stateIsDirty = true;
     }
     protected void OnStateChange() {
-        Debug.Log(species + " (team " + GetComponentStrict<Team>().TeamId + "): STATE CHANGED! " + state + " " + focus + " " + Scanning + Focused);
+        DebugLogStateChange(false);
+        if (Listening) {
+            velocity = Vector2.zero;
+            ScanningBehavior.Stop();
+            FocusedBehavior.Stop();
+            TrekkingBehavior.Stop();
+            ExecutingBehavior?.Stop();
+            return;
+        }
         if (Busy) ClearFocus();
         ScanningBehavior.RunIf(Scanning);
         TrekkingBehavior.RunIf(!Focused && !Busy);
@@ -416,7 +438,7 @@ public class Brain {
             stateIsDirty = false;
             OnStateChange();
         }
-        StateAssumptions();
+        if (!Listening) StateAssumptions(); // Listening overrides everything, so put off sanity checks
     }
 
     // Clean up state

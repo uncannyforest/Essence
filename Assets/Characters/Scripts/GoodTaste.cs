@@ -10,7 +10,20 @@ public class GoodTaste : StatusQuantity {
 
     private Transform tamer;
     private Action Tamed;
+    public Action TamerChanged;
     private ExpandableInfo? error = null;
+
+    private Transform Tamer {
+        get => tamer;
+        set {
+            tamer = value;
+            if (TamerChanged != null) TamerChanged();
+        }
+    }
+
+    public bool Listening {
+        get => Tamer != null;
+    }
 
     override protected void Awake() {
         base.Awake();
@@ -18,14 +31,14 @@ public class GoodTaste : StatusQuantity {
     }
 
     public void StartTaming(Transform tamer, Action tamedHandler) {
-        this.tamer = tamer;
+        this.Tamer = tamer;
         this.Tamed = tamedHandler;
     }
 
     public ExpandableInfo? StopTaming(Transform tamer) {
-        if (tamer != null) {
-            if (this.tamer != tamer) return null;
-            this.tamer = null;
+        if (this.Tamer != null) {
+            if (this.Tamer != tamer) return null;
+            this.Tamer = null;
             Reset();
             return Creature.GenerateTamingInfo(gameObject, insufficientTimeInfoShort, insufficientTimeInfoLong);
         } else {
@@ -36,17 +49,17 @@ public class GoodTaste : StatusQuantity {
     }
 
     public void HandleTamed() {
-        if (GetComponent<Creature>().TryTame(tamer)) {
+        if (GetComponent<Creature>().TryTame(Tamer)) {
             if (Tamed != null) Tamed();
         } else error = GetComponent<Creature>().TamingInfo;
-        this.tamer = null;
+        this.Tamer = null;
         Reset();
     }
     
     void Update() {
-        if (tamer != null) {
+        if (Tamer != null) {
             Debug.Log("HEY!" + max * Time.deltaTime / timeToTame);
-            GetComponent<Team>()?.OnAttack(tamer);
+            GetComponent<Team>()?.OnAttack(Tamer);
             Increase((int)(max * Time.fixedDeltaTime / timeToTame));
         }
     }
