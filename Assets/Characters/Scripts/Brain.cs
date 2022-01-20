@@ -18,6 +18,7 @@ public enum CreatureState {
 public class BrainConfig {
     public AIDirections numMovementDirections;
     public float movementSpeed;
+    public float roamRestingFraction = .5f;
     public float reconsiderRateRoam = 5;
     public float reconsiderRateTarget = 2.5f;
     public float reconsiderRatePursuit = 1f;
@@ -333,7 +334,8 @@ public class Brain {
                 }
             } else switch (state) {
                 case CreatureState.Roam:
-                    velocity = RandomVelocity();
+                    if (Random.value < general.roamRestingFraction) velocity = Vector2.zero;
+                    else velocity = RandomVelocity();
                     yield return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
                 break;
                 case CreatureState.Follow:

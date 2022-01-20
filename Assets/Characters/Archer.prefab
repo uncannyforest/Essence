@@ -512,6 +512,7 @@ MonoBehaviour:
   brainConfig:
     numMovementDirections: 3
     movementSpeed: 1
+    roamRestingFraction: 0.75
     reconsiderRateRoam: 5
     reconsiderRateTarget: 2.5
     reconsiderRatePursuit: 1
