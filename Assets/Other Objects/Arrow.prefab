@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 8342955255124277181}
   - component: {fileID: -9082664675784299005}
   - component: {fileID: 7558747776822399738}
-  - component: {fileID: 1683451940898182241}
+  - component: {fileID: 2983574556094804189}
   m_Layer: 12
   m_Name: Arrow
   m_TagString: Untagged
@@ -168,8 +168,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &1683451940898182241
-CapsuleCollider2D:
+--- !u!58 &2983574556094804189
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -182,5 +182,5 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.5, y: 0.25}
-  m_Direction: 1
+  serializedVersion: 2
+  m_Radius: 0.25
