@@ -131,6 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 12
   reach: 4.2426405
+  itemPrefab: {fileID: 2811642717277558146, guid: a9460bc4561224266bbf5d2502106dad, type: 3}
 --- !u!114 &-9082664675784299005
 MonoBehaviour:
   m_ObjectHideFlags: 0

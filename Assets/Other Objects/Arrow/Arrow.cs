@@ -6,6 +6,7 @@ using UnityEngine;
 public class Arrow : MonoBehaviour {
     public float speed;
     public float reach;
+    public Collectible itemPrefab;
 
     new private Rigidbody2D rigidbody;
     private Transform sprite;
@@ -26,6 +27,7 @@ public class Arrow : MonoBehaviour {
     }
 
     private void Land() {
+        Collectible.Instantiate(itemPrefab, GameObject.FindObjectOfType<Terrain>().transform, transform.position, 1);
         Destroy(gameObject);
     }
 }
