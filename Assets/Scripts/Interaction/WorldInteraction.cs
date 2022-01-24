@@ -58,6 +58,7 @@ public class WorldInteraction : MonoBehaviour {
     public MeleeSquare.Config praxelSelectConfig = new MeleeSquare.Config(.5f, .0625f);
     public float swordRate = 1/2f;
     public float arrowRate = 1/3f;
+    public ExpandableInfo noArrowsTip;
     public int soilCost = 1;
     public int scaleCost = 2;
     public Arrow flyingArrowPrefab;
@@ -403,14 +404,16 @@ public class WorldInteraction : MonoBehaviour {
                 break;
                 case Mode.Arrow:
                     rangedSelect.PointerToKeys(PointerForRanged(worldPoint));
-                    Arrow.Instantiate(
-                        flyingArrowPrefab,
-                        grid.transform,
-                        player,
-                        (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
-                    SignalOffensiveTarget(rangedSelect.DirectionVector,
-                        signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
-                        yield return new WaitForSeconds(arrowRate);
+                    if (inventory.Retrieve(Material.Type.Arrow, 1)) {
+                        Arrow.Instantiate(
+                            flyingArrowPrefab,
+                            grid.transform,
+                            player,
+                            (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
+                        SignalOffensiveTarget(rangedSelect.DirectionVector,
+                            signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
+                    } else TextDisplay.I.ShowTip(noArrowsTip);
+                    yield return new WaitForSeconds(arrowRate);
                 break;
                 default:
                     toolChanged = true;

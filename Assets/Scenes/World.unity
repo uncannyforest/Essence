@@ -41497,7 +41497,7 @@ MonoBehaviour:
   meleeConfig:
     damageCenterDistance: 0.5
     damageRadius: 0.25
-    damage: 10
+    damage: 15
   rangedConfig:
     aimMinRate: 45
     aimMaxRate: 540
@@ -41508,6 +41508,13 @@ MonoBehaviour:
   praxelSelectConfig:
     latency: 0.2
     delay: 0.1
+  swordRate: 0.5
+  arrowRate: 0.33333334
+  noArrowsTip:
+    miniText: You have no arrows.
+    fullText: You must collect arrows to use your bow.  Arrows are (1) given by <color=creature>Arrowwiggles</color>
+      on your team and (2) dropped on the ground when an <color=creature>Archer</color>
+      misses a shot.
   soilCost: 1
   scaleCost: 2
   flyingArrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}

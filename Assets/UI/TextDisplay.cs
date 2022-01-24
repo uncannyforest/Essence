@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct ExpandableInfo {
+[Serializable] public struct ExpandableInfo {
     public string miniText;
     public string fullText;
     public ExpandableInfo(string miniText, string fullText) {
