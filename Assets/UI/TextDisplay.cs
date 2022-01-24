@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 [Serializable] public struct ExpandableInfo {
     public string miniText;
-    public string fullText;
+    [TextArea(2, 12)] public string fullText;
     public ExpandableInfo(string miniText, string fullText) {
         this.miniText = miniText;
         this.fullText = fullText;

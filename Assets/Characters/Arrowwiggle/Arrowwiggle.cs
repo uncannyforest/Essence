@@ -5,6 +5,7 @@ using UnityEngine;
 
 [Serializable]
 public class ArrowwiggleConfig {
+    public int tamingCost = 1;
     public float restockDistance = 1f;
     public int restockQuantity = 10;
     public float restockTime = .1f;
@@ -29,8 +30,12 @@ public class ArrowwiggleBrain : Brain {
         };
     }
 
-    override public bool CanTame(Transform player) => true;
-    override public bool ExtractTamingCost(Transform player) => true;
+    override public bool CanTame(Transform player) =>
+        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Arrow, arrowwiggle.tamingCost);
+
+    public override bool ExtractTamingCost(Transform player) {
+        return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Arrow, arrowwiggle.tamingCost);
+    }
 
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {

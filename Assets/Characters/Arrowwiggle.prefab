@@ -273,11 +273,14 @@ MonoBehaviour:
   creatureName: Arrowwiggle
   icon: {fileID: 6399436051876537120, guid: 4ab05ede570204ae6a60ef9e20b89eca, type: 3}
   breastplate: {fileID: -5489052246051778459, guid: 4ab05ede570204ae6a60ef9e20b89eca, type: 3}
-  tamingInfoShort: Whistle song (press and hold) to tame
-  tamingInfoLong: The <creature/> will not be tamed unless you whistle a song for
-    sufficient time.  Press and hold the left mouse button to whistle a song.  A
-    blue stat bar will appear beneath the <creature/> to indicate it can hear you;
-    when the stat bar reaches the end the <creature/> will be tamed.
+  tamingInfoShort: You need one arrow to tame
+  tamingInfoLong: '<color=creature>Arrowwiggles</color> make arrows, and they will
+    make you arrows if you first lure them to your side with an arrow of your own.
+
+
+    You
+    can collect a dropped arrow from an <color=creature>Archer</color>, if you dodge
+    its shots and then pick up the arrow.'
   personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!50 &4481103850635713295
@@ -368,6 +371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speciesConfig:
+    tamingCost: 1
     restockDistance: 1
     restockQuantity: 1
     restockTime: 0.1
