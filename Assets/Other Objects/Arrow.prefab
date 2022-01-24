@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32881d432e6b4a5790113640c65a00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 12
+  speed: 9
   reach: 4.2426405
   itemPrefab: {fileID: 2811642717277558146, guid: a9460bc4561224266bbf5d2502106dad, type: 3}
 --- !u!114 &-9082664675784299005
