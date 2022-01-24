@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -55,6 +56,8 @@ public class WorldInteraction : MonoBehaviour {
     public Melee.Config meleeConfig = new Melee.Config(1, .5f, 10);
     public Ranged.Config rangedConfig = new Ranged.Config(1f, 6f, 15, null, 6, 100);
     public MeleeSquare.Config praxelSelectConfig = new MeleeSquare.Config(.5f, .0625f);
+    public float swordRate = 1/2f;
+    public float arrowRate = 1/3f;
     public int soilCost = 1;
     public int scaleCost = 2;
     public Arrow flyingArrowPrefab;
@@ -171,6 +174,7 @@ public class WorldInteraction : MonoBehaviour {
             [Terrain.Grid.YWalls] = uiMapEdgeY,
             [Terrain.Grid.Roof] = uiMap
         };
+        ConfirmOngoing = new CoroutineWrapper(ConfirmOngoingE, this);
         inventory = player.GetComponentStrict<Inventory>();
         Orientor.I.onRotation += ClearTile;
     }
@@ -306,20 +310,8 @@ public class WorldInteraction : MonoBehaviour {
         Creature creature;
         switch (PlayerAction) {
             case Mode.Sword:
-                meleeSelect.Damage(player.GetComponent<Team>().TeamId);
-                SignalOffensiveTarget(meleeSelect.InputVelocity,
-                    signalMeleeRadius, signalFrontOfPlayer, 0);
-            break;
             case Mode.Arrow:
-                if (Input.GetMouseButtonDown(0))
-                    rangedSelect.PointerToKeys(PointerForRanged(worldPoint));
-                Arrow.Instantiate(
-                    flyingArrowPrefab,
-                    grid.transform,
-                    player,
-                    (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
-                SignalOffensiveTarget(rangedSelect.DirectionVector,
-                    signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
+                if (!ConfirmOngoing.IsRunning) ConfirmOngoing.Start();
             break;
             case Mode.Praxel:
                 coord = (Vector2Int)activeTile;
@@ -390,6 +382,45 @@ public class WorldInteraction : MonoBehaviour {
                 PlayerAction = Mode.Taming;
             break;
         }
+    }
+
+    private CoroutineWrapper ConfirmOngoing;
+    private IEnumerator ConfirmOngoingE() {
+        bool toolChanged = false;
+        int i = 0;
+        for (i = 0; i < 100_000; i++) { // prevent infinite loop bugs
+            // these end conditions are on separate lines for clairity
+            if (!Input.GetMouseButton(0)) break;
+            if (toolChanged) break;
+
+            Vector2 worldPoint = InputManager.PointerPosition;
+            switch (PlayerAction) {
+                case Mode.Sword:
+                    meleeSelect.Damage(player.GetComponent<Team>().TeamId);
+                    SignalOffensiveTarget(meleeSelect.InputVelocity,
+                        signalMeleeRadius, signalFrontOfPlayer, 0);
+                    yield return new WaitForSeconds(swordRate);
+                break;
+                case Mode.Arrow:
+                    rangedSelect.PointerToKeys(PointerForRanged(worldPoint));
+                    Arrow.Instantiate(
+                        flyingArrowPrefab,
+                        grid.transform,
+                        player,
+                        (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
+                    SignalOffensiveTarget(rangedSelect.DirectionVector,
+                        signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
+                        yield return new WaitForSeconds(arrowRate);
+                break;
+                default:
+                    toolChanged = true;
+                break;
+            }
+        }
+        if (i >= 100_000) Debug.Log("Oops, infinite loop");
+        Debug.Log("WorldInteration: exiting ConfirmOngoing");
+        ConfirmOngoing.Stop();
+        yield break;
     }
 
     public void ConfirmComplete(Vector2 worldPoint) {
