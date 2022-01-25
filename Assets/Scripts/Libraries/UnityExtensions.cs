@@ -13,6 +13,11 @@ public static class Vct {
     public static Vector2 F(float x, float y) {
         return new Vector2(x, y);
     }
+
+    public static Vector2 DirectionToVelocity(float? direction) {
+        if (direction is float realDirection) return Quaternion.Euler(0, 0, realDirection) * Vector2.right;
+        else return Vector2.zero;
+    }
 }
 
 public static class GameObjectExtensions {
@@ -46,6 +51,11 @@ public static class GameObjectExtensions {
 }
 
 public static class VectorExtensions {
+    public static float? VelocityToDirection(this Vector2 value) {
+        if (value == Vector2.zero) return (float?)null;
+        return Vector3.SignedAngle(Vector3.right, (Vector2)value, Vector3.forward);
+    }
+
     public static Vector2Int Transform(this Vector2Int vec, Func<int, int> x, Func<int, int> y) {
         return new Vector2Int(x(vec.x), y(vec.y));
     }

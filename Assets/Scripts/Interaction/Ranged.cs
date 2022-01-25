@@ -31,14 +31,10 @@ public class Ranged {
         set {
             if (!keysArePressed && value == Vector2.zero) return;
             keysArePressed = value != Vector2.zero;
-            UpdateInputDirection(VelocityToDirection(value));
+            UpdateInputDirection(value.VelocityToDirection());
         }
     }
 
-    public float? VelocityToDirection(Vector2 value) {
-        if (value == Vector2.zero) return (float?)null;
-        return Vector3.SignedAngle(Vector3.right, (Vector2)value, Vector3.forward);
-    }
 
     public void UpdateInputDirection(float? newDirection) {
         if (newDirection == null) inputDirection = null;
@@ -92,7 +88,7 @@ public class Ranged {
 
     public void PointerToKeys(Vector2 pointer) {
         if (keysArePressed) return;
-        float? inputAngle = VelocityToDirection(pointer);
+        float? inputAngle = pointer.VelocityToDirection();
         if (inputAngle is float realAngle) {
             pointerDirection = realAngle;
             UpdatePointerToKeys();

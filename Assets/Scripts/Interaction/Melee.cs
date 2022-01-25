@@ -16,11 +16,13 @@ public class Melee {
     private Config config;
     private Transform transform;
 
-    private Vector3 direction = Vector3.right;
+    private Vector3 direction = Vector3.right; // one of eight options
+    private bool keysArePressed = false; // muxes between keys and pointer
 
     public Vector2 InputVelocity {
         get => direction;
         set {
+            keysArePressed = value != Vector2.zero;
             if (value != Vector2.zero) direction = value.normalized;
         }
     }
@@ -30,9 +32,16 @@ public class Melee {
         this.transform = transform;
     }
 
+    public Vector2 DamageCenter {
+        get => transform.position + direction * config.damageCenterDistance;
+    }
+    public float DamageRadius {
+        get => config.damageRadius;
+    }
+
     public List<Health> Damage(int safeTeam) {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position + direction * config.damageCenterDistance,
-            config.damageRadius, LayerMask.GetMask("Player", "HealthCreature"));
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(DamageCenter,
+            DamageRadius, LayerMask.GetMask("Player", "HealthCreature"));
         List<Health> healths = new List<Health>();
         foreach (Collider2D collider in colliders) {
             if (collider.GetComponentStrict<Team>().TeamId == safeTeam) continue;
@@ -43,5 +52,14 @@ public class Melee {
             health.Decrease(config.damage, transform);
         }
         return healths;
+    }
+
+    public void PointerToKeys(Vector2 pointer) {
+        if (keysArePressed) return;
+        float? inputAngle = pointer.VelocityToDirection();
+        if (inputAngle is float realAngle) {
+            float nearest45 = Mathf.Round((realAngle + 360) % 360 / 45) * 45;
+            direction = Vct.DirectionToVelocity(nearest45);
+        }
     }
 }

@@ -186,6 +186,7 @@ public class Brain {
         return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
     }
     protected Vector2 IndexedVelocity(Vector2 targetDirection) {
+        // round instead of floor if aiDirections.Length were even.
         int index = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, targetDirection) + 360) % 360 / (90 / aiDirections.Length));
         int rotation = index / aiDirections.Length;
         int subIndex = index % aiDirections.Length;

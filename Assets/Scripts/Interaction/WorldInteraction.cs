@@ -62,6 +62,8 @@ public class WorldInteraction : MonoBehaviour {
     public int soilCost = 1;
     public int scaleCost = 2;
     public Arrow flyingArrowPrefab;
+    public GameObject swordSwipePrefab;
+    public float swordSwipeZ;
     public Color followingCharacterColor;
 
     public float collectibleZ = 1;
@@ -113,7 +115,7 @@ public class WorldInteraction : MonoBehaviour {
         Taming,
         Directing
     }
-    private Interaction currentAction = Interaction.Player(Mode.Arrow);
+    private Interaction currentAction = Interaction.Player(Mode.Sword);
 
     public Mode PlayerAction {
         get => currentAction.mode;
@@ -256,7 +258,7 @@ public class WorldInteraction : MonoBehaviour {
     public void PointerMove(Vector2 pointer, bool duringPress) {
         switch (PlayerAction) {
             case Mode.Arrow:
-                rangedSelect.PointerToKeys(PointerForRanged(pointer));
+                rangedSelect.PointerToKeys(PointerForAim(pointer));
             break;
             case Mode.Sod:
                 ClearTile();
@@ -391,19 +393,25 @@ public class WorldInteraction : MonoBehaviour {
         int i = 0;
         for (i = 0; i < 100_000; i++) { // prevent infinite loop bugs
             // these end conditions are on separate lines for clairity
-            if (!Input.GetMouseButton(0)) break;
+            if (!InputManager.Firing) break;
             if (toolChanged) break;
 
             Vector2 worldPoint = InputManager.PointerPosition;
             switch (PlayerAction) {
                 case Mode.Sword:
+                    if (Input.GetMouseButton(0)) // click not space
+                        meleeSelect.PointerToKeys(PointerForAim(worldPoint));
                     meleeSelect.Damage(player.GetComponent<Team>().TeamId);
                     SignalOffensiveTarget(meleeSelect.InputVelocity,
                         signalMeleeRadius, signalFrontOfPlayer, 0);
+                    Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, grid.transform).transform;
+                    swordSwipe.position = meleeSelect.DamageCenter.WithZ(swordSwipeZ);
+                    swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
                     yield return new WaitForSeconds(swordRate);
                 break;
                 case Mode.Arrow:
-                    rangedSelect.PointerToKeys(PointerForRanged(worldPoint));
+                    if (Input.GetMouseButton(0)) // click not space
+                        rangedSelect.PointerToKeys(PointerForAim(worldPoint));
                     if (inventory.Retrieve(Material.Type.Arrow, 1)) {
                         Arrow.Instantiate(
                             flyingArrowPrefab,
@@ -483,7 +491,7 @@ public class WorldInteraction : MonoBehaviour {
             character.GetCharacterComponent<Creature>().FollowOffensive(offensiveTarget);
     }
 
-    private Vector2 PointerForRanged(Vector2 pointer) =>
+    private Vector2 PointerForAim(Vector2 pointer) =>
         player.GetComponent<PlayerCharacter>().InputVelocity == Vector2Int.zero
                     ? pointer - (Vector2)player.position : Vector2.zero;
 

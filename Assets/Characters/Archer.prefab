@@ -515,7 +515,7 @@ MonoBehaviour:
     roamRestingFraction: 0.75
     reconsiderRateRoam: 5
     reconsiderRateTarget: 2.5
-    reconsiderRatePursuit: 1
+    reconsiderRatePursuit: 0.33333334
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 1

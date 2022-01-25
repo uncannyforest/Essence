@@ -41496,7 +41496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meleeConfig:
     damageCenterDistance: 0.5
-    damageRadius: 0.25
+    damageRadius: 0.5
     damage: 15
   rangedConfig:
     aimMinRate: 45
@@ -41526,6 +41526,8 @@ MonoBehaviour:
   soilCost: 1
   scaleCost: 2
   flyingArrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
+  swordSwipePrefab: {fileID: 1998722872617208, guid: 235d96e1b4f334589b775bf0d7ead730, type: 3}
+  swordSwipeZ: 25
   followingCharacterColor: {r: 0.6, g: 0.8666667, b: 0.73333335, a: 1}
   collectibleZ: 2
   highlightZ: 0.5

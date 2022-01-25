@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour {
         "<color=key>/</color> - expand info message / if none, this page";
 
     void Start() {
-        SelectAction2();
+        SelectAction1();
     }
 
     public static Vector2 PointerPosition {
@@ -24,7 +24,7 @@ public class InputManager : MonoBehaviour {
             return Camera.main.ScreenToWorldPoint(mouse);
         }
     }
-    public static bool Clicking {
+    public static bool Firing {
         get => SimpleInput.GetButton("Fire");
     }
 
@@ -63,7 +63,7 @@ public class InputManager : MonoBehaviour {
 
     public void Update() {
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
-            world.PointerMove(PointerPosition, Clicking);
+            world.PointerMove(PointerPosition, Firing);
         }
 
         if (SimpleInput.GetButtonDown("Pause")) {
