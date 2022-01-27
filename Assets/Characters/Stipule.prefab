@@ -71,7 +71,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -3506536579647068688, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  m_Sprite: {fileID: -3819732051993879288, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -153,7 +153,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 818616984480399886, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  m_Sprite: {fileID: 1365456587537952046, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -279,7 +279,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  m_Sprite: {fileID: -7264097725937428021, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   m_Color: {r: 0.6666667, g: 0.6666667, b: 0.6666667, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -447,7 +447,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1353735933490891112, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -455,7 +455,7 @@ SpriteRenderer:
   m_Size: {x: 0.375, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &4481103850635713290
@@ -468,14 +468,15 @@ GameObject:
   m_Component:
   - component: {fileID: 4481103850635713289}
   - component: {fileID: 6284982019010971546}
-  - component: {fileID: 4481103850635713288}
   - component: {fileID: 4481103850635713293}
   - component: {fileID: 4481103850635713295}
   - component: {fileID: 4481103850635713292}
   - component: {fileID: 4481103850635713299}
   - component: {fileID: 6486091420523554066}
+  - component: {fileID: 8273002267813487745}
+  - component: {fileID: 7051101361044908341}
   m_Layer: 10
-  m_Name: Archer
+  m_Name: Stipule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -512,39 +513,23 @@ MonoBehaviour:
   brainConfig:
     numMovementDirections: 3
     movementSpeed: 1
-    roamRestingFraction: 0.75
+    roamRestingFraction: 0.25
     reconsiderRateRoam: 5
     reconsiderRateTarget: 2.5
-    reconsiderRatePursuit: 0.33333334
+    reconsiderRatePursuit: 0.5
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 1
-    timidity: 0.3
-  species: {fileID: 4481103850635713288}
-  creatureName: Archer
-  icon: {fileID: -7132172409892320828, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
-  breastplate: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
-  tamingInfoShort: You need two scales to tame
-  tamingInfoLong: To tame any <creature/>, you need two scales.  Scales are orange
+    timidity: 0.2
+  species: {fileID: 8273002267813487745}
+  creatureName: Stipule
+  icon: {fileID: 5684846723981245244, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
+  breastplate: {fileID: -7264097725937428021, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
+  tamingInfoShort: You need three scales to tame
+  tamingInfoLong: To tame any <creature/>, you need three scales.  Scales are orange
     objects dropped when you defeat them.
   personalBubble: 0.25
   stateForEditorDebugging: 0
---- !u!114 &4481103850635713288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4481103850635713290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c55bcb4490694817bbbc0f9d9f1fc40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speciesConfig:
-    attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
-    scaleCost: 2
-    arrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
 --- !u!114 &4481103850635713293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -639,6 +624,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c53988c2f101f44b2ab2809094ed5ea4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8273002267813487745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d1d2afc610d442e6ab3d3739b4ca3b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speciesConfig:
+    attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
+    scaleCost: 3
+    meleeReach: 1
+    attack: 15
+--- !u!95 &7051101361044908341
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ffc245c70e4e64c53b47fab214bb85dc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,7 +792,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3001767060249510921, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+  m_Sprite: {fileID: -8927839234888600542, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

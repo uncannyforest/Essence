@@ -41564,6 +41564,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bunny: {fileID: 4481103850635713290, guid: d4d4ebbc99b91449e90944b5e778759e, type: 3}
   arrowwiggle: {fileID: 4481103850635713290, guid: 52a225b6ed0ec4c9bb92580f490fd0f7, type: 3}
+  stipule: {fileID: 4481103850635713290, guid: 9d441d971641f40d18b8e2dd75da009a, type: 3}
   archer: {fileID: 4481103850635713290, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
 --- !u!114 &2120764636
 MonoBehaviour:

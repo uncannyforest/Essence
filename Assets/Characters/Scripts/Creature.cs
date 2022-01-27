@@ -73,7 +73,7 @@ public class Creature : MonoBehaviour {
     new private Rigidbody2D rigidbody;
     private SpriteSorter spriteManager;
     public SpriteSorter SpriteManager { get => spriteManager; }
-    private Animator animator; // may be null
+    [NonSerialized] public Animator animator; // may be null
 
     void Start() {
         brain = species.Brain(brainConfig).InitializeAll();

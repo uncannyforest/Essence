@@ -49,6 +49,7 @@ public class Fauna : MonoBehaviour {
     }
 
     private GameObject IdentifyCreature() {
+        if (Randoms.CoinFlip) return creatureLibrary.stipule;
         int justARandomNumberForNow = Random.Range(0, 3);
         switch (justARandomNumberForNow) {
             case 0: return creatureLibrary.bunny;

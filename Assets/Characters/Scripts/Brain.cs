@@ -65,6 +65,7 @@ public class Brain {
 
     protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
     protected Transform transform { get => species.transform; }
+    protected Animator animator { get => creature.animator; }
 
     public Vector2 velocity {
         get => creature.InputVelocity;
