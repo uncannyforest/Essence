@@ -7,6 +7,7 @@ public class CharacterController {
     private MonoBehaviour parentComponent;
     private Transform transform;
     private Rigidbody2D rigidbody;
+    private Transform spriteSorterTransform;
     private Animator animator; // may be null
 
     private float? personalBubble {
@@ -24,14 +25,14 @@ public class CharacterController {
         this.parentComponent = parentComponent;
         transform = parentComponent.transform;
         rigidbody = parentComponent.GetComponentStrict<Rigidbody2D>();
+        spriteSorterTransform = parentComponent.GetComponentInChildren<SpriteSorter>().transform;
         animator = parentComponent.GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
     }
 
     public CharacterController Toward(Vector2 direction) {
         velocity = direction;
-        animator?.SetFloat("X", Math.Sign(direction.x));
-        animator?.SetFloat("Y", Math.Sign(direction.y));
+        SetAnimatorDirection(direction);
         animator?.SetBool("Moving", true);
         return this;
     }
@@ -46,9 +47,15 @@ public class CharacterController {
 
     public CharacterController IdleFacing(Vector3 target) {
         Vector3 direction = target - transform.position;
-        animator?.SetFloat("X", Math.Sign(direction.x));
-        animator?.SetFloat("Y", Math.Sign(direction.y));
+        SetAnimatorDirection(direction);
         return Idle();
+    }
+
+    private void SetAnimatorDirection(Vector2 direction) {
+        int x = Math.Sign(direction.x);
+        animator?.SetFloat("X", Math.Abs(x));
+        spriteSorterTransform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
+        animator?.SetFloat("Y", Math.Sign(direction.y));
     }
 
     public CharacterController Trigger(string trigger) {

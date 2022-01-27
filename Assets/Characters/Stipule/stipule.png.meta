@@ -182,7 +182,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 32
+        y: 16
         width: 6
         height: 8
       alignment: 7
@@ -203,7 +203,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 12
-        y: 32
+        y: 16
         width: 6
         height: 8
       alignment: 7
@@ -224,7 +224,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 18
-        y: 32
+        y: 16
         width: 6
         height: 8
       alignment: 7
@@ -245,7 +245,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 24
-        y: 32
+        y: 16
         width: 6
         height: 8
       alignment: 7
@@ -266,7 +266,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 30
-        y: 32
+        y: 16
         width: 6
         height: 8
       alignment: 7
@@ -287,7 +287,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 24
+        y: 8
         width: 6
         height: 8
       alignment: 7
@@ -308,7 +308,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 12
-        y: 24
+        y: 8
         width: 6
         height: 8
       alignment: 7
@@ -329,7 +329,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 18
-        y: 24
+        y: 8
         width: 6
         height: 8
       alignment: 7
@@ -350,7 +350,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 24
-        y: 24
+        y: 8
         width: 6
         height: 8
       alignment: 7
@@ -371,7 +371,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 30
-        y: 24
+        y: 8
         width: 6
         height: 8
       alignment: 7
@@ -392,7 +392,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 16
+        y: 0
         width: 6
         height: 8
       alignment: 7
@@ -413,7 +413,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 12
-        y: 16
+        y: 0
         width: 6
         height: 8
       alignment: 7
@@ -434,7 +434,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 18
-        y: 16
+        y: 0
         width: 6
         height: 8
       alignment: 7
@@ -455,7 +455,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 24
-        y: 16
+        y: 0
         width: 6
         height: 8
       alignment: 7
@@ -476,7 +476,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 30
-        y: 16
+        y: 0
         width: 6
         height: 8
       alignment: 7
@@ -488,216 +488,6 @@ TextureImporter:
       bones: []
       spriteID: 3ee1323e4b0048f70800000000000000
       internalID: 9188469916647497443
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_15
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 8
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6c51bb0ef7894f960800000000000000
-      internalID: 7634894943298459078
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_16
-      rect:
-        serializedVersion: 2
-        x: 12
-        y: 8
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1f6da0496675fde90800000000000000
-      internalID: -6998779197828442383
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_17
-      rect:
-        serializedVersion: 2
-        x: 18
-        y: 8
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a52c8e6da674c0350800000000000000
-      internalID: 5984236529066230362
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_18
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 8
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5609cdeb320a4f040800000000000000
-      internalID: 4680541988131213413
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_19
-      rect:
-        serializedVersion: 2
-        x: 30
-        y: 8
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 125aae9a3234ed7f0800000000000000
-      internalID: -585957081057942239
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_20
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b0d2c00d512c4d190800000000000000
-      internalID: -7938506844206781173
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_21
-      rect:
-        serializedVersion: 2
-        x: 12
-        y: 0
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5fcb728590cabd1c0800000000000000
-      internalID: -4477796248356143883
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_22
-      rect:
-        serializedVersion: 2
-        x: 18
-        y: 0
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a639be9570ab3b5c0800000000000000
-      internalID: -4200809486670392470
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_23
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 0
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a73bc01964825d640800000000000000
-      internalID: 5104030036240675706
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: stipule_24
-      rect:
-        serializedVersion: 2
-        x: 30
-        y: 0
-        width: 6
-        height: 8
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6b1b028e14a822de0800000000000000
-      internalID: -1359372121840504394
       vertices: []
       indices: 
       edges: []

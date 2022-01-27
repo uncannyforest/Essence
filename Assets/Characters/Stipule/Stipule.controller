@@ -73,24 +73,8 @@ BlendTree:
   m_Name: Attack
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: da79f7347955a434ba2257e80184a2e9, type: 2}
-    m_Threshold: 0
-    m_Position: {x: -1, y: 1}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: Velocity X
-    m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: a36064ca4113a4f6b95ad5ee967b1c93, type: 2}
-    m_Threshold: 0.33333334
-    m_Position: {x: -1, y: -1}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: Velocity X
-    m_Mirror: 0
-  - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 0ce4f004f158443e0bc6ed42482fcae9, type: 2}
-    m_Threshold: 0.6666667
+    m_Threshold: -1
     m_Position: {x: 1, y: -1}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -104,13 +88,13 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Velocity X
     m_Mirror: 0
-  m_BlendParameter: X
+  m_BlendParameter: Y
   m_BlendParameterY: Y
-  m_MinThreshold: 0
+  m_MinThreshold: -1
   m_MaxThreshold: 1
-  m_UseAutomaticThresholds: 1
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
-  m_BlendType: 2
+  m_BlendType: 0
 --- !u!91 &9100000
 AnimatorController:
   m_ObjectHideFlags: 0
