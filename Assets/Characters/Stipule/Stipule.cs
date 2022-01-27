@@ -75,17 +75,14 @@ public class StipuleBrain : Brain {
 
     private WaitForSeconds Attack(Transform target) {
         if (Vector2.Distance(target.position, transform.position) < stipule.meleeReach) {
-            velocity = Vector2.zero;
             Health health = target.GetComponentStrict<Health>();
             if (target.GetComponent<Team>()?.TeamId == team) {
                 Debug.LogError("Unexpected state, target is same team");
                 return new WaitForSeconds(general.reconsiderRatePursuit);
             }
             health.Decrease(stipule.attack, transform);
-            animator.SetFloat("Velocity X", (target.position - transform.position).x);
-            animator.SetFloat("Velocity Y", (target.position - transform.position).y);
-            animator.SetTrigger("Attack");
-        } else velocity = IndexedVelocity(target.position - transform.position);
+            movement.IdleFacing(target.position).Trigger("Attack");
+        } else movement.Toward(IndexedVelocity(target.position - transform.position));
         return new WaitForSeconds(general.reconsiderRatePursuit);
     }
 }

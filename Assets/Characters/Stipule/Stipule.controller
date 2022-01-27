@@ -70,7 +70,7 @@ BlendTree:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blend Tree
+  m_Name: Attack
   m_Childs:
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: da79f7347955a434ba2257e80184a2e9, type: 2}
@@ -104,8 +104,8 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Velocity X
     m_Mirror: 0
-  m_BlendParameter: Velocity X
-  m_BlendParameterY: Velocity Y
+  m_BlendParameter: X
+  m_BlendParameterY: Y
   m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 1
@@ -120,7 +120,7 @@ AnimatorController:
   m_Name: Stipule
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Velocity X
+  - m_Name: X
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -132,8 +132,14 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: Velocity Y
+  - m_Name: Y
     m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
+  - m_Name: Moving
+    m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
@@ -177,7 +183,7 @@ AnimatorState:
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
-  m_TimeParameter: Velocity X
+  m_TimeParameter: X
 --- !u!1101 &5967656314018152621
 AnimatorStateTransition:
   m_ObjectHideFlags: 1

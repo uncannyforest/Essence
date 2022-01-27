@@ -53,11 +53,11 @@ public class BunnyBrain : Brain {
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
             if (Vector2.Distance(Focus.position, transform.position) < bunny.healDistance) {
-                velocity = Vector2.zero;
+                movement.IdleFacing(Focus.position);
                 Focus.GetComponentStrict<Health>().Increase(bunny.healQuantity);
                 yield return new WaitForSeconds(bunny.healTime);
             } else {
-                velocity = IndexedVelocity(Focus.position - transform.position);
+                movement.Toward(IndexedVelocity(Focus.position - transform.position));
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
             }
         }

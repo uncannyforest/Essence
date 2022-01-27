@@ -87,10 +87,10 @@ public class ArcherBrain : Brain {
         Vector2 expectedFuturePosition = ExpectedFuturePosition(pos0, pos1, time0, time1);
         Debug.DrawLine(pos1, expectedFuturePosition, Color.red, 1f);
         if (Vector2.Distance(expectedFuturePosition, transform.position) < expectedArrowReach) {
-            velocity = Vector2.zero;
+            movement.IdleFacing(expectedFuturePosition);
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition);
         } else if (State != CreatureState.Station) {
-            velocity = IndexedVelocity(target.position - transform.position);
+            movement.Toward(IndexedVelocity(target.position - transform.position));
         }
         return new WaitForSeconds(general.reconsiderRatePursuit * .9f);
     }

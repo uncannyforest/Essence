@@ -58,11 +58,11 @@ public class ArrowwiggleBrain : Brain {
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
             if (Vector2.Distance(Focus.position, transform.position) < arrowwiggle.restockDistance) {
-                velocity = Vector2.zero;
+                movement.IdleFacing(Focus.position);
                 Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity, arrowwiggle.arrowCollectibleSprite);
                 yield return new WaitForSeconds(arrowwiggle.restockTime);
             } else {
-                velocity = IndexedVelocity(Focus.position - transform.position);
+                movement.Toward(IndexedVelocity(Focus.position - transform.position));
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
             }
         }

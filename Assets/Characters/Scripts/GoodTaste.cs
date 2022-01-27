@@ -13,7 +13,7 @@ public class GoodTaste : StatusQuantity {
     public Action TamerChanged;
     private ExpandableInfo? error = null;
 
-    private Transform Tamer {
+    public Transform Tamer {
         get => tamer;
         set {
             tamer = value;

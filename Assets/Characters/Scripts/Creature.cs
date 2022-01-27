@@ -56,8 +56,6 @@ public class Creature : MonoBehaviour {
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
     public float personalBubble = .25f;
 
-    public const int subGridUnit = 8;
-
     public CreatureState stateForEditorDebugging;
 
     public Brain brain;
@@ -70,19 +68,17 @@ public class Creature : MonoBehaviour {
     private const float despawnTime = 128f;
     public const float neighborhood = 6.5f;
 
-    new private Rigidbody2D rigidbody;
+    public CharacterController controller;
     private SpriteSorter spriteManager;
     public SpriteSorter SpriteManager { get => spriteManager; }
-    [NonSerialized] public Animator animator; // may be null
 
     void Start() {
+        controller = new CharacterController(this);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         cMaybeDespawn = StartCoroutine(MaybeDespawn());
-        rigidbody = GetComponentInChildren<Rigidbody2D>();
         spriteManager = GetComponentInChildren<SpriteSorter>();
         GetComponent<Team>().changed += TeamChangedEventHandler;
-        animator = GetComponentInChildren<Animator>(); // may be null
     }
 
     private void InitializeActionList(Brain brain) {
@@ -173,33 +169,12 @@ public class Creature : MonoBehaviour {
         }
     }
 
-    private Vector2 velocity = Vector2.zero;
-    public Vector2 InputVelocity {
-        get => velocity;
-        set {
-            velocity = value;
-            animator?.SetFloat("Velocity X", value.x);
-            animator?.SetFloat("Velocity Y", value.y);
-        }
-    }
-    private float timeDoneMoving = 0;
-    public void FixedUpdate() {
-        if (Time.fixedTime > timeDoneMoving)
-            if (InputVelocity != Vector2Int.zero)
-                if (Move() is Vector2 move)
-                    rigidbody.MovePosition(move);
-    }
-
     public void Update() {
         brain.Update();
     }
-    private Vector2? Move() {
-        float timeToMove = 1f / (InputVelocity.ChebyshevMagnitude() * subGridUnit);
-        Vector2 newLocation = rigidbody.position + InputVelocity * timeToMove;
-        Collider2D[] overlaps = Physics2D.OverlapCircleAll(newLocation, personalBubble, LayerMask.GetMask("Player", "Creature", "HealthCreature"));
-        if (overlaps.Length > 1) return null;
-        timeDoneMoving = timeToMove + Time.fixedTime;
-        return newLocation;
+
+    public void FixedUpdate() {
+        controller.FixedUpdate();
     }
 }
 

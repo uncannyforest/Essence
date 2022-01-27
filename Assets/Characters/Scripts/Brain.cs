@@ -61,16 +61,11 @@ public class Brain {
     protected Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     protected int team { get => GetComponentStrict<Team>().TeamId; }
+    protected CharacterController movement { get => creature.controller; }
     private GoodTaste taste;
 
     protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
     protected Transform transform { get => species.transform; }
-    protected Animator animator { get => creature.animator; }
-
-    public Vector2 velocity {
-        get => creature.InputVelocity;
-        set => creature.InputVelocity = value;
-    }
 
     ///////////////////
     // STATE PROPERTIES
@@ -218,7 +213,7 @@ public class Brain {
     protected void OnStateChange() {
         DebugLogStateChange(false);
         if (Listening) {
-            velocity = Vector2.zero;
+            movement.IdleFacing(taste.Tamer.position);
             ScanningBehavior.Stop();
             FocusedBehavior.Stop();
             TrekkingBehavior.Stop();
@@ -327,7 +322,7 @@ public class Brain {
 
         for (int i = 0; i < 10_000; i++) {
             if (Investigating) {
-                velocity = IndexedVelocity((Vector3)Investigation - transform.position);
+                movement.Toward(IndexedVelocity((Vector3)Investigation - transform.position));
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
                 if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
                         general.reconsiderRatePursuit * general.movementSpeed) { // arrived at point, found nothing
@@ -336,13 +331,13 @@ public class Brain {
                 }
             } else switch (state) {
                 case CreatureState.Roam:
-                    if (Random.value < general.roamRestingFraction) velocity = Vector2.zero;
-                    else velocity = RandomVelocity();
+                    if (Random.value < general.roamRestingFraction) movement.Idle();
+                    else movement.Toward(RandomVelocity());
                     yield return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
                 break;
                 case CreatureState.Follow:
                     targetDirection = FollowTargetDirection(followDirective.position);
-                    velocity = IndexedVelocity(targetDirection);
+                    movement.Toward(IndexedVelocity(targetDirection));
                     yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
                 break;
                 case CreatureState.FollowOffensive:
@@ -352,12 +347,12 @@ public class Brain {
                 break;
                 case CreatureState.Station:
                     targetDirection = stationDirective - transform.position;
-                    if (targetDirection.magnitude < 1f / Creature.subGridUnit) {
-                        velocity = Vector2.zero;
+                    if (targetDirection.magnitude < 1f / CharacterController.subGridUnit) {
+                        movement.Idle();
                         yield return new WaitForSeconds(general.reconsiderRateTarget);
                         continue;
                     }
-                    velocity = IndexedVelocity(targetDirection);
+                    movement.Toward(IndexedVelocity(targetDirection));
                     if (targetDirection.magnitude > general.reconsiderRateTarget * general.movementSpeed)
                         yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
                     else yield return null;
