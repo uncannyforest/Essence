@@ -47,6 +47,13 @@ public class Orientor : MonoBehaviour {
             TilemapGroup childTilemapGroup = child.GetComponent<TilemapGroup>();
             DisplacementOrientable displacement = child.GetComponent<DisplacementOrientable>();
 
+            CharacterController character = null;
+            PlayerCharacter player = child.GetComponent<PlayerCharacter>();
+            Creature creature = child.GetComponent<Creature>();
+            if (creature != null) character = creature.controller;
+            if (player != null) character = player.movement;
+
+
             if (tilemap != null) {
 
                 // Update tilemaps: refresh rule tiles
@@ -60,7 +67,14 @@ public class Orientor : MonoBehaviour {
             } else if (displacement != null) {
 
                 // Update objects whose sprites should not be rotated
-                displacement.Orient();
+                displacement.Orient(Rotation);
+
+            } else if (character != null) {
+
+                // Update objects whose sprites should not be rotated
+                SetRotation(child.transform);
+                character.OrientFurther();
+
             } else {
 
                 // Update object sprites

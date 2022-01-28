@@ -13,7 +13,7 @@ public class PlayerCharacter : MonoBehaviour {
     private Health health;
     private Vector2Int inputVelocity = Vector2Int.zero; // not scaled to speed, instant update on key change
     private Vector2Int currentTile = Vector2Int.zero;
-    private CharacterController movement;
+    [NonSerialized] public CharacterController movement;
 
     private float SQRT_2 = Mathf.Sqrt(2);
 

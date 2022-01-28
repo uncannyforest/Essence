@@ -8,12 +8,12 @@ public class DisplacementOrientable : Orientable {
 
     override public void Start() {
         defaultDisplacement = transform.GetChild(0).localPosition;
-        Orient();
+        Orient(Orientor.Rotation);
     }
 
-    public void Orient() {
+    public void Orient(Orientation orientation) {
         transform.GetChild(0).localPosition =
-                Quaternion.Euler(0, 0, (int)Orientor.Rotation) * defaultDisplacement;
+                Quaternion.Euler(0, 0, (int)orientation) * defaultDisplacement;
         Debug.Log(defaultDisplacement + " " + transform.GetChild(0).localPosition);
     }
 }

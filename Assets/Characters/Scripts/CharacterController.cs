@@ -14,6 +14,7 @@ public class CharacterController {
     private Vector2 velocityChebyshevSubgridUnit;
     private float timeToChebyshevSubgridUnit;
     private float timeDoneMoving = 0;
+    private Vector2 animatorDirection;
 
     public CharacterController(MonoBehaviour parentComponent) {
         transform = parentComponent.transform;
@@ -63,10 +64,12 @@ public class CharacterController {
     }
 
     private void SetAnimatorDirection(Vector2 direction) {
-        int x = Math.Sign(direction.x);
+        animatorDirection = direction;
+        Vector2 orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
+        int x = Math.Sign(orientedDirection.x);
         animator?.SetFloat("X", Math.Abs(x));
         spriteSorterTransform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
-        animator?.SetFloat("Y", Math.Sign(direction.y));
+        animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
     }
 
     public CharacterController Trigger(string trigger) {
@@ -95,5 +98,9 @@ public class CharacterController {
         }
         timeDoneMoving = timeToChebyshevSubgridUnit + Time.fixedTime;
         return newLocation;
+    }
+
+    public void OrientFurther() {
+        SetAnimatorDirection(animatorDirection);
     }
 }
