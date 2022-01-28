@@ -15,7 +15,7 @@ public static class OMBExtension {
 public class Orientable : MonoBehaviour {
     public Vector2 position => transform.position;
 
-    void Start() {
+    virtual public void Start() {
         Orientor.SetRotation(transform);
     }
 }

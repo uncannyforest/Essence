@@ -45,6 +45,7 @@ public class Orientor : MonoBehaviour {
         foreach (Transform child in parent) {
             Tilemap tilemap = child.GetComponent<Tilemap>();
             TilemapGroup childTilemapGroup = child.GetComponent<TilemapGroup>();
+            DisplacementOrientable displacement = child.GetComponent<DisplacementOrientable>();
 
             if (tilemap != null) {
 
@@ -56,6 +57,10 @@ public class Orientor : MonoBehaviour {
                 // Update groups of tilemaps
                 UpdateChildRotations(childTilemapGroup.transform);
 
+            } else if (displacement != null) {
+
+                // Update objects whose sprites should not be rotated
+                displacement.Orient();
             } else {
 
                 // Update object sprites

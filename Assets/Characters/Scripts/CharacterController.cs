@@ -52,7 +52,6 @@ public class CharacterController {
     // Chain after Toward() to indicate direction faced to the animator.
     public CharacterController Idle() {
         velocityChebyshevSubgridUnit = Vector2.zero;
-        Debug.Log("Where's the animator? " + animator);
         animator?.SetBool("Moving", false);
         return this;
     }
