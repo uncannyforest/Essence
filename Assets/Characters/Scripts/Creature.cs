@@ -73,7 +73,7 @@ public class Creature : MonoBehaviour {
     public SpriteSorter SpriteManager { get => spriteManager; }
 
     void Start() {
-        controller = new CharacterController(this);
+        controller = new CharacterController(this).WithPersonalBubble(personalBubble);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         cMaybeDespawn = StartCoroutine(MaybeDespawn());

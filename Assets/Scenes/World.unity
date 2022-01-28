@@ -424,7 +424,6 @@ GameObject:
   m_Component:
   - component: {fileID: 91696534}
   - component: {fileID: 91696535}
-  - component: {fileID: 91696536}
   m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
@@ -497,25 +496,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
---- !u!95 &91696536
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 91696533}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 48505176f75e0469d81719421f365f08, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &109813215
 GameObject:
   m_ObjectHideFlags: 0
@@ -5257,6 +5237,7 @@ GameObject:
   - component: {fileID: 403460094}
   - component: {fileID: 403460093}
   - component: {fileID: 403460091}
+  - component: {fileID: 403460095}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -5296,7 +5277,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terrain: {fileID: 2120764633}
   defaultSpeed: 2
-  subGridUnit: 8
 --- !u!114 &403460086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5479,6 +5459,25 @@ MonoBehaviour:
   terrain: {fileID: 2120764633}
   parent: {fileID: 2120764631}
   player: {fileID: 403460084}
+--- !u!95 &403460095
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403460083}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 48505176f75e0469d81719421f365f08, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!224 &406809448 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2125089558098251116, guid: 2230ef5eaf192412287ab938c31b89ee, type: 3}

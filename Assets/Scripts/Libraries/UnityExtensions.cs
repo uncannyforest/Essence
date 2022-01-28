@@ -71,6 +71,10 @@ public static class VectorExtensions {
         return new Vector2Int(Mathf.FloorToInt(vec.x), Mathf.FloorToInt(vec.y));
     }
 
+    public static Vector2Int RoundToInt(this Vector2 vec) {
+        return new Vector2Int(Mathf.RoundToInt(vec.x), Mathf.RoundToInt(vec.y));
+    }
+
     public static int ChebyshevMagnitude(this Vector2Int vec) {
         return Mathf.Max(Mathf.Abs(vec.x), Mathf.Abs(vec.y));
     }
