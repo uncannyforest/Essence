@@ -20,6 +20,18 @@ TextureImporter:
   - first:
       213: -3506536579647068688
     second: Archer_5
+  - first:
+      213: 7243941689720402736
+    second: Archer_6
+  - first:
+      213: -5511490489121558247
+    second: Archer_7
+  - first:
+      213: -6542253794372221699
+    second: Archer_8
+  - first:
+      213: 8994285840009083728
+    second: Archer_9
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -125,8 +137,8 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 6
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -145,9 +157,9 @@ TextureImporter:
       name: Archer_1
       rect:
         serializedVersion: 2
-        x: 6
-        y: 0
-        width: 6
+        x: 8
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -166,9 +178,9 @@ TextureImporter:
       name: Archer_2
       rect:
         serializedVersion: 2
-        x: 12
-        y: 0
-        width: 6
+        x: 16
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -187,9 +199,9 @@ TextureImporter:
       name: Archer_3
       rect:
         serializedVersion: 2
-        x: 18
-        y: 0
-        width: 6
+        x: 24
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -208,9 +220,9 @@ TextureImporter:
       name: Archer_4
       rect:
         serializedVersion: 2
-        x: 24
-        y: 0
-        width: 6
+        x: 32
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -229,9 +241,9 @@ TextureImporter:
       name: Archer_5
       rect:
         serializedVersion: 2
-        x: 30
-        y: 0
-        width: 6
+        x: 40
+        y: 8
+        width: 8
         height: 8
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -242,6 +254,90 @@ TextureImporter:
       bones: []
       spriteID: 0f5293a2f87465fc0800000000000000
       internalID: -3506536579647068688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 8
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0337d653696a78460800000000000000
+      internalID: 7243941689720402736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_7
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 8
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91137fce9904383b0800000000000000
+      internalID: -5511490489121558247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_8
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 8
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df40efb16de3535a0800000000000000
+      internalID: -6542253794372221699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_9
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 0
+        width: 8
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05b3116515f12dc70800000000000000
+      internalID: 8994285840009083728
       vertices: []
       indices: 
       edges: []

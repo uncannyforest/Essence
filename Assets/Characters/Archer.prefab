@@ -76,7 +76,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.375, y: 0.5}
+  m_Size: {x: 0.5, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -158,7 +158,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.375, y: 0.5}
+  m_Size: {x: 0.5, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 4481103850635713292}
   - component: {fileID: 4481103850635713299}
   - component: {fileID: 6486091420523554066}
+  - component: {fileID: -36652973859218673}
   m_Layer: 10
   m_Name: Archer
   m_TagString: Untagged
@@ -564,6 +565,8 @@ MonoBehaviour:
   itemDrop: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
   itemDropSize: 1
   collectiblePrefab: {fileID: 0}
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -639,6 +642,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c53988c2f101f44b2ab2809094ed5ea4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &-36652973859218673
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d691107d4cde04bdabb210872509be52, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0

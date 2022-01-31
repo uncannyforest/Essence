@@ -72,6 +72,11 @@ public class CharacterController {
         animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
     }
 
+    public CharacterController SetBool(string name, bool value) {
+        animator?.SetBool(name, value);
+        return this;
+    }
+
     public CharacterController Trigger(string trigger) {
         animator?.SetTrigger(trigger);
         return this;

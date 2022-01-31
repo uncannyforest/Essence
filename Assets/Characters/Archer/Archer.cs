@@ -28,12 +28,13 @@ public class ArcherBrain : Brain {
         expectedArrowReach = archer.arrowPrefab.reach + archer.arrowPrefab.GetComponentStrict<CircleCollider2D>().radius;
     }
 
-    override public bool CanTame(Transform player) =>
-        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Scale, archer.scaleCost);
+    override public bool CanTame(Transform player) {
+        return State == CreatureState.Faint;
+    }
 
     // Returns true if successful.
     public override bool ExtractTamingCost(Transform player) {
-        return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Scale, archer.scaleCost);
+        return State == CreatureState.Faint; // changed in CommandFollow
     }
 
     override public List<CreatureAction> Actions() {
@@ -100,5 +101,10 @@ public class ArcherBrain : Brain {
         float approxTimeToHit = Vector2.Distance(pos1, transform.position) / archer.arrowPrefab.speed;
         Debug.Log(velocity + " " + approxTimeToHit + " " + (pos1 + velocity * approxTimeToHit));
         return pos1 + velocity * (approxTimeToHit / 2f);
+    }
+
+    override protected void OnHealthReachedZero() {
+        State = CreatureState.Faint;
+        movement.SetBool("Fainted", true);
     }
 }

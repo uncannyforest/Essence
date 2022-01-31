@@ -11,7 +11,8 @@ public enum CreatureState {
     FollowOffensive,
     Station,
     Execute,
-    Pair
+    Pair,
+    Faint,
 }
 
 [Serializable]
@@ -117,7 +118,7 @@ public class Brain {
         get => investigation != null;
     }
     public bool Busy { // not available to focus
-        get => state == CreatureState.Execute || state == CreatureState.Pair;
+        get => state == CreatureState.Execute || state == CreatureState.Pair || state == CreatureState.Faint;
     }
     protected bool Scanning {
         get =>
@@ -154,7 +155,7 @@ public class Brain {
         taste = GetComponent<GoodTaste>();
         if (taste != null) taste.TamerChanged += TriggerStateChange;
         Health health = GetComponent<Health>();
-        if (health != null) health.ReachedZero += HandleDeath;
+        if (health != null) health.ReachedZero += OnHealthReachedZero;
         TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
         ScanningBehavior = new CoroutineWrapper(ScanningBehaviorE, species);
         FocusedBehavior = new CoroutineWrapper(FocusedBehaviorE, species);
@@ -176,7 +177,7 @@ public class Brain {
 
     protected T GetComponent<T>() => species.GetComponent<T>();
     protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
-    private void HandleDeath() => GameObject.Destroy(creature.gameObject);
+    virtual protected void OnHealthReachedZero() => GameObject.Destroy(creature.gameObject);
     protected Vector2 RandomVelocity() {
         Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
         return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
@@ -221,6 +222,7 @@ public class Brain {
             return;
         }
         if (Busy) ClearFocus();
+        if (State == CreatureState.Faint) movement.Idle();
         ScanningBehavior.RunIf(Scanning);
         TrekkingBehavior.RunIf(!Focused && !Busy);
         ExecutingBehavior?.RunIf(State == CreatureState.Execute);
@@ -240,6 +242,7 @@ public class Brain {
         followDirective = directive;
         ClearFocus();
         State = CreatureState.Follow;
+        movement.SetBool("Fainted", false);
     }
     protected void RequestFollow() { // initiated by creature
         if (followDirective == null) throw new InvalidOperationException("No follow directive to return to");
@@ -495,12 +498,14 @@ public class Brain {
             ScanningBehavior.Stop();
         }
         int runningBehaviors = (FocusedBehavior.IsRunning ? 1 : 0) + (TrekkingBehavior.IsRunning ? 1 : 0)
-                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? 1 : 0);
+                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? 1 : 0)
+                + (State == CreatureState.Faint ? 1 : 0);
         if (runningBehaviors != 1) {
             Debug.LogError("Exactly one of these must be running, but FocusedBehavior is"
                 + (FocusedBehavior.IsRunning ? null : " not") + ", TrekkingBehavior is"
-                + (TrekkingBehavior.IsRunning ? null : " not") + ", and ExecutingBehavior is"
-                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? null : " not"));
+                + (TrekkingBehavior.IsRunning ? null : " not") + ", ExecutingBehavior is"
+                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? null : " not")
+                + ", and State == Faint is " + (State == CreatureState.Faint));
             // reset to most helpful default
             if (followDirective != null) RequestFollow();
             else State = CreatureState.Roam;
