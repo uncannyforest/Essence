@@ -486,7 +486,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2311659948842064771, guid: a089046d331a4471dae5dac0bb70c6bc, type: 3}
-  m_Color: {r: 0.76862746, g: 0.8784314, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5400,6 +5400,8 @@ MonoBehaviour:
   itemDrop: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
   itemDropSize: 1
   collectiblePrefab: {fileID: 0}
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4
 --- !u!114 &403460091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5864,7 +5866,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.99607843, g: 0.99607843, b: 0.99607843, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -41409,6 +41411,7 @@ GameObject:
   - component: {fileID: 2120764636}
   - component: {fileID: 2120764635}
   - component: {fileID: 2120764637}
+  - component: {fileID: 2120764638}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -41602,6 +41605,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fountain: {fileID: -6226454821118147200, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
+--- !u!114 &2120764638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ef2a94f194a4d2c8b77ef6c95f13e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  spriteSolidColor: {fileID: 2100000, guid: a7fdfcf1e36774c7c9ea78e33a63359f, type: 2}
 --- !u!1001 &981116046808898326
 PrefabInstance:
   m_ObjectHideFlags: 0
