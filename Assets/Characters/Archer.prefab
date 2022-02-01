@@ -525,9 +525,12 @@ MonoBehaviour:
   creatureName: Archer
   icon: {fileID: -7132172409892320828, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   breastplate: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
-  tamingInfoShort: You need two scales to tame
-  tamingInfoLong: To tame any <creature/>, you need two scales.  Scales are orange
-    objects dropped when you defeat them.
+  tamingInfoShort: Must defeat + have bunny near to tame
+  tamingInfoLong: 'When you defeat an <creature/>, it will faint.
+
+
+    You can tame
+    a fainted <creature/> as long as you have a bunny on your team within view.'
   personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!114 &4481103850635713288

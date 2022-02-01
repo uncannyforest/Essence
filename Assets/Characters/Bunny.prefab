@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7532843021069982219}
   - component: {fileID: 8033951431855805050}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2760363490736756264}
   - component: {fileID: 241173226187111004}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Heart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4481103849553270638}
   - component: {fileID: 4481103849553270637}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: -7616915303342351412}
   - component: {fileID: 3938203489945016266}
   - component: {fileID: 5977861657139729999}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Bunny
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 4481103850873570955}
   - component: {fileID: 4358164898572260723}
   - component: {fileID: 1432531887274004917}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: SpriteSort
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -484,7 +484,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3472115710825019626}
   - component: {fileID: 3086455932783831156}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,7 +566,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3937125572334828775}
   - component: {fileID: 3702918095936141886}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}

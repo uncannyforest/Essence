@@ -23,8 +23,12 @@ public class StatusQuantity : MonoBehaviour {
     }
 
     virtual public void Reset() {
-        if (startAtMax) level = max;
-        else level = 0;
+        if (startAtMax) ResetTo(max);
+        else ResetTo(0);
+    }
+
+    virtual public void ResetTo(int level) {
+        this.level = level;
         statBar.SetPercentWithoutVisibility((float) level / max);
         statBar.Hide();
     }

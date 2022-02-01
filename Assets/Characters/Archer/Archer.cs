@@ -29,12 +29,16 @@ public class ArcherBrain : Brain {
     }
 
     override public bool CanTame(Transform player) {
-        return State == CreatureState.Faint;
+        return State == CreatureState.Faint // changed in CommandFollow not ExtractTamingCost
+            && HasBunnyNearby(player);
     }
 
     // Returns true if successful.
     public override bool ExtractTamingCost(Transform player) {
-        return State == CreatureState.Faint; // changed in CommandFollow
+        if (CanTame(player)) {
+            GetComponentStrict<Health>().ResetTo(1);
+            return true;
+        } else return false;
     }
 
     override public List<CreatureAction> Actions() {
@@ -106,5 +110,15 @@ public class ArcherBrain : Brain {
     override protected void OnHealthReachedZero() {
         State = CreatureState.Faint;
         movement.SetBool("Fainted", true);
+    }
+
+    private bool HasBunnyNearby(Transform player) {
+        Collider2D[] charactersNearby =
+            Physics2D.OverlapCircleAll(player.position, Creature.neighborhood, LayerMask.GetMask("Creature"));
+        foreach (Collider2D character in charactersNearby)
+            if (character.GetComponentInParent<Bunny>() != null &&
+                    character.GetComponentInParent<Team>().SameTeam(player))
+                return true;
+        return false;
     }
 }
