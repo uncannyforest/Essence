@@ -91,6 +91,8 @@ public class WorldInteraction : MonoBehaviour {
     public float signalRangedRadius = 1f;
     public float signalRangedDistance = 4f;
 
+    public bool freeTamingCheat = false;
+
     private Ranged rangedSelect;
     private Melee meleeSelect;
     private MeleeSquare meleeSquare;
@@ -360,9 +362,12 @@ public class WorldInteraction : MonoBehaviour {
                     ActiveCharacterToFollowing();
                 } else {
                     creature = activeCharacter.GetCharacterComponent<Creature>();
-                    if (creature.CanTame(player)) {
+                    if (freeTamingCheat) {
+                        creature.ForceTame(player);
+                        ActiveCharacterToFollowing();
+                    } else if (creature.CanTame(player)) {
                         GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
-                        if (taste != null) {
+                        if (taste != null && !freeTamingCheat) {
                             taste.StartTaming(player, ActiveCharacterToFollowing);
                         } else {
                             bool tamed = creature.TryTame(player);

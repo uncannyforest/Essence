@@ -99,14 +99,17 @@ public class Creature : MonoBehaviour {
     // If false, get TamingInfo for error
     public bool TryTame(Transform player) {
         if (brain.ExtractTamingCost(player)) {
-            StopCoroutine(cMaybeDespawn);
-            GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
-            Follow(player);
+            ForceTame(player);
             return true;
         } else return false;
     }
     public bool CanTame(Transform player) {
         return brain.CanTame(player);
+    }
+    public void ForceTame(Transform player) { // bypasses ExtractTamingCost
+        StopCoroutine(cMaybeDespawn);
+        GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
+        Follow(player);
     }
     public ExpandableInfo TamingInfo {
         get => GenerateTamingInfo(creatureName, tamingInfoShort, tamingInfoLong);
