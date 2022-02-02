@@ -474,8 +474,11 @@ public class Brain {
         if (attackDirective == null) {
             Focus = NearestThreat(); // no target
             if (Focus == null) DisableFollowOffensive();
-        } else if (CanSee(attackDirective)) Focus = attackDirective; // found target
-        else {
+        } else if (GetComponentStrict<Team>().SameTeam(attackDirective)) {
+            DisableFollowOffensive();
+        } else if (CanSee(attackDirective)) {
+            Focus = attackDirective; // found target
+        } else {
             if (!Investigating) DisableFollowOffensive(); // unless we have no leads
             Focus = null; // keep looking
         }
