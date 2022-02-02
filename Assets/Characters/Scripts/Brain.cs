@@ -46,14 +46,24 @@ public class BrainConfig {
     };
 }
 
-//                 | Scanning | Investigating | Focused | attackDir. | executeDir. | pairDir.
-// ----------------+----------+---------------+---------+------------+-------------+----------
-// Roam            | ALWAYS   | defensively   | defens. |            |             |
-// Follow          | sffwf.  | defensively   | defens. |            |             |
-// FollowOffensive | ALWAYS   | ifnt dir/vis  | ifnt dv | if directd |             |
-// Station         | ALWAYS   | defensively   | defens. |            |             |
-// Execute         |          |               |         |            | ALWAYS      |
-// Pair            |          |               |         |            |             | ALWAYS
+// READY States : Roam | Follow | FollowOffsensive | Station
+
+//                 | Scanning | Investigating | Focused | Busy | Trekking | followDir. | attackDir. | executeDir.
+// ----------------+----------+---------------+---------+------+----------+------------+------------+------------
+// READY: not I/F  | USUALLY* |               |         |      | ALWAYS   | if F/FO    | FO if dir. |            
+// READY: investg. | ALWAYS   | ALWAYS        |         |      | ALWAYS   | if F/FO    | FO if dir. |            
+// READY: focused  |          |               | ALWAYS  |      |          | if F/FO    | FO if dir. |            
+// Execute         |          |               |         | ALWS |          | ALWAYS     |            | ALWAYS     
+// Pair            |          |               |         | ALWS | ALWAYS   | sometimes  |            |            
+// Faint           |          |               |         | ALWS |          |            |            |            
+// listening       | states and directives: any row above, but ignored - no coroutines running
+
+// * always except iff State is Following and scanForFocusWhileFollowing is off
+
+// Note: always exactly one in each row is true:
+// * Focused | Busy | TrekkingSolo
+// * Focused | Trekking | Execute | Faint
+// These rules are encoded in StateAssumptions() at the bottom, which runs every Update().
 
 public class Brain {
     public BrainConfig general;
@@ -90,7 +100,12 @@ public class Brain {
             if (ReferenceEquals(focus, value)) return;
             ClearFocus();
             focus = value;
-            if (!ReferenceEquals(value, null)) FocusedBehavior.Start();
+            if (ReferenceEquals(value, null)) {
+                if (focusOrExecuteDirectiveIsPair != null) {
+                    focusOrExecuteDirectiveIsPair.EndPairCommand();
+                    focusOrExecuteDirectiveIsPair = null;
+                }
+            } else FocusedBehavior.Start();
             TriggerStateChange();
         }
     }
@@ -120,6 +135,9 @@ public class Brain {
     public bool Busy { // not available to focus
         get => state == CreatureState.Execute || state == CreatureState.Pair || state == CreatureState.Faint;
     }
+    public bool TrekkingSolo { // available for pairing
+        get => !Focused && !Busy;
+    }
     protected bool Scanning {
         get =>
             state == CreatureState.Roam ||
@@ -133,7 +151,7 @@ public class Brain {
     private CreatureState state = CreatureState.Roam;
     private bool badState = false; // wait one frame for CleanUpState()
     private bool stateIsDirty = false;
-    private Transform focus = null; // when Focused
+    private Transform focus = null; // when Focused. Only written to inside Focus.set and ClearFocus()
     private Vector2? investigation = null; // focus character not identified, only location
     private RunOnce investigationCancel = null;
     protected Transform threat = null; // for Follow
@@ -141,6 +159,8 @@ public class Brain {
     protected Vector3 stationDirective = Vector3.zero; // for Station
     protected Transform attackDirective = null; // for FollowOffensive, can be null
     protected OneOf<Terrain.Position, SpriteSorter> executeDirective = null; // for Execute
+    protected Creature pairDirective = null;
+    protected Creature focusOrExecuteDirectiveIsPair = null;
 
     /////////////////////////////////////////////
     // INITIALIZATION, VIRTUAL, & UTILITY METHODS
@@ -223,32 +243,65 @@ public class Brain {
         }
         if (Busy) ClearFocus();
         if (State == CreatureState.Faint) movement.Idle();
+
+        // run coroutines
         ScanningBehavior.RunIf(Scanning);
-        TrekkingBehavior.RunIf(!Focused && !Busy);
+        TrekkingBehavior.RunIf(TrekkingSolo || State == CreatureState.Pair);
         ExecutingBehavior?.RunIf(State == CreatureState.Execute);
+
+        // clear directives
+        if (!(State == CreatureState.Follow || State == CreatureState.FollowOffensive || 
+            State == CreatureState.Execute || State == CreatureState.Pair)) followDirective = null;
+        if (State != CreatureState.FollowOffensive) attackDirective = null;
+        if (State != CreatureState.Station) stationDirective = Vector3.zero;
         if (State != CreatureState.Execute) {
             executeDirective = null;
             ExecutingBehavior = null;
         }
-    }
-    protected void ClearDirectives() {
-        followDirective = null;
-        attackDirective = null;
-        stationDirective = Vector2.zero;
+        if (State != CreatureState.Pair && pairDirective != null) {
+            pairDirective.EndPairRequest();
+            pairDirective = null;
+        }
     }
 
     public void CommandFollow(Transform directive) {
-        ClearDirectives();
         followDirective = directive;
         ClearFocus();
         State = CreatureState.Follow;
         movement.SetBool("Fainted", false);
     }
-    protected void RequestFollow() { // initiated by creature
-        if (followDirective == null) throw new InvalidOperationException("No follow directive to return to");
-        WorldInteraction playerInterface = followDirective.GetComponentStrict<PlayerCharacter>().Interaction;
-        State = CreatureState.Follow;
-        playerInterface.EnqueueFollowing(creature);
+    public void RequestFollow() {
+        if (followDirective == null) State = CreatureState.Roam;
+        else {
+            WorldInteraction playerInterface = followDirective.GetComponentStrict<PlayerCharacter>().Interaction;
+            State = CreatureState.Follow;
+            playerInterface.EnqueueFollowing(creature);
+        }
+    }
+    // param recipient may be null, which is a no-op
+    protected Transform RequestPair(Creature recipient) {
+        if (recipient?.TryPair(creature) == true) {
+            focusOrExecuteDirectiveIsPair = recipient;
+            return recipient.transform;
+        }
+        else return null;
+    }
+    public bool TryCommandPair(Creature initiator) {
+        if (TrekkingSolo) {
+            State = CreatureState.Pair;
+            pairDirective = initiator;
+            return true;
+        } else return false;
+    }
+    public void EndPairRequest() {
+        focusOrExecuteDirectiveIsPair = null; // manually lest we issue redundant EndPairCommand below
+        if (Focused) Focus = null;
+        else if (State == CreatureState.Execute) RequestFollow();
+        else Debug.LogError(species.name + ": Why was there a pair when state " + State);
+    }
+    public void EndPairCommand() {
+        if (followDirective == null) State = CreatureState.Roam;
+        else State = CreatureState.Follow;
     }
     public void CommandExecute(CoroutineWrapper executingBehavior,
             OneOf<Terrain.Position, SpriteSorter> directive) {
@@ -257,18 +310,13 @@ public class Brain {
         State = CreatureState.Execute;
     }
     public void CommandStation(Vector2Int directive) {
-        ClearDirectives();
         stationDirective = terrain.CellCenter(directive);
         ClearFocus();
         State = CreatureState.Station;
     }
 
     public void DisableFollowOffensive() {
-        if (State == CreatureState.FollowOffensive) {
-            attackDirective = null;
-            State = CreatureState.Follow;
-            Debug.Log("DISABLED");
-        }
+        if (State == CreatureState.FollowOffensive) State = CreatureState.Follow;
     }
     public bool EnableFollowOffensive() {
         if (!general.hasAttack) throw new InvalidOperationException(species + " cannot attack");
@@ -276,7 +324,6 @@ public class Brain {
             attackDirective = null;
             return true;
         } else if (State == CreatureState.Follow) {
-            attackDirective = null;
             State = CreatureState.FollowOffensive;
             return true;
         } else return false;
@@ -317,7 +364,6 @@ public class Brain {
     ///////////
     // BEHAVIOR
 
-    // Runs when not Focused
     protected CoroutineWrapper TrekkingBehavior;
     public IEnumerator TrekkingBehaviorE() {
         if (GetComponent<Team>().TeamId == 1) Debug.Log("Starting trek");
@@ -349,16 +395,12 @@ public class Brain {
                     yield return null;
                 break;
                 case CreatureState.Station:
-                    targetDirection = stationDirective - transform.position;
-                    if (targetDirection.magnitude < 1f / CharacterController.subGridUnit) {
-                        movement.Idle();
-                        yield return new WaitForSeconds(general.reconsiderRateTarget);
-                        continue;
-                    }
-                    movement.Toward(IndexedVelocity(targetDirection));
-                    if (targetDirection.magnitude > general.reconsiderRateTarget * general.movementSpeed)
-                        yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
-                    else yield return null;
+                    yield return ApproachTargetThenIdle(stationDirective,
+                        general.reconsiderRateTarget, 1f / CharacterController.subGridUnit);
+                break;
+                case CreatureState.Pair:
+                    yield return ApproachTargetThenIdle(pairDirective.transform.position,
+                        general.reconsiderRateTarget, creature.personalBubble);
                 break;
                 default:
                     Debug.LogError("Weird state: " + state);
@@ -366,6 +408,18 @@ public class Brain {
             }
         }
         Debug.LogError("Forgot to add a yield return on some branch :P");
+    }
+
+    protected WaitForSeconds ApproachTargetThenIdle(Vector3 target, float reconsiderRate, float proximityToStop) {
+        Vector3 targetDirection = target - transform.position;
+        if (targetDirection.magnitude < proximityToStop) {
+            movement.Idle();
+            return new WaitForSeconds(reconsiderRate);
+        }
+        movement.Toward(IndexedVelocity(targetDirection));
+        if (targetDirection.magnitude > reconsiderRate * general.movementSpeed)
+            return new WaitForSeconds(Random.value * reconsiderRate);
+        else return null; // adjust faster when we're close
     }
 
     protected Vector3 FollowTargetDirection(Vector3 targetPosition) {
@@ -415,12 +469,9 @@ public class Brain {
     }
 
     // Call when in FollowOffensive but not Focused or Investigating.
+    // Assumes already checked attackDirective still alive.
     protected void UpdateFollowOffensive() {
-        if (!ReferenceEquals(attackDirective, null) && attackDirective == null) { // target died
-            Debug.Log("KILLED IT!");
-            DisableFollowOffensive();
-            Focus = null;
-        } else if (attackDirective == null) {
+        if (attackDirective == null) {
             Focus = NearestThreat(); // no target
             if (Focus == null) DisableFollowOffensive();
         } else if (CanSee(attackDirective)) Focus = attackDirective; // found target
@@ -453,10 +504,15 @@ public class Brain {
         if (attackDirective == null && !ReferenceEquals(attackDirective, null)) {
             Debug.Log("Cleanup pre-check: attackDirective died");
             DisableFollowOffensive();
+            Focus = null;
         }
         if (executeDirective != null && executeDirective.WhichType == typeof(SpriteSorter)
                 && (SpriteSorter)executeDirective == null) {
             Debug.Log("Cleanup pre-check: executeDirective died");
+            RequestFollow();
+        }
+        if (pairDirective == null && !ReferenceEquals(pairDirective, null)) {
+            Debug.Log("Cleanup pre-check: pairDirective died");
             RequestFollow();
         }
     }
@@ -489,7 +545,8 @@ public class Brain {
             ExecutingBehavior.Stop();
             ExecutingBehavior = null;
         }
-        if (Busy && (FocusedBehavior.IsRunning || TrekkingBehavior.IsRunning || ScanningBehavior.IsRunning)) {
+        if (Busy && (FocusedBehavior.IsRunning || ScanningBehavior.IsRunning ||
+                (TrekkingBehavior.IsRunning && State != CreatureState.Pair))) {
             Debug.LogError("Busy but " + (FocusedBehavior.IsRunning ? "FocusedBehavior " : null)
                 + (TrekkingBehavior.IsRunning ? "TrekkingBehavior " : null)
                 + (ScanningBehavior.IsRunning ? "ScanningBehavior " : null) + "is running");
@@ -506,9 +563,7 @@ public class Brain {
                 + (TrekkingBehavior.IsRunning ? null : " not") + ", ExecutingBehavior is"
                 + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? null : " not")
                 + ", and State == Faint is " + (State == CreatureState.Faint));
-            // reset to most helpful default
-            if (followDirective != null) RequestFollow();
-            else State = CreatureState.Roam;
+            RequestFollow(); // reset to most helpful default
         }
         // Directives
         if (state == CreatureState.Follow && followDirective == null) {
@@ -530,13 +585,20 @@ public class Brain {
         if (state == CreatureState.Execute && followDirective == null) {
             Debug.LogError("Executing without subsequent followDirective");
         }
+        if (state == CreatureState.Pair && pairDirective == null) {
+            Debug.LogError("Paired without pairDirective");
+            State = CreatureState.Roam;
+        }
         // Invalid focus combinations
         if (focus != null && investigation != null) {
             Debug.LogError("Focus and investigation at the same time: " + focus + " " + investigation);
             Investigation = null;
         }
-        if (State == CreatureState.Execute && (focus != null || investigation != null)) {
-            Debug.LogError("Should not have focus or investigation while Executing: " + focus + " " + investigation);
+        // I didn't bother to ensure Pair and Investigation cannot happen simultaneously
+        if ((State == CreatureState.Execute || State == CreatureState.Faint)
+            && (focus != null || investigation != null)) {
+            Debug.LogError("Should not have focus or investigation while in state "
+                + State + ": " + focus + " " + investigation);
             if (focus != null) Focus = null;
             if (investigation != null) Investigation = null;
         }

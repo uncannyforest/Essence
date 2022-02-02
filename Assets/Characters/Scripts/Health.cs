@@ -72,8 +72,10 @@ public class Health : StatusQuantity {
                 timeSinceDamage -= damageVisual1Time;
                 float fractionElapsed = Mathf.Clamp01(timeSinceDamage / damageVisual2Time);
                 foreach (SpriteRenderer sprite in damageVisualSprites) {
-                    sprite.material = GeneralAssetLibrary.P.spriteDefault;
-                    sprite.color = new Color(1, fractionElapsed, fractionElapsed);
+                    if (sprite != null) {
+                        sprite.material = GeneralAssetLibrary.P.spriteDefault;
+                        sprite.color = new Color(1, fractionElapsed, fractionElapsed);
+                    }
                 }
                 if (fractionElapsed >= 1f)
                     damageVisualSprites.Clear();

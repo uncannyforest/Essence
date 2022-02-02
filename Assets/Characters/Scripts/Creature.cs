@@ -120,6 +120,14 @@ public class Creature : MonoBehaviour {
             tamingInfoLong.Replace("<creature/>", "<color=creature>" + creatureName + "</color>"));
     }
 
+    public bool CanPair() => brain.TrekkingSolo;
+    
+    public bool TryPair(Creature initiator) => brain.TryCommandPair(initiator);
+
+    public void EndPairCommand() => brain.EndPairCommand(); // call this method on recipient
+
+    public void EndPairRequest() => brain.EndPairRequest(); // call this method on initiator
+
     public bool CanSee(Transform seen) => brain.CanSee(seen);
 
     public static Transform FindOffensiveTarget(int team, Vector2 playerPosition, Vector2 playerDirection,

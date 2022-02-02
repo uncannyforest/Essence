@@ -116,8 +116,8 @@ public class ArcherBrain : Brain {
         Collider2D[] charactersNearby =
             Physics2D.OverlapCircleAll(player.position, Creature.neighborhood, LayerMask.GetMask("Creature"));
         foreach (Collider2D character in charactersNearby)
-            if (character.GetComponentInParent<Bunny>() != null &&
-                    character.GetComponentInParent<Team>().SameTeam(player))
+            if (character.GetComponent<Bunny>() != null &&
+                    character.GetComponentStrict<Team>().SameTeam(player))
                 return true;
         return false;
     }

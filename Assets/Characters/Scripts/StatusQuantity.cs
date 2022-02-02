@@ -16,6 +16,9 @@ public class StatusQuantity : MonoBehaviour {
     public int Level {
         get => level;
     }
+    public float LevelPercent {
+        get => level / (float)max;
+    }
 
     virtual protected void Awake() {
         if (startAtMax) level = max;
@@ -32,6 +35,8 @@ public class StatusQuantity : MonoBehaviour {
         statBar.SetPercentWithoutVisibility((float) level / max);
         statBar.Hide();
     }
+
+
 
     virtual public bool IsFull() {
         return level == max;

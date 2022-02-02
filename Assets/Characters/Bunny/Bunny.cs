@@ -35,12 +35,22 @@ public class BunnyBrain : Brain {
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);
-            if (Focused && ShouldHealPlayer()) continue;
+
+            if (Focused) {
+                if (CanHeal(Focus)) continue;
+                else Focus = null;
+            }
             
-            if ((State == CreatureState.Roam || State == CreatureState.Station || State == CreatureState.Follow)
-                && ShouldHealPlayer()) Focus = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-            else Focus = null;
+            Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
+            if (CanHeal(player)) Focus = player;
+            else Focus = RequestPair(FindCreatureToHeal()); 
         }
+    }
+
+    private bool CanHeal(Transform character) {
+        return character.GetComponentStrict<Team>().TeamId == team &&
+                !character.GetComponentStrict<Health>().IsFull() &&
+                Vector2.Distance(transform.position, character.position) <= Creature.neighborhood;
     }
 
     private bool ShouldHealPlayer() {
@@ -48,6 +58,25 @@ public class BunnyBrain : Brain {
         return player.GetComponentStrict<Team>().TeamId == team &&
                 !player.GetComponentStrict<Health>().IsFull() &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
+    }
+
+    private Creature FindCreatureToHeal() {
+        Collider2D[] charactersNearby =
+            Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("HealthCreature"));
+        Creature result = null;
+        float resultPriority = 1;
+        foreach (Collider2D character in charactersNearby) {
+            if (character.GetComponentStrict<Team>().TeamId == team && character.GetComponentStrict<Creature>().CanPair()) {
+                float priority = character.GetComponentStrict<Health>().LevelPercent
+                    + Vector2.Distance(character.transform.position, transform.position) / Creature.neighborhood;
+                Debug.Log("To heal? " + character.gameObject + " priority " + priority + (priority < resultPriority ? ": updating" : null));
+                if (priority < resultPriority) {
+                    result = character.GetComponentStrict<Creature>();
+                    resultPriority = priority;
+                }
+            }
+        }
+        return result;
     }
 
     override protected IEnumerator FocusedBehaviorE() {
