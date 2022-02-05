@@ -8,4 +8,5 @@ public class FeatureLibrary : MonoBehaviour {
     void Awake() { if (instance == null) instance = this; }
 
     public Feature fountain;
+    public Feature windmill;
 }

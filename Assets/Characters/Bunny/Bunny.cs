@@ -86,7 +86,7 @@ public class BunnyBrain : Brain {
                 Focus.GetComponentStrict<Health>().Increase(bunny.healQuantity);
                 yield return new WaitForSeconds(bunny.healTime);
             } else {
-                movement.Toward(IndexedVelocity(Focus.position - transform.position));
+                movement.InDirection(IndexedVelocity(Focus.position - transform.position));
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
             }
         }

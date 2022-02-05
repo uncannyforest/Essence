@@ -34,7 +34,7 @@ public class CharacterController {
         return this;
     }
 
-    public CharacterController Toward(Vector2 velocity) {
+    public CharacterController InDirection(Vector2 velocity) {
         velocityChebyshevSubgridUnit = velocity / velocity.ChebyshevMagnitude() / subGridUnit;
         timeToChebyshevSubgridUnit = 1f / velocity.ChebyshevMagnitude() / subGridUnit;
         SetAnimatorDirection(velocity);
@@ -42,7 +42,7 @@ public class CharacterController {
         return this;
     }
 
-    public CharacterController Toward(Vector2 velocityChebyshevUnit, float speed) {
+    public CharacterController InDirection(Vector2 velocityChebyshevUnit, float speed) {
         velocityChebyshevSubgridUnit = velocityChebyshevUnit / subGridUnit;
         timeToChebyshevSubgridUnit = velocityChebyshevUnit.magnitude / speed / subGridUnit;
         SetAnimatorDirection(velocityChebyshevUnit);

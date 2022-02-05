@@ -37425,7 +37425,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1684077856}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2.001}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children:
   - {fileID: 313843123}
@@ -41211,6 +41211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2120764631}
   - component: {fileID: 2120764630}
+  - component: {fileID: 2120764639}
   - component: {fileID: 2120764632}
   - component: {fileID: 2120764634}
   - component: {fileID: 2120764633}
@@ -41335,10 +41336,7 @@ MonoBehaviour:
   scaleCost: 2
   flyingArrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
   swordSwipePrefab: {fileID: 1998722872617208, guid: 235d96e1b4f334589b775bf0d7ead730, type: 3}
-  swordSwipeZ: 1
   followingCharacterColor: {r: 0.6, g: 0.8666667, b: 0.73333335, a: 1}
-  collectibleZ: 2
-  highlightZ: 0.5
   camera: {fileID: 519420031}
   player: {fileID: 403460084}
   inventory: {fileID: 403460089}
@@ -41375,6 +41373,7 @@ MonoBehaviour:
   arrowwiggle: {fileID: 4481103850635713290, guid: 52a225b6ed0ec4c9bb92580f490fd0f7, type: 3}
   stipule: {fileID: 4481103850635713290, guid: 9d441d971641f40d18b8e2dd75da009a, type: 3}
   archer: {fileID: 4481103850635713290, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
+  redDwarf: {fileID: 755594374484330081, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
 --- !u!114 &2120764636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41412,6 +41411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fountain: {fileID: -6226454821118147200, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
+  windmill: {fileID: 5500238641662902520, guid: 2e73418e674d34064a27d30599c45843, type: 3}
 --- !u!114 &2120764638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41426,6 +41426,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   spriteSolidColor: {fileID: 2100000, guid: a7fdfcf1e36774c7c9ea78e33a63359f, type: 2}
+--- !u!114 &2120764639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elevation:
+    groundLevelHighlight: 1
+    collectibles: 2.01
+    features: 2.01
 --- !u!1001 &981116046808898326
 PrefabInstance:
   m_ObjectHideFlags: 0

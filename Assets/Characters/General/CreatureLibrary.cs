@@ -5,4 +5,5 @@ public class CreatureLibrary : MonoBehaviour {
     public GameObject arrowwiggle;
     public GameObject stipule;
     public GameObject archer;
+    public GameObject redDwarf;
 }

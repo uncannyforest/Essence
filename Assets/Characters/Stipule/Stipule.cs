@@ -82,7 +82,7 @@ public class StipuleBrain : Brain {
             }
             health.Decrease(stipule.attack, transform);
             movement.IdleFacing(target.position).Trigger("Attack");
-        } else movement.Toward(IndexedVelocity(target.position - transform.position));
+        } else movement.InDirection(IndexedVelocity(target.position - transform.position));
         return new WaitForSeconds(general.reconsiderRatePursuit);
     }
 }

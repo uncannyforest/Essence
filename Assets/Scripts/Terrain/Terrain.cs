@@ -124,6 +124,7 @@ public class Terrain : MonoBehaviour {
         TerrainGenerator.GenerateTerrain(this);
         AddDepths();
         TerrainGenerator.PlaceFountains(this);
+        TerrainGenerator.FinalDecor(this);
     }
 
     private Dictionary<Land, int> voluminousTiles = new Dictionary<Land, int> {
@@ -149,6 +150,16 @@ public class Terrain : MonoBehaviour {
                 return (pos.x >= 0 && pos.y >= 0 && pos.x <= Bounds.x && pos.y < Bounds.y);
             default:
                 return (pos.x >= 0 && pos.y >= 0 && pos.x < Bounds.x && pos.y < Bounds.y);
+        }
+    }
+    public Vector2 CellCenter(Position position) {
+        switch (position.grid) {
+            case Grid.XWalls:
+                return xWallTiles.GetCellCenterWorld((Vector3Int) position.Coord);
+            case Grid.YWalls:
+                return yWallTiles.GetCellCenterWorld((Vector3Int) position.Coord);
+            default:
+                return CellCenter(position.Coord);
         }
     }
     public Vector2 CellCenter(Vector2Int cellPosition) => gameGrid.GetCellCenterWorld((Vector3Int) cellPosition);
@@ -177,6 +188,10 @@ public class Terrain : MonoBehaviour {
 
     public Feature PlaceFeature(Vector2Int pos, Feature feature) {
         if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return null;
+        Debug.Log(gameGrid);
+        Debug.Log(GlobalConfig.I);
+        Debug.Log(feature);
+        Debug.Log(pos);
         Feature newFeature = GameObject.Instantiate<Feature>(feature,
                 CellCenter(pos).WithZ(GlobalConfig.I.elevation.features),
                 Quaternion.identity, gameGrid.transform);
@@ -330,6 +345,16 @@ public class Terrain : MonoBehaviour {
         public Position ToLeft() => new Position(grid, x - 1, y);
         public Position Behind() => new Position(grid, x, y - 1);
         public bool AllFourSides(Func<Position, bool> func) => func(ToRight()) && func(Ahead()) && func(ToLeft()) && func(Behind());
+        public bool IsOnOrAdjacentTo(Vector2Int cell) {
+            switch (grid) {
+                case Grid.XWalls:
+                    return cell.x == x && (cell.y == y || cell.y == y - 1);
+                case Grid.YWalls:
+                    return cell.y == y && (cell.x == x || cell.x == x - 1);
+                default:
+                    return Math.Abs(cell.x - x) + Math.Abs(cell.y - y) <= 1;
+            }
+        }
         public override string ToString() => $"({grid}, {x}, {y})";
         public static Position zero = new Position(Grid.Roof, 0, 0);
     }

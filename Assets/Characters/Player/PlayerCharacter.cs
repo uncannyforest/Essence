@@ -37,7 +37,7 @@ public class PlayerCharacter : MonoBehaviour {
         set {
             inputVelocity = value;
             if (value == Vector2Int.zero) movement.Idle();
-            else movement.Toward((Vector2)value * defaultSpeed / value.magnitude);
+            else movement.InDirection((Vector2)value * defaultSpeed / value.magnitude);
         }
     }
 

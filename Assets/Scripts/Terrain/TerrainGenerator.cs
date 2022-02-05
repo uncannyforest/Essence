@@ -452,4 +452,16 @@ public class TerrainGenerator {
         }
     }
 
+    public static void FinalDecor(Terrain terrain) {
+        for (int i = 0; i < 16; i++) {
+            for (int t = 0; t < 1000; t++) {
+                Vector2Int location = Randoms.Vector2Int(0, 0, terrain.Bounds.x, terrain.Bounds.x);
+                if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill
+                    || terrain.Feature[location] != null) continue;
+                terrain.Land[location] = Land.Grass;
+                terrain.Feature[location] = FeatureLibrary.P.windmill;
+                break;
+            }
+        }
+    }
 }

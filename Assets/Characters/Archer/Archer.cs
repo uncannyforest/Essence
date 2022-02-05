@@ -95,7 +95,7 @@ public class ArcherBrain : Brain {
             movement.IdleFacing(expectedFuturePosition);
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition);
         } else if (State != CreatureState.Station) {
-            movement.Toward(IndexedVelocity(target.position - transform.position));
+            movement.InDirection(IndexedVelocity(target.position - transform.position));
         }
         return new WaitForSeconds(general.reconsiderRatePursuit * .9f);
     }

@@ -371,7 +371,7 @@ public class Brain {
 
         for (int i = 0; i < 10_000; i++) {
             if (Investigating) {
-                movement.Toward(IndexedVelocity((Vector3)Investigation - transform.position));
+                MoveToward((Vector3)Investigation);
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
                 if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
                         general.reconsiderRatePursuit * general.movementSpeed) { // arrived at point, found nothing
@@ -381,12 +381,12 @@ public class Brain {
             } else switch (state) {
                 case CreatureState.Roam:
                     if (Random.value < general.roamRestingFraction) movement.Idle();
-                    else movement.Toward(RandomVelocity());
+                    else movement.InDirection(RandomVelocity());
                     yield return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
                 break;
                 case CreatureState.Follow:
                     targetDirection = FollowTargetDirection(followDirective.position);
-                    movement.Toward(IndexedVelocity(targetDirection));
+                    movement.InDirection(IndexedVelocity(targetDirection));
                     yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
                 break;
                 case CreatureState.FollowOffensive:
@@ -410,13 +410,16 @@ public class Brain {
         Debug.LogError("Forgot to add a yield return on some branch :P");
     }
 
+    protected void MoveToward(Vector3 target) =>
+        movement.InDirection(IndexedVelocity(target - transform.position));
+
     protected WaitForSeconds ApproachTargetThenIdle(Vector3 target, float reconsiderRate, float proximityToStop) {
         Vector3 targetDirection = target - transform.position;
         if (targetDirection.magnitude < proximityToStop) {
             movement.Idle();
             return new WaitForSeconds(reconsiderRate);
         }
-        movement.Toward(IndexedVelocity(targetDirection));
+        movement.InDirection(IndexedVelocity(targetDirection));
         if (targetDirection.magnitude > reconsiderRate * general.movementSpeed)
             return new WaitForSeconds(Random.value * reconsiderRate);
         else return null; // adjust faster when we're close

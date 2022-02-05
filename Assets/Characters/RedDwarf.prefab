@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &5207151488633200148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755594374484330081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be7e2473a3c97450db8af204cf19272e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speciesConfig:
+    woodBuildAction: {fileID: 1659339631126922887, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
+    buildTime: 0.5
+--- !u!1001 &7033450149092257649
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 734244058616520922, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1231420001142842265, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1231420001142842265, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1231420001142842265, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -7469225494850520325, guid: 586d94fa742fc41edab1561da41aefda, type: 3}
+    - target: {fileID: 1231420001142842265, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1612462188442748188, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1612462188442748188, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1612462188442748188, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 4633436313230585301, guid: 586d94fa742fc41edab1561da41aefda, type: 3}
+    - target: {fileID: 1612462188442748188, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 6875194701234111526, guid: 586d94fa742fc41edab1561da41aefda, type: 3}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: species
+      value: 
+      objectReference: {fileID: 5207151488633200148}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: breastplate
+      value: 
+      objectReference: {fileID: -7306258763297454091, guid: 586d94fa742fc41edab1561da41aefda, type: 3}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureName
+      value: Red Dwarf
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.timidity
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.movementSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.roamRestingFraction
+      value: 0.125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.numMovementDirections
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2935051636441069319, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3200447014513491315, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 7eb61c777b8864100860031163322344, type: 2}
+    - target: {fileID: 4914513955349957905, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6072286252149001515, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6072286252149001515, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6072286252149001515, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -7306258763297454091, guid: 586d94fa742fc41edab1561da41aefda, type: 3}
+    - target: {fileID: 6072286252149001515, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7176394317434626478, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Name
+      value: RedDwarf
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+--- !u!1 &755594374484330081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+  m_PrefabInstance: {fileID: 7033450149092257649}
+  m_PrefabAsset: {fileID: 0}

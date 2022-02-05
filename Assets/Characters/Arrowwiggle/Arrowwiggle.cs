@@ -62,7 +62,7 @@ public class ArrowwiggleBrain : Brain {
                 Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity, arrowwiggle.arrowCollectibleSprite);
                 yield return new WaitForSeconds(arrowwiggle.restockTime);
             } else {
-                movement.Toward(IndexedVelocity(Focus.position - transform.position));
+                movement.InDirection(IndexedVelocity(Focus.position - transform.position));
                 yield return new WaitForSeconds(general.reconsiderRatePursuit);
             }
         }
