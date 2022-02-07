@@ -403,7 +403,7 @@ public class TerrainGenerator {
             location = Randoms.Vector2Int(0, 0, subDim, subDim);
             if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill) continue;
             terrain.Land[location] = Land.Grass;
-            Fountain first = terrain.PlaceGadget(location, GadgetLibrary.P.fountain).GetComponent<Fountain>();
+            Fountain first = terrain.PlaceFeature(location, FeatureLibrary.P.fountain).GetComponent<Fountain>();
             first.Team = 1;
             break;
         }
@@ -412,7 +412,7 @@ public class TerrainGenerator {
             location = Randoms.Vector2Int(subDim, 0, 2*subDim, subDim);
             if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Gadget[location] = GadgetLibrary.P.fountain;
+            terrain.Feature[location] = FeatureLibrary.P.fountain;
             break;
         }
         // forest
@@ -428,7 +428,7 @@ public class TerrainGenerator {
             }
             if (terrain.Land[location] == Land.Hill) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Gadget[location] = GadgetLibrary.P.fountain;
+            terrain.Feature[location] = FeatureLibrary.P.fountain;
             break;
         }
         // hills
@@ -447,7 +447,7 @@ public class TerrainGenerator {
             }
             if (terrain.Land[location] == Land.Water) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Gadget[location] = GadgetLibrary.P.fountain;
+            terrain.Feature[location] = FeatureLibrary.P.fountain;
             break;
         }
     }

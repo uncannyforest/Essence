@@ -47,16 +47,16 @@ public class Terrain : MonoBehaviour {
         public Construction? Get(Vector2Int key) => terrain.GetConstruction(new Position(grid, key));
         public Construction? Get(int x, int y) => terrain.GetConstruction(new Position(grid, x, y));
     }
-    public class GadgetIndex {
+    public class FeatureIndex {
         Terrain terrain;
-        public GadgetIndex(Terrain terrain) => this.terrain = terrain;
-        public Gadget this[Vector2Int key] {
-            get => terrain.gadgets[key.x, key.y];
-            set => terrain.PlaceGadget(key, value);
+        public FeatureIndex(Terrain terrain) => this.terrain = terrain;
+        public Feature this[Vector2Int key] {
+            get => terrain.features[key.x, key.y];
+            set => terrain.PlaceFeature(key, value);
         }
-        public Gadget this[int x, int y] {
-            get => terrain.gadgets[x, y];
-            set => terrain.PlaceGadget(Vct.I(x, y), value);
+        public Feature this[int x, int y] {
+            get => terrain.features[x, y];
+            set => terrain.PlaceFeature(Vct.I(x, y), value);
         }
     }
 
@@ -75,13 +75,13 @@ public class Terrain : MonoBehaviour {
     private Construction[,] xWalls = new Construction[Dim, Dim];
     private Construction[,] yWalls = new Construction[Dim, Dim];
     private Construction[,] roofs = new Construction[Dim, Dim];
-    private Gadget[,] gadgets = new Gadget[Dim, Dim];
+    private Feature[,] features = new Feature[Dim, Dim];
 
     public LandIndex Land;
     public ConstructionIndex XWall;
     public ConstructionIndex YWall;
     public ConstructionIndex Roof;
-    public GadgetIndex Gadget;
+    public FeatureIndex Feature;
 
     private UnityEngine.Grid gameGrid;
     private Tilemap[] mainTiles;
@@ -99,7 +99,7 @@ public class Terrain : MonoBehaviour {
         XWall = new ConstructionIndex(this, Grid.XWalls);
         YWall = new ConstructionIndex(this, Grid.YWalls);
         Roof = new ConstructionIndex(this, Grid.Roof);
-        Gadget = new GadgetIndex(this);
+        Feature = new FeatureIndex(this);
 
         validator.Initialize();
 
@@ -151,9 +151,9 @@ public class Terrain : MonoBehaviour {
                 return (pos.x >= 0 && pos.y >= 0 && pos.x < Bounds.x && pos.y < Bounds.y);
         }
     }
-    public Vector3 CellCenter(Vector2Int cellPosition) => gameGrid.GetCellCenterWorld((Vector3Int) cellPosition);
+    public Vector2 CellCenter(Vector2Int cellPosition) => gameGrid.GetCellCenterWorld((Vector3Int) cellPosition);
     public Vector2Int CellAt(Vector3 worldPosition) => (Vector2Int)gameGrid.WorldToCell(worldPosition);
-    public Vector3 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
+    public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
 
     public Land? GetLand(Vector2Int coord) {
         return InBounds(coord) ? (Land?)Land[coord] : null;
@@ -175,11 +175,13 @@ public class Terrain : MonoBehaviour {
         set => SetConstruction(key, value);
     }
 
-    public Gadget PlaceGadget(Vector2Int pos, Gadget gadget) {
-        if (!gadget.IsValidTerrain(Land[pos]) || !gadget.IsValidTerrain(Roof[pos])) return null;
-        Gadget newGadget = GameObject.Instantiate<Gadget>(gadget, CellCenter(pos), Quaternion.identity, gameGrid.transform);
-        gadgets[pos.x, pos.y] = newGadget;
-        return newGadget;
+    public Feature PlaceFeature(Vector2Int pos, Feature feature) {
+        if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return null;
+        Feature newFeature = GameObject.Instantiate<Feature>(feature,
+                CellCenter(pos).WithZ(GlobalConfig.I.elevation.features),
+                Quaternion.identity, gameGrid.transform);
+        features[pos.x, pos.y] = newFeature;
+        return newFeature;
     }
 
     private void SetXWall(int x, int y, Construction construction) {

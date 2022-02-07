@@ -98,8 +98,8 @@ public class Tele {
 
     private bool IsCenter(Vector2 worldPoint, ref Vector2Int tile) {
         tile = terrain.CellAt(worldPoint);
-        Vector3 center = terrain.CellCenter(tile);
-        Vector3 diff = (Vector3)worldPoint - center;
+        Vector2 center = terrain.CellCenter(tile);
+        Vector2 diff = worldPoint - center;
         return Mathf.Abs(diff.x) + Mathf.Abs(diff.y) < 0.25;
     }
 

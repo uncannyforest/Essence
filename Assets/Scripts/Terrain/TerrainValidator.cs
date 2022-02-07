@@ -46,7 +46,7 @@ public class TerrainValidator {
     }
 
     public bool IsValidLand(Vector2Int pos, Land tile) {
-        if (terrain.Gadget[pos]?.IsValidTerrain(tile) == false) return false;
+        if (terrain.Feature[pos]?.IsValidTerrain(tile) == false) return false;
         return true;
     }
 
@@ -88,7 +88,7 @@ public class TerrainValidator {
             case Terrain.Grid.YWalls:
                 return !terrain.Land[pos.x - 1, pos.y].IsHilly() && !terrain.Land[pos.Coord].IsHilly();
             default:
-                if (terrain.Gadget[pos.Coord]?.IsValidTerrain(tile) == false) return false;
+                if (terrain.Feature[pos.Coord]?.IsValidTerrain(tile) == false) return false;
                 Land land = terrain.Land[pos.Coord];
                 if (land == Land.Meadow ||
                     land == Land.Shrub ||

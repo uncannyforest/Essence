@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Gadget : MonoBehaviour {
+public class Feature : MonoBehaviour {
     [SerializeField] public LandFlags validLand = 0;
     [SerializeField] public bool roofValid;
 

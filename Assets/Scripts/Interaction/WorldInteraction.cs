@@ -63,11 +63,7 @@ public class WorldInteraction : MonoBehaviour {
     public int scaleCost = 2;
     public Arrow flyingArrowPrefab;
     public GameObject swordSwipePrefab;
-    public float swordSwipeZ;
     public Color followingCharacterColor;
-
-    public float collectibleZ = 1;
-    public float highlightZ = 0.5f;
 
     new public Camera camera;
     public Transform player;
@@ -237,7 +233,7 @@ public class WorldInteraction : MonoBehaviour {
     public SortingGroup NewCharacterHighlight(SpriteSorter character, bool active) {
         SortingGroup result = character.AddGroup(
             character.broadGirth ? largeCharacterSelectPrefab : smallCharacterSelectPrefab,
-            highlightZ);
+            GlobalConfig.I.elevation.groundLevelHighlight);
         if (!active) result.GetComponentInChildren<SpriteRenderer>().color = followingCharacterColor;
         return result;
     }
@@ -336,12 +332,12 @@ public class WorldInteraction : MonoBehaviour {
                     }
                 } else if (terrain.Land[coord] == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
-                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord), 1);
+                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), 1);
                 } else if (terrain.Land[coord].IsPlanty()) {
                     int woodQuantity = terrain.Land[coord] == Land.Meadow ? 1 :
                         terrain.Land[coord] == Land.Shrub ? 3 : 6;
                     terrain.Land[coord] = Land.Grass;
-                    Collectible.Instantiate(wood, grid.transform, terrain.CellCenter(coord), woodQuantity);
+                    Collectible.Instantiate(wood, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
                 }
             break;
             case Mode.WoodBuilding:
@@ -410,7 +406,7 @@ public class WorldInteraction : MonoBehaviour {
                     SignalOffensiveTarget(meleeSelect.InputVelocity,
                         signalMeleeRadius, signalFrontOfPlayer, 0);
                     Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, grid.transform).transform;
-                    swordSwipe.position = meleeSelect.DamageCenter.WithZ(swordSwipeZ);
+                    swordSwipe.position = meleeSelect.DamageCenter.WithZ(GlobalConfig.I.elevation.groundLevelHighlight);
                     swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
                     yield return new WaitForSeconds(swordRate);
                 break;
