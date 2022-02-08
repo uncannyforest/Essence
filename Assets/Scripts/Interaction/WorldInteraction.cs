@@ -380,10 +380,12 @@ public class WorldInteraction : MonoBehaviour {
                 ClearTile();
                 creature = PeekFollowing();
                 if (creature != null) {
-                    ForcePopFollowing();
+                    if (!CurrentAction.CreatureAction.canQueue) {
+                        ForcePopFollowing();
+                        PlayerAction = Mode.Taming;
+                    }
                     CurrentAction.CreatureAction.pendingDirective(creature, target);
                 }
-                PlayerAction = Mode.Taming;
             break;
         }
     }

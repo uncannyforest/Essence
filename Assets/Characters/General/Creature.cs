@@ -11,34 +11,42 @@ public struct CreatureAction {
     public readonly Action<Creature> instantDirective;
     public readonly Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective;
     public readonly TeleFilter dynamicFilter;
+    public readonly bool canQueue;
     public readonly bool isRoam;
     public readonly bool isStation;
     private CreatureAction(Sprite icon, Action<Creature> instantDirective, 
             Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective,
-            TeleFilter filter, bool isRoam, bool isStation) {
+            TeleFilter filter, bool canQueue, bool isRoam, bool isStation) {
         this.icon = icon;
         this.instantDirective = instantDirective;
         this.pendingDirective = pendingDirective;
         this.dynamicFilter = filter;
+        this.canQueue = canQueue;
         this.isRoam = isRoam;
         this.isStation = isStation;
     }
 
     public static CreatureAction Instant(Sprite icon, Action<Creature> instantDirective) =>
-        new CreatureAction(icon, instantDirective, null,  null, false, false);
+        new CreatureAction(icon, instantDirective, null, null, false, false, false);
     public static CreatureAction WithObject(Sprite icon,
             CoroutineWrapper executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.Execute(executingBehavior, target),
-            filter, false, false);
+            filter, false, false, false);
+    public static CreatureAction QueueableWithObject(Sprite icon,
+            CoroutineWrapper executingBehavior,
+            TeleFilter filter) =>
+        new CreatureAction(icon, null,
+            (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
+            filter, true, false, false);
     public static CreatureAction Roam =
-        new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, true, false);
+        new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, false, true, false);
     public static CreatureAction Station =
         new CreatureAction(null, null,
             (creature, location) => creature.Station(((Terrain.Position)location).Coord),
             new TeleFilter(TeleFilter.Terrain.TILES, null),
-            false, true);
+            false, false, true);
 
     public bool IsInstant {
         get => instantDirective != null;
@@ -160,9 +168,10 @@ public class Creature : MonoBehaviour {
     public void Station(Vector2Int location) => brain.CommandStation(location);
 
     public void Execute(CoroutineWrapper executingBehavior,
-            OneOf<Terrain.Position, SpriteSorter> target) {
-        brain.CommandExecute(executingBehavior, target);
-    }
+            OneOf<Terrain.Position, SpriteSorter> target) => brain.CommandExecute(executingBehavior, target);
+
+    public void ExecuteEnqueue(CoroutineWrapper executingBehavior,
+            OneOf<Terrain.Position, SpriteSorter> target) => brain.EnqueueExecuteCommand(executingBehavior, target);
 
     private Coroutine cMaybeDespawn;
     private IEnumerator MaybeDespawn() {

@@ -25,7 +25,7 @@ public class RedDwarfBrain : Brain {
 
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
-            CreatureAction.WithObject(redDwarf.woodBuildAction,
+            CreatureAction.QueueableWithObject(redDwarf.woodBuildAction,
                 new CoroutineWrapper(WoodBuildBehaviorE, species),
                 new TeleFilter(TeleFilter.Terrain.WOODBUILDING, null))
         };
@@ -52,7 +52,7 @@ public class RedDwarfBrain : Brain {
             if (reached) {
                 terrain[buildLocation] = Construction.Wood;
                 yield return new WaitForSeconds(redDwarf.buildTime);
-                RequestFollow(); 
+                CompleteExecution(); 
                 yield break;
             } else yield return approachWait;
         }

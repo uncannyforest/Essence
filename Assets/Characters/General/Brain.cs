@@ -143,6 +143,7 @@ public class Brain {
     protected Vector3 stationDirective = Vector3.zero; // for Station
     protected Transform attackDirective = null; // for FollowOffensive, can be null
     protected OneOf<Terrain.Position, SpriteSorter> executeDirective = null; // for Execute
+    protected Queue<Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>>> executeCommandQueue = null; // null when not used
     protected Creature pairDirective = null;
     protected Creature focusOrExecuteDirectiveIsPair = null;
 
@@ -231,6 +232,7 @@ public class Brain {
         if (State != CreatureState.Execute) {
             executeDirective = null;
             ExecutingBehavior = null;
+            executeCommandQueue = null;
         }
         if (State != CreatureState.Pair && pairDirective != null) {
             pairDirective.EndPairRequest();
@@ -282,6 +284,26 @@ public class Brain {
         this.ExecutingBehavior = executingBehavior;
         this.executeDirective = directive;
         State = CreatureState.Execute;
+        executeCommandQueue = null;
+    }
+    public void EnqueueExecuteCommand(CoroutineWrapper executingBehavior,
+            OneOf<Terrain.Position, SpriteSorter> directive) {
+        if (executeCommandQueue == null) {
+            CommandExecute(executingBehavior, directive);
+            executeCommandQueue = new Queue<Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>>>();
+        } else {
+            executeCommandQueue.Enqueue(new Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>>(executingBehavior, directive));
+        }
+    }
+    public void CompleteExecution() {
+        if (executeCommandQueue == null || executeCommandQueue.Count == 0) RequestFollow();
+        else {
+            ExecutingBehavior.Stop(); // not sure if this does anything, yield break should happen right after
+            Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>> nextCommand = executeCommandQueue.Dequeue();
+            this.ExecutingBehavior = nextCommand.Item1;
+            this.executeDirective = nextCommand.Item2;
+            ExecutingBehavior.Start();
+        }
     }
     public void CommandStation(Vector2Int directive) {
         stationDirective = terrain.CellCenter(directive);
