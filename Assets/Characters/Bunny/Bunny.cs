@@ -81,14 +81,9 @@ public class BunnyBrain : Brain {
 
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            if (Vector2.Distance(Focus.position, transform.position) < bunny.healDistance) {
-                movement.IdleFacing(Focus.position);
-                Focus.GetComponentStrict<Health>().Increase(bunny.healQuantity);
-                yield return new WaitForSeconds(bunny.healTime);
-            } else {
-                movement.InDirection(IndexedVelocity(Focus.position - transform.position));
-                yield return new WaitForSeconds(general.reconsiderRatePursuit);
-            }
+            yield return pathfinding.Approach(Focus, bunny.healDistance).Then(null, bunny.healTime, (target) => {
+                target.GetComponentStrict<Health>().Increase(bunny.healQuantity);
+            });
         }
     }
 }

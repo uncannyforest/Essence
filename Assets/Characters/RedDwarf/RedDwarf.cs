@@ -7,6 +7,7 @@ using UnityEngine;
 public class RedDwarfConfig {
     public Sprite woodBuildAction;
     public float buildTime;
+    public float buildDistance;
 }
 
 public class RedDwarf : Species<RedDwarfConfig> {
@@ -46,15 +47,14 @@ public class RedDwarfBrain : Brain {
     private IEnumerator WoodBuildBehaviorE() {
         for (int i = 0; i < 100_000; i++) {
             Terrain.Position buildLocation = (Terrain.Position)executeDirective;
-            if (!((Terrain.Position)executeDirective).IsOnOrAdjacentTo(terrain.CellAt(transform.position))) {
-                MoveToward(terrain.CellCenter(buildLocation));
-                yield return new WaitForSeconds(general.reconsiderRatePursuit);
-            } else {
+            bool reached = pathfinding.Approach(buildLocation, redDwarf.buildDistance)
+                    .ThenCheckIfReached(null, out WaitForSeconds approachWait);
+            if (reached) {
                 terrain[buildLocation] = Construction.Wood;
                 yield return new WaitForSeconds(redDwarf.buildTime);
                 RequestFollow(); 
                 yield break;
-            }
+            } else yield return approachWait;
         }
     }
 }

@@ -57,14 +57,9 @@ public class ArrowwiggleBrain : Brain {
 
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            if (Vector2.Distance(Focus.position, transform.position) < arrowwiggle.restockDistance) {
-                movement.IdleFacing(Focus.position);
+            yield return pathfinding.Approach(Focus, arrowwiggle.restockDistance).Then(null, arrowwiggle.restockTime, (target) => {
                 Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity, arrowwiggle.arrowCollectibleSprite);
-                yield return new WaitForSeconds(arrowwiggle.restockTime);
-            } else {
-                movement.InDirection(IndexedVelocity(Focus.position - transform.position));
-                yield return new WaitForSeconds(general.reconsiderRatePursuit);
-            }
+            });
         }
     }
 }

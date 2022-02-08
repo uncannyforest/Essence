@@ -83,7 +83,7 @@ public class ArcherBrain : Brain {
     private WaitForSeconds WatchForMovement(Transform target, out Vector2 pos0, out float time0) {
         pos0 = target.position;
         time0 = Time.time;
-        return new WaitForSeconds(general.reconsiderRatePursuit * .1f);
+        return new WaitForSeconds(general.reconsiderRateTarget * .1f);
     }
 
     private WaitForSeconds Attack(Transform target, Vector2 pos0, float time0) {
@@ -95,9 +95,9 @@ public class ArcherBrain : Brain {
             movement.IdleFacing(expectedFuturePosition);
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition);
         } else if (State != CreatureState.Station) {
-            movement.InDirection(IndexedVelocity(target.position - transform.position));
+            pathfinding.MoveToward(target.position);
         }
-        return new WaitForSeconds(general.reconsiderRatePursuit * .9f);
+        return new WaitForSeconds(general.reconsiderRateTarget * .9f);
     }
 
     private Vector2 ExpectedFuturePosition(Vector2 pos0, Vector2 pos1, float time0, float time1) {

@@ -17,33 +17,17 @@ public enum CreatureState {
 
 [Serializable]
 public class BrainConfig {
-    public AIDirections numMovementDirections;
+    public Pathfinding.AIDirections numMovementDirections;
     public float movementSpeed;
     public float roamRestingFraction = .5f;
     public float reconsiderRateRoam = 5;
-    public float reconsiderRateTarget = 2.5f;
-    public float reconsiderRatePursuit = 1f;
+    public float reconsiderRateFollow = 2.5f;
+    public float reconsiderRateTarget = 1f;
     public float scanningRate = 1f;
     public bool scanForFocusWhenFollowing = true;
     public bool hasAttack = false;
     public float timidity = .75f;   
 
-    public enum AIDirections {
-        Infinite,
-        Four,
-        Eight,
-        Twelve
-    }
-    public static Dictionary<AIDirections, Vector2[]> AIDirectionVectors = new Dictionary<AIDirections, Vector2[]>() {
-        [AIDirections.Four] = new Vector2[] {
-            Vct.F(0.7071067812f, 0.7071067812f),
-        },
-        [AIDirections.Twelve] = new Vector2[] {
-            Vct.F(1f, 0.2679491924f), // tan(15)
-            Vct.F(0.7071067812f, 0.7071067812f),
-            Vct.F(0.2679491924f, 1f)
-        }
-    };
 }
 
 // READY States : Roam | Follow | FollowOffsensive | Station
@@ -69,14 +53,14 @@ public class Brain {
     public BrainConfig general;
     protected Species species;
     protected Creature creature;
-    protected Terrain terrain;
+    public Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     protected int team { get => GetComponentStrict<Team>().TeamId; }
-    protected CharacterController movement { get => creature.controller; }
+    public CharacterController movement { get => creature.controller; }
+    protected Pathfinding pathfinding;
     private GoodTaste taste;
 
-    protected Vector2[] aiDirections { get => BrainConfig.AIDirectionVectors[general.numMovementDirections]; }
-    protected Transform transform { get => species.transform; }
+    public Transform transform { get => species.transform; }
 
     ///////////////////
     // STATE PROPERTIES
@@ -170,6 +154,7 @@ public class Brain {
         this.general = general;
     }
     public Brain InitializeAll() {
+        pathfinding = new Pathfinding(this);
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
         taste = GetComponent<GoodTaste>();
@@ -198,17 +183,6 @@ public class Brain {
     protected T GetComponent<T>() => species.GetComponent<T>();
     protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
     virtual protected void OnHealthReachedZero() => GameObject.Destroy(creature.gameObject);
-    protected Vector2 RandomVelocity() {
-        Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
-        return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
-    }
-    protected Vector2 IndexedVelocity(Vector2 targetDirection) {
-        // round instead of floor if aiDirections.Length were even.
-        int index = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, targetDirection) + 360) % 360 / (90 / aiDirections.Length));
-        int rotation = index / aiDirections.Length;
-        int subIndex = index % aiDirections.Length;
-        return aiDirections[subIndex].RotateRightAngles(rotation) * general.movementSpeed;
-    }
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS
@@ -366,28 +340,21 @@ public class Brain {
 
     protected CoroutineWrapper TrekkingBehavior;
     public IEnumerator TrekkingBehaviorE() {
-        if (GetComponent<Team>().TeamId == 1) Debug.Log("Starting trek");
-        Vector3 targetDirection;
-
         for (int i = 0; i < 10_000; i++) {
             if (Investigating) {
-                MoveToward((Vector3)Investigation);
-                yield return new WaitForSeconds(general.reconsiderRatePursuit);
+                pathfinding.MoveToward((Vector3)Investigation);
+                yield return new WaitForSeconds(general.reconsiderRateTarget);
                 if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
-                        general.reconsiderRatePursuit * general.movementSpeed) { // arrived at point, found nothing
+                        general.reconsiderRateTarget * general.movementSpeed) { // arrived at point, found nothing
                     DisableFollowOffensive();
                     Investigation = null;
                 }
             } else switch (state) {
                 case CreatureState.Roam:
-                    if (Random.value < general.roamRestingFraction) movement.Idle();
-                    else movement.InDirection(RandomVelocity());
-                    yield return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
+                    yield return pathfinding.Roam();
                 break;
                 case CreatureState.Follow:
-                    targetDirection = FollowTargetDirection(followDirective.position);
-                    movement.InDirection(IndexedVelocity(targetDirection));
-                    yield return new WaitForSeconds(Random.value * general.reconsiderRateTarget);
+                    yield return pathfinding.Follow(followDirective);
                 break;
                 case CreatureState.FollowOffensive:
                     if (!badState && !stateIsDirty) Debug.LogError(species + ": FollowOffensive state must have Focus or Investigation. Please call UpdateFollowOffensive()");
@@ -395,12 +362,10 @@ public class Brain {
                     yield return null;
                 break;
                 case CreatureState.Station:
-                    yield return ApproachTargetThenIdle(stationDirective,
-                        general.reconsiderRateTarget, 1f / CharacterController.subGridUnit);
+                    yield return pathfinding.ApproachThenIdle(stationDirective, 1f / CharacterController.subGridUnit);
                 break;
                 case CreatureState.Pair:
-                    yield return ApproachTargetThenIdle(pairDirective.transform.position,
-                        general.reconsiderRateTarget, creature.personalBubble);
+                    yield return pathfinding.ApproachThenIdle(pairDirective.transform.position, creature.personalBubble);
                 break;
                 default:
                     Debug.LogError("Weird state: " + state);
@@ -408,31 +373,6 @@ public class Brain {
             }
         }
         Debug.LogError("Forgot to add a yield return on some branch :P");
-    }
-
-    protected void MoveToward(Vector3 target) =>
-        movement.InDirection(IndexedVelocity(target - transform.position));
-
-    protected WaitForSeconds ApproachTargetThenIdle(Vector3 target, float reconsiderRate, float proximityToStop) {
-        Vector3 targetDirection = target - transform.position;
-        if (targetDirection.magnitude < proximityToStop) {
-            movement.Idle();
-            return new WaitForSeconds(reconsiderRate);
-        }
-        movement.InDirection(IndexedVelocity(targetDirection));
-        if (targetDirection.magnitude > reconsiderRate * general.movementSpeed)
-            return new WaitForSeconds(Random.value * reconsiderRate);
-        else return null; // adjust faster when we're close
-    }
-
-    protected Vector3 FollowTargetDirection(Vector3 targetPosition) {
-        Vector3 toTarget = targetPosition - transform.position;
-
-        Transform nearestThreat = NearestThreat();
-        if (nearestThreat == null) return toTarget;
-        Vector3 toThreat = nearestThreat.position - transform.position;
-        Vector3 toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
-        return toTarget - toThreatCorrected;
     }
 
     public virtual bool CanSee(Transform seen) {
@@ -456,8 +396,8 @@ public class Brain {
     protected bool IsThreat(Transform threat) =>
         !GetComponentStrict<Team>().SameTeam(threat) && CanSee(threat);
 
-    protected Transform NearestThreat() => NearestThreat(null);
-    protected Transform NearestThreat(Func<Collider2D, bool> filter) {
+    public Transform NearestThreat() => NearestThreat(null);
+    public Transform NearestThreat(Func<Collider2D, bool> filter) {
         Collider2D[] charactersNearby =
             Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
         List<Transform> threats = new List<Transform>();

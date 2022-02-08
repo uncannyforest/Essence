@@ -15,6 +15,7 @@ MonoBehaviour:
   speciesConfig:
     woodBuildAction: {fileID: 1659339631126922887, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     buildTime: 0.5
+    buildDistance: 0.70710677
 --- !u!1001 &7033450149092257649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85,6 +86,10 @@ PrefabInstance:
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.roamRestingFraction
       value: 0.125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.reconsiderRateFollow
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.numMovementDirections

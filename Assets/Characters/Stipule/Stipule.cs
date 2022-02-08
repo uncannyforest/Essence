@@ -61,28 +61,24 @@ public class StipuleBrain : Brain {
 
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            yield return Attack(Focus);
+            yield return pathfinding.Approach(Focus, stipule.meleeReach).Then("Attack", Attack);
         }
         Debug.Log("Focus just ended, exiting FocusedBehavior");
     }
     
     private IEnumerator AttackBehaviorE() {
         while (((SpriteSorter)executeDirective) != null) {
-            yield return Attack(((SpriteSorter)executeDirective).Character);
+            yield return pathfinding.Approach(((SpriteSorter)executeDirective).Character, stipule.meleeReach).Then("Attack", Attack);
         }
         Debug.Log("Attack just ended, exiting AttackBehavior");
     }
 
-    private WaitForSeconds Attack(Transform target) {
-        if (Vector2.Distance(target.position, transform.position) < stipule.meleeReach) {
-            Health health = target.GetComponentStrict<Health>();
-            if (target.GetComponent<Team>()?.TeamId == team) {
-                Debug.LogError("Unexpected state, target is same team");
-                return new WaitForSeconds(general.reconsiderRatePursuit);
-            }
-            health.Decrease(stipule.attack, transform);
-            movement.IdleFacing(target.position).Trigger("Attack");
-        } else movement.InDirection(IndexedVelocity(target.position - transform.position));
-        return new WaitForSeconds(general.reconsiderRatePursuit);
+    private void Attack(Transform target) {
+        Health health = target.GetComponentStrict<Health>();
+        if (target.GetComponent<Team>()?.TeamId == team) {
+            Debug.LogError("Unexpected state, target is same team");
+            return;
+        }
+        health.Decrease(stipule.attack, transform);
     }
 }
