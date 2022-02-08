@@ -265,8 +265,8 @@ MonoBehaviour:
     movementSpeed: 1
     roamRestingFraction: 0.4
     reconsiderRateRoam: 5
-    reconsiderRateTarget: 2.5
-    reconsiderRatePursuit: 1
+    reconsiderRateFollow: 2.5
+    reconsiderRateTarget: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0
