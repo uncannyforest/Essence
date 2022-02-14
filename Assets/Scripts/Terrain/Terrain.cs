@@ -89,9 +89,12 @@ public class Terrain : MonoBehaviour {
     private Tilemap yWallTiles;
     private Dictionary<Land, TileBase[]> landTiles;
 
+    private static Terrain instance;
+    public static Terrain I { get => instance; }
     Terrain(): base() {
         validator = new TerrainValidator(this);
         concealment = new Concealment(this);
+        instance = this;
     }
 
     void Start() {
@@ -187,10 +190,13 @@ public class Terrain : MonoBehaviour {
     }
 
     public bool PlaceFeature(Vector2Int pos, Feature feature) {
+        if (feature == null) return DestroyFeature(pos);
+        if (features[pos.x, pos.y] != null) return false;
         if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return false;
         feature.transform.position = CellCenter(pos).WithZ(GlobalConfig.I.elevation.features);
         feature.transform.rotation = Quaternion.identity;
         features[pos.x, pos.y] = feature;
+        feature.tile = pos;
         return true;
     }
     public Feature BuildFeature(Vector2Int pos, Feature featurePrefab) {
@@ -198,6 +204,19 @@ public class Terrain : MonoBehaviour {
         Feature feature = GameObject.Instantiate(featurePrefab, gameGrid.transform);
         PlaceFeature(pos, feature);
         return feature;
+    }
+    public Feature UninstallFeature(Vector2Int pos) {
+        Feature feature = features[pos.x, pos.y];
+        features[pos.x, pos.y] = null;
+        if (feature != null) feature.tile = null;
+        return feature;
+    }
+    public bool DestroyFeature(Vector2Int pos) {
+        Feature feature = UninstallFeature(pos);
+        if (feature != null) {
+            GameObject.Destroy(feature.gameObject);
+            return true;
+        } else return false;
     }
 
     private void SetXWall(int x, int y, Construction construction) {

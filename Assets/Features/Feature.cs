@@ -5,6 +5,7 @@ public class Feature : MonoBehaviour {
     [SerializeField] public LandFlags validLand = 0;
     [SerializeField] public bool roofValid;
 
+    public Vector2Int? tile;
     public Action<PlayerCharacter> PlayerEntered;
 
     public bool IsValidTerrain(Land land) {
@@ -12,5 +13,18 @@ public class Feature : MonoBehaviour {
     }
     public bool IsValidTerrain(Construction construction) {
         return construction == Construction.None || roofValid;
+    }
+    public void Uninstall() {
+        if (tile is Vector2Int realTile) {
+            Terrain.I.UninstallFeature(realTile);
+        } else Debug.LogError(this + " not installed");
+    }
+    public void Destroy() {
+        if (tile is Vector2Int realTile) {
+            Terrain.I.Feature[realTile] = null;
+        } else {
+            Debug.Log("Destroying loose feature " + this);
+            GameObject.Destroy(this.gameObject);
+        }
     }
 }

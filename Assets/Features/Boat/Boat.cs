@@ -10,6 +10,7 @@ public class Boat : MonoBehaviour {
     public float shorePush = .5f;
 
     private Terrain terrain;
+    private Feature feature;
     private CharacterController movement;
 
     private bool inUse;
@@ -20,9 +21,10 @@ public class Boat : MonoBehaviour {
     private Vector2Int currentTile;
 
     void Start() {
-        terrain = GameObject.FindObjectOfType<Terrain>();
+        terrain = Terrain.I;
         movement = new CharacterController(this).SettingAnimatorDirectionDirectly();
-        GetComponent<Feature>().PlayerEntered += HandlePlayerEntered;
+        feature = GetComponent<Feature>();
+        feature.PlayerEntered += HandlePlayerEntered;
     }
 
     void HandlePlayerEntered(PlayerCharacter player) {
@@ -32,6 +34,7 @@ public class Boat : MonoBehaviour {
         player.transform.localPosition = Vector2.zero;
         player.EnteredVehicle(SetInputVelocity);
         charactersInBoat[0] = player.movement;
+        feature.Uninstall();
     }
 
     void HandlePlayerExited(Vector2 location) {
@@ -40,6 +43,7 @@ public class Boat : MonoBehaviour {
         player.transform.localPosition = ((Vector2)location).WithZ(2.01f); // TODO: fix
         player.ExitedVehicle();
         charactersInBoat[0] = null;
+        terrain.Feature[currentTile] = feature;
     }
 
     void SetInputVelocity(Vector2Int inputVelocity) {
@@ -69,7 +73,6 @@ public class Boat : MonoBehaviour {
         if (movement.FixedUpdateReturnTileWhenEntered() is Vector2Int tile) {
             if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
                 HandlePlayerExited(transform.position);
-                terrain.Feature[currentTile] = GetComponent<Feature>();
                 movement.IdleFacing(shoreCorrection);
                 inputVelocity = Vector2.zero;
                 currentVelocity = Vector2.zero;
