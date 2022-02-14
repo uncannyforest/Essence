@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1513103252902643624}
   - component: {fileID: 4298521760196247329}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Isometric Diamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 2514985222897334611}
   - component: {fileID: 676075985585426901}
   - component: {fileID: 8267327629834868875}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Fountain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ PolygonCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -219,3 +219,5 @@ MonoBehaviour:
   itemDrop: {fileID: 0}
   itemDropSize: 0
   collectiblePrefab: {fileID: 0}
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4

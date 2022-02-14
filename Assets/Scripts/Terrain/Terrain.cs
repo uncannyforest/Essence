@@ -123,8 +123,8 @@ public class Terrain : MonoBehaviour {
 
         TerrainGenerator.GenerateTerrain(this);
         AddDepths();
-        TerrainGenerator.PlaceFountains(this);
-        TerrainGenerator.FinalDecor(this);
+        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
+        TerrainGenerator.FinalDecor(this, startLocation);
     }
 
     private Dictionary<Land, int> voluminousTiles = new Dictionary<Land, int> {
@@ -186,17 +186,18 @@ public class Terrain : MonoBehaviour {
         set => SetConstruction(key, value);
     }
 
-    public Feature PlaceFeature(Vector2Int pos, Feature feature) {
-        if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return null;
-        Debug.Log(gameGrid);
-        Debug.Log(GlobalConfig.I);
-        Debug.Log(feature);
-        Debug.Log(pos);
-        Feature newFeature = GameObject.Instantiate<Feature>(feature,
-                CellCenter(pos).WithZ(GlobalConfig.I.elevation.features),
-                Quaternion.identity, gameGrid.transform);
-        features[pos.x, pos.y] = newFeature;
-        return newFeature;
+    public bool PlaceFeature(Vector2Int pos, Feature feature) {
+        if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return false;
+        feature.transform.position = CellCenter(pos).WithZ(GlobalConfig.I.elevation.features);
+        feature.transform.rotation = Quaternion.identity;
+        features[pos.x, pos.y] = feature;
+        return true;
+    }
+    public Feature BuildFeature(Vector2Int pos, Feature featurePrefab) {
+        if (!featurePrefab.IsValidTerrain(Land[pos]) || !featurePrefab.IsValidTerrain(Roof[pos])) return null;
+        Feature feature = GameObject.Instantiate(featurePrefab, gameGrid.transform);
+        PlaceFeature(pos, feature);
+        return feature;
     }
 
     private void SetXWall(int x, int y, Construction construction) {
@@ -260,6 +261,16 @@ public class Terrain : MonoBehaviour {
         if (position.grid == Grid.XWalls) SetXWall(position.x, position.y, construction);
         if (position.grid == Grid.YWalls) SetYWall(position.x, position.y, construction);
         if (position.grid == Grid.Roof) SetRoof(position.Coord, construction);
+    }
+
+    public Land?[] GetFourLandTilesAround(Vector2 pos) {
+        Vector2Int firstCell = CellAt(pos + Vct.F(0, -.5f));
+        return new Land?[] {
+            GetLand(firstCell),
+            GetLand(firstCell + Vct.I(1, 0)),
+            GetLand(firstCell + Vct.I(0, 1)),
+            GetLand(firstCell + Vct.I(1, 1))
+        };
     }
 
     private void AddDepths() {

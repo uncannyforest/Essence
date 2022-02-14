@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class FeatureLibrary : MonoBehaviour {
@@ -9,4 +10,5 @@ public class FeatureLibrary : MonoBehaviour {
 
     public Feature fountain;
     public Feature windmill;
+    public Feature boat;
 }

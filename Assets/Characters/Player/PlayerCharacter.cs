@@ -10,18 +10,21 @@ public class PlayerCharacter : MonoBehaviour {
     public Terrain terrain;
     public float defaultSpeed = 3f;
 
+    private Transform cameraTransform;
+
     private Health health;
     private Vector2Int inputVelocity = Vector2Int.zero; // not scaled to speed, instant update on key change
-    private Vector2Int currentTile = Vector2Int.zero;
     [NonSerialized] public CharacterController movement;
-
-    private float SQRT_2 = Mathf.Sqrt(2);
+    private Action<Vector2Int> VehicleInput = null;
 
     public Action<Vector2Int> CrossedTile;
 
+    private float SQRT_2 = Mathf.Sqrt(2);
     public const int neighborhood = 8;
 
     void Start() {
+        cameraTransform = GetComponentInChildren<Camera>().transform;
+        CrossedTile += HandleCrossedTile;
         movement = new CharacterController(this).WithSnap();
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
@@ -36,17 +39,25 @@ public class PlayerCharacter : MonoBehaviour {
         get => inputVelocity;
         set {
             inputVelocity = value;
+            if (VehicleInput != null) {
+                VehicleInput(value);
+                return;
+            }
             if (value == Vector2Int.zero) movement.Idle();
             else movement.InDirection((Vector2)value * defaultSpeed / value.magnitude);
         }
     }
 
     public void FixedUpdate() {
-        if (movement.FixedUpdate() is Vector2 newPos) {
-            Vector2Int oldTile = currentTile;
-            currentTile = terrain.CellAt(newPos);
-            if (oldTile != currentTile && CrossedTile != null) CrossedTile(currentTile);
-        }
+        if (VehicleInput == null &&
+                movement.FixedUpdateReturnTileWhenEntered() is Vector2Int tile &&
+                CrossedTile != null)
+            CrossedTile(tile);
+    }
+
+    public void HandleCrossedTile(Vector2Int newTile) {
+        if (terrain.Feature[newTile] is Feature feature && feature.PlayerEntered != null)
+            feature.PlayerEntered(this);
     }
 
     public void HandleDeath() {
@@ -59,5 +70,20 @@ public class PlayerCharacter : MonoBehaviour {
         int randomIndex = Random.Range(0, teamSpawnPoints.Length);
         Debug.Log(allSpawnPoints.Length + " " + teamSpawnPoints.Length + " " + randomIndex);
         transform.position = teamSpawnPoints[randomIndex].transform.position;
+    }
+
+    public void EnteredVehicle(Action<Vector2Int> ReceiveInput) {
+        movement.Idle();
+        VehicleInput = ReceiveInput;
+        GetComponent<Rigidbody2D>().simulated = false;
+        cameraTransform.parent = transform.parent.parent.parent;
+        GetComponentInChildren<SpriteSorter>().Disable();
+    }
+
+    public void ExitedVehicle() {
+        VehicleInput = null;
+        GetComponent<Rigidbody2D>().simulated = true;
+        cameraTransform.parent = transform;
+        GetComponentInChildren<SpriteSorter>().Enable();
     }
 }

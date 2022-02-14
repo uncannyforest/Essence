@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 465108167609975466}
   - component: {fileID: 5900765189765307573}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 597487281553897393}
   - component: {fileID: 6582708178009582225}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,7 +173,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6235767708898384831}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: StatBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Visualizations
   - Water
   - UI
   - Clickable
@@ -18,7 +18,7 @@ TagManager:
   - HealthCreature
   - Collectible
   - Projectile
-  - 
+  - NoCreatures
   - 
   - 
   - 

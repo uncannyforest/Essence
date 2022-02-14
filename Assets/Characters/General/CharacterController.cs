@@ -4,11 +4,13 @@ using UnityEngine;
 public class CharacterController {
     public const int subGridUnit = 8;
     
+    private Terrain terrain;
     private Transform transform;
     private Rigidbody2D rigidbody;
     private Transform spriteSorterTransform;
     private Animator animator; // may be null
     private float? personalBubble = null;
+    private bool setAnimatorDirectionDirectly = false;
 
     private bool snap = false;
     private Vector2 velocityChebyshevSubgridUnit;
@@ -17,9 +19,11 @@ public class CharacterController {
     private Vector2 animatorDirection;
 
     public CharacterController(MonoBehaviour parentComponent) {
+        terrain = GameObject.FindObjectOfType<Terrain>();
         transform = parentComponent.transform;
         rigidbody = parentComponent.GetComponentStrict<Rigidbody2D>();
-        spriteSorterTransform = parentComponent.GetComponentInChildren<SpriteSorter>().transform;
+        SpriteSorter spriteSorter = parentComponent.GetComponentInChildren<SpriteSorter>();
+        if (spriteSorter != null) spriteSorterTransform = spriteSorter.transform;
         animator = parentComponent.GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
     }
@@ -29,9 +33,19 @@ public class CharacterController {
         return this;
     }
 
+    public CharacterController SettingAnimatorDirectionDirectly() {
+        this.setAnimatorDirectionDirectly = true;
+        return this;
+    }
+
     public CharacterController WithSnap() {
         snap = true;
         return this;
+    }
+
+    public CharacterController SetVelocity(Vector2 velocity) {
+        if (velocity == Vector2.zero) return Idle();
+        else return InDirection(velocity);
     }
 
     public CharacterController InDirection(Vector2 velocity) {
@@ -66,10 +80,15 @@ public class CharacterController {
     private void SetAnimatorDirection(Vector2 direction) {
         animatorDirection = direction;
         Vector2 orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
-        int x = Math.Sign(orientedDirection.x);
-        animator?.SetFloat("X", Math.Abs(x));
-        spriteSorterTransform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
-        animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
+        if (setAnimatorDirectionDirectly) {
+            animator?.SetFloat("X", orientedDirection.x);
+            animator?.SetFloat("Y", orientedDirection.y);
+        } else {
+            int x = Math.Sign(orientedDirection.x);
+            animator?.SetFloat("X", Math.Abs(x));
+            spriteSorterTransform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
+            animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
+        }
     }
 
     public CharacterController SetBool(string name, bool value) {
@@ -82,12 +101,22 @@ public class CharacterController {
         return this;
     }
 
-    public Vector2? FixedUpdate() {
+    private Vector2? FixedUpdateReturnPosition() {
         if (Time.fixedTime > timeDoneMoving)
             if (velocityChebyshevSubgridUnit != Vector2Int.zero)
                 if (Move() is Vector2 move) {
             rigidbody.MovePosition(move);
             return move;
+        }
+        return null;
+    }
+    public void FixedUpdate() => FixedUpdateReturnPosition();
+    private Vector2Int currentTile = Vector2Int.zero;
+    public Vector2Int? FixedUpdateReturnTileWhenEntered() {
+        if (FixedUpdateReturnPosition() is Vector2 newPos) {
+            Vector2Int oldTile = currentTile;
+            currentTile = terrain.CellAt(newPos);
+            return (oldTile != currentTile) ? currentTile : (Vector2Int?)null;
         }
         return null;
     }

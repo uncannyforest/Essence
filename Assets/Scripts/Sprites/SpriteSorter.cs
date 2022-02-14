@@ -54,6 +54,16 @@ public class SpriteSorter : MonoBehaviour {
         }
     }
 
+    public void Enable() => this.enabled = true;
+
+    public void Disable() {
+        foreach (OrientableChild sortingGroup in SortingGroups)
+            sortingGroup.transform.localPosition = Vector3.zero;
+        foreach (OrientableChild sprite in Sprites)
+            sprite.transform.localPosition = Vector3.zero;
+        this.enabled = false;
+    }
+
     public SortingGroup AddGroup(SortingGroup prefab, float z) {
         SortingGroup result = GameObject.Instantiate(prefab, transform);
         result.transform.localPosition = new Vector3(0, 0, z);

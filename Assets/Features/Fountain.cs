@@ -2,16 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Feature))]
 [RequireComponent(typeof(Health))]
 public class Fountain : MonoBehaviour {
     public float timeToCapture = 5f;
     public float timeToReset = 1f;
 
+    private Terrain terrain;
+
     private int team = 0;
     private Health health;
     private bool enemyPresent;
     new private Collider2D collider;
-    private Collider2D enemy;
+    private Transform enemy;
 
     public int Team {
         get => team;
@@ -23,24 +26,25 @@ public class Fountain : MonoBehaviour {
     }
 
     void Start() {
+        terrain = GameObject.FindObjectOfType<Terrain>();
+        GetComponent<Feature>().PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
         if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
     }
 
-    void OnTriggerEnter2D(Collider2D other) {
-        PlayerCharacter target = other.GetComponent<PlayerCharacter>();
-        if (target == null) return;
+    void HandlePlayerEntered(PlayerCharacter target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
         if (playerTeam == team) return;
         enemyPresent = true;
-        enemy = other;
+        enemy = target.transform;
     }
 
     void FixedUpdate() {
         if (enemyPresent) {
-            if (collider.IsTouching(enemy))
+            Debug.Log(terrain.CellAt(transform.position) + " and " + terrain.CellAt(enemy.position));
+            if (terrain.CellAt(transform.position) == terrain.CellAt(enemy.position))
                 health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy.transform);
             else enemyPresent = false;
         } else if (!health.IsFull()) {

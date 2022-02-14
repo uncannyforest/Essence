@@ -395,16 +395,17 @@ public class TerrainGenerator {
         }
     }
 
-    public static void PlaceFountains(Terrain terrain) {
+    public static Vector2Int PlaceFountains(Terrain terrain) {
         int subDim = terrain.Bounds.x / 2;
         Vector2Int location;
+        Vector2Int startLocation = Vector2Int.zero;
         // water
         for (int t = 0; t < 1000; t++) {
-            location = Randoms.Vector2Int(0, 0, subDim, subDim);
-            if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill) continue;
-            terrain.Land[location] = Land.Grass;
-            Fountain first = terrain.PlaceFeature(location, FeatureLibrary.P.fountain).GetComponent<Fountain>();
-            first.Team = 1;
+            startLocation = Randoms.Vector2Int(0, 0, subDim, subDim);
+            if (terrain.Land[startLocation] == Land.Water || terrain.Land[startLocation] == Land.Hill) continue;
+            terrain.Land[startLocation] = Land.Grass;
+            Feature first = terrain.BuildFeature(startLocation, FeatureLibrary.P.fountain);
+            first.GetComponentStrict<Fountain>().Team = 1;
             break;
         }
         // grass
@@ -412,7 +413,7 @@ public class TerrainGenerator {
             location = Randoms.Vector2Int(subDim, 0, 2*subDim, subDim);
             if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Feature[location] = FeatureLibrary.P.fountain;
+            terrain.BuildFeature(location, FeatureLibrary.P.fountain);
             break;
         }
         // forest
@@ -428,7 +429,7 @@ public class TerrainGenerator {
             }
             if (terrain.Land[location] == Land.Hill) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Feature[location] = FeatureLibrary.P.fountain;
+            terrain.BuildFeature(location, FeatureLibrary.P.fountain);
             break;
         }
         // hills
@@ -447,21 +448,54 @@ public class TerrainGenerator {
             }
             if (terrain.Land[location] == Land.Water) continue;
             terrain.Land[location] = Land.Grass;
-            terrain.Feature[location] = FeatureLibrary.P.fountain;
+            terrain.BuildFeature(location, FeatureLibrary.P.fountain);
             break;
         }
+
+        return startLocation;
     }
 
-    public static void FinalDecor(Terrain terrain) {
+    public static void FinalDecor(Terrain terrain, Vector2Int startLocation) {
         for (int i = 0; i < 16; i++) {
             for (int t = 0; t < 1000; t++) {
                 Vector2Int location = Randoms.Vector2Int(0, 0, terrain.Bounds.x, terrain.Bounds.x);
                 if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill
                     || terrain.Feature[location] != null) continue;
                 terrain.Land[location] = Land.Grass;
-                terrain.Feature[location] = FeatureLibrary.P.windmill;
+            terrain.BuildFeature(location, FeatureLibrary.P.windmill);
                 break;
             }
         }
+
+        bool[] continueInDirection = new bool[] {true, true, true, true};
+        Vector2Int farthestShore = Vector2Int.zero;
+        int distance = 1;
+        for (int shoresEncountered = 0; shoresEncountered < 4; distance++) {
+            if (continueInDirection[0] && terrain.Land[startLocation + Vector2Int.right * distance] == Land.Water) {
+                continueInDirection[0] = false;
+                shoresEncountered++;
+                farthestShore = startLocation + Vector2Int.right * distance;
+                Debug.Log(farthestShore);
+            }
+            if (continueInDirection[1] && terrain.Land[startLocation + Vector2Int.up * distance] == Land.Water) {
+                continueInDirection[1] = false;
+                shoresEncountered++;
+                farthestShore = startLocation + Vector2Int.up * distance;
+                Debug.Log(farthestShore);
+            }
+            if (continueInDirection[2] && terrain.Land[startLocation + Vector2Int.left * distance] == Land.Water) {
+                continueInDirection[2] = false;
+                shoresEncountered++;
+                farthestShore = startLocation + Vector2Int.left * distance;
+                Debug.Log(farthestShore);
+            }
+            if (continueInDirection[3] && terrain.Land[startLocation + Vector2Int.down * distance] == Land.Water) {
+                continueInDirection[3] = false;
+                shoresEncountered++;
+                farthestShore = startLocation + Vector2Int.down * distance;
+                Debug.Log(farthestShore);
+            }
+        }
+        terrain.BuildFeature(farthestShore, FeatureLibrary.P.boat);
     }
 }

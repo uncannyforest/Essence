@@ -66,11 +66,9 @@ public class Concealment {
         if (land?.PlantLevel() >= seen.Height) {
             if ((seer.position - seen.transform.position).sqrMagnitude < 2.5f * 2.5f)
                 return true;
-            foreach (Vector2Int tile in FourCellsAt(seen.transform.position)) {
-                Land? adjLand = terrain.GetLand(tile);
+            foreach (Land? adjLand in terrain.GetFourLandTilesAround(seen.transform.position))
                 if (adjLand == null || adjLand?.PlantLevel() < seen.Height)
                     return true;
-            }
             return false;
         }
         return true;
@@ -134,7 +132,7 @@ public class Concealment {
         }
     }
 
-    private Vector2Int[] FourCellsAt(Vector2 pos) {
+    private Vector2Int[] FourTilesAround(Vector2 pos) {
         Vector2Int firstCell = terrain.CellAt(pos + Vct.F(0, -.5f));
         return new Vector2Int[] {
             firstCell,
