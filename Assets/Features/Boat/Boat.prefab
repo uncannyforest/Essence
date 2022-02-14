@@ -352,6 +352,7 @@ MonoBehaviour:
   acceleration: 4
   minSpeed: 0.33333334
   shorePush: 0.5
+  shorePushNoZone: 0.2
 --- !u!1001 &9059841471045547052
 PrefabInstance:
   m_ObjectHideFlags: 0

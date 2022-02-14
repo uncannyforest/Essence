@@ -168,6 +168,7 @@ public class Terrain : MonoBehaviour {
     public Vector2 CellCenter(Vector2Int cellPosition) => gameGrid.GetCellCenterWorld((Vector3Int) cellPosition);
     public Vector2Int CellAt(Vector3 worldPosition) => (Vector2Int)gameGrid.WorldToCell(worldPosition);
     public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
+    public Vector2 PositionInCell(Vector2 position) /* -1 <= x + y <= 1 */ => 2 * (position - CellCenterAt(position));
 
     public Land? GetLand(Vector2Int coord) {
         return InBounds(coord) ? (Land?)Land[coord] : null;

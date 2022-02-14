@@ -9,6 +9,7 @@ public class Boat : MonoBehaviour {
     public float acceleration = 4;
     public float minSpeed = 1/30f;
     public float shorePush = .5f;
+    public float shorePushNoZone = .2f;
 
     private Terrain terrain;
     private Feature feature;
@@ -52,17 +53,22 @@ public class Boat : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if (!inUse) return;
+
         Vector2 shoreCorrection = Vector2.zero;
         Land?[] nearTiles = terrain.GetFourLandTilesAround(transform.position);
-        if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush);
-        if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(-shorePush, 0);
-        if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush, 0);
-        if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, -shorePush);
-        float expectedX = (shoreCorrection.x * inputVelocity.x) > 0 && Mathf.Abs(shoreCorrection.x) < Mathf.Abs(inputVelocity.x)
-            ? shoreCorrection.x : inputVelocity.x;
-        float expectedY = (shoreCorrection.y * inputVelocity.y) > 0 && Mathf.Abs(shoreCorrection.y) < Mathf.Abs(inputVelocity.y)
-            ? shoreCorrection.y : inputVelocity.y;
-        Vector2 expectedVelocity = new Vector2(expectedX, expectedY);
+        Vector2 sub = terrain.PositionInCell(transform.position);
+        if (sub.magnitude < shorePushNoZone) sub = Vector2.zero;
+        if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush * (Mathf.Abs(sub.x) - sub.y));
+        if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x - Mathf.Abs(sub.y)), 0);
+        if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x + Mathf.Abs(sub.y)), 0);
+        if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush * (-Mathf.Abs(sub.x) - sub.y));
+        // float expectedX = (shoreCorrection.x * inputVelocity.x) > 0 && Mathf.Abs(shoreCorrection.x) < Mathf.Abs(inputVelocity.x)
+        //     ? shoreCorrection.x : inputVelocity.x;
+        // float expectedY = (shoreCorrection.y * inputVelocity.y) > 0 && Mathf.Abs(shoreCorrection.y) < Mathf.Abs(inputVelocity.y)
+        //     ? shoreCorrection.y : inputVelocity.y;
+        Vector2 expectedVelocity = inputVelocity + shoreCorrection;
+        Debug.Log("Input velocity: " + inputVelocity + " / shore max velocity: " + shoreCorrection + " / actual max velocity: " + expectedVelocity);
 
         if (currentVelocity != expectedVelocity) {
             Debug.Log(currentVelocity + " towards " + expectedVelocity + " at " + acceleration * Time.fixedDeltaTime);
