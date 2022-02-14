@@ -7,6 +7,7 @@ using UnityEngine;
 public class Boat : MonoBehaviour {
     public float speed = 2;
     public float acceleration = 4;
+    public float minSpeed = 1/30f;
     public float shorePush = .5f;
 
     private Terrain terrain;
@@ -66,6 +67,9 @@ public class Boat : MonoBehaviour {
         if (currentVelocity != expectedVelocity) {
             Debug.Log(currentVelocity + " towards " + expectedVelocity + " at " + acceleration * Time.fixedDeltaTime);
             currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, acceleration * Time.fixedDeltaTime);
+            if (currentVelocity.magnitude < minSpeed) {
+                currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
+            }
             Debug.Log("is " + currentVelocity);
             movement.SetVelocity(currentVelocity);
         }
