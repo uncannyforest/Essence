@@ -8,6 +8,7 @@ public class Fountain : MonoBehaviour {
     public float timeToCapture = 5f;
     public float timeToReset = 1f;
 
+    private Feature feature;
     private Terrain terrain;
 
     private int team = 0;
@@ -26,6 +27,8 @@ public class Fountain : MonoBehaviour {
     }
 
     void Start() {
+        feature = GetComponent<Feature>();
+        feature.PlayerEntered += HandlePlayerEntered;
         terrain = GameObject.FindObjectOfType<Terrain>();
         GetComponent<Feature>().PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
@@ -44,8 +47,8 @@ public class Fountain : MonoBehaviour {
     void FixedUpdate() {
         if (enemyPresent) {
             Debug.Log(terrain.CellAt(transform.position) + " and " + terrain.CellAt(enemy.position));
-            if (terrain.CellAt(transform.position) == terrain.CellAt(enemy.position))
-                health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy.transform);
+            if (feature.tile == terrain.CellAt(enemy.position))
+                health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy);
             else enemyPresent = false;
         } else if (!health.IsFull()) {
             health.Increase((int)(health.max * Time.fixedDeltaTime / timeToReset));
