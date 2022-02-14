@@ -68,8 +68,7 @@ public class PlayerCharacter : MonoBehaviour {
             where point.Team == GetComponent<Team>().TeamId
             select point).ToArray<Fountain>();
         int randomIndex = Random.Range(0, teamSpawnPoints.Length);
-        Debug.Log(allSpawnPoints.Length + " " + teamSpawnPoints.Length + " " + randomIndex);
-        transform.position = teamSpawnPoints[randomIndex].transform.position;
+        transform.position = (Vector2)(teamSpawnPoints[randomIndex].transform.position);
     }
 
     public void EnteredVehicle(Action<Vector2Int> ReceiveInput) {
