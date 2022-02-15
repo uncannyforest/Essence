@@ -17,15 +17,12 @@ public class PlayerCharacter : MonoBehaviour {
     [NonSerialized] public CharacterController movement;
     private Action<Vector2Int> VehicleInput = null;
 
-    public Action<Vector2Int> CrossedTile;
-
     private float SQRT_2 = Mathf.Sqrt(2);
     public const int neighborhood = 8;
 
     void Start() {
         cameraTransform = GetComponentInChildren<Camera>().transform;
-        CrossedTile += HandleCrossedTile;
-        movement = new CharacterController(this).WithSnap();
+        movement = new CharacterController(this).WithSnap().WithCrossedTileHandler(HandleCrossedTile);
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
     }
@@ -46,13 +43,6 @@ public class PlayerCharacter : MonoBehaviour {
             if (value == Vector2Int.zero) movement.Idle();
             else movement.InDirection((Vector2)value * defaultSpeed / value.magnitude);
         }
-    }
-
-    public void FixedUpdate() {
-        if (VehicleInput == null &&
-                movement.FixedUpdateReturnTileWhenEntered() is Vector2Int tile &&
-                CrossedTile != null)
-            CrossedTile(tile);
     }
 
     public void HandleCrossedTile(Vector2Int newTile) {

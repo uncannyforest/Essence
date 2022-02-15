@@ -21,10 +21,13 @@ public class Boat : MonoBehaviour {
     private Vector2 inputVelocity = Vector2.zero;
     private Vector2 currentVelocity = Vector2.zero;
     private Vector2Int currentTile;
+    private Vector2 currentShoreCorrection;
 
     void Start() {
         terrain = Terrain.I;
-        movement = new CharacterController(this).SettingAnimatorDirectionDirectly();
+        movement = new CharacterController(this)
+            .SettingAnimatorDirectionDirectly()
+            .WithCrossedTileHandler(HandleCrossedTile);
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
     }
@@ -80,15 +83,18 @@ public class Boat : MonoBehaviour {
             movement.SetVelocity(currentVelocity);
         }
 
-        if (movement.FixedUpdateReturnTileWhenEntered() is Vector2Int tile) {
-            if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
-                HandlePlayerExited(transform.position);
-                movement.IdleFacing(shoreCorrection);
-                inputVelocity = Vector2.zero;
-                currentVelocity = Vector2.zero;
-            } else {
-                currentTile = tile;
-            }
+        currentShoreCorrection = shoreCorrection;
+        Debug.Log(currentShoreCorrection);
+    }
+
+    private void HandleCrossedTile(Vector2Int tile) {
+        if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
+            HandlePlayerExited(transform.position);
+            movement.IdleFacing(currentShoreCorrection);
+            inputVelocity = Vector2.zero;
+            currentVelocity = Vector2.zero;
+        } else {
+            currentTile = tile;
         }
     }
 

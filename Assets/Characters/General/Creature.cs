@@ -192,10 +192,6 @@ public class Creature : MonoBehaviour {
     public void Update() {
         brain.Update();
     }
-
-    public void FixedUpdate() {
-        controller.FixedUpdate();
-    }
 }
 
 [RequireComponent(typeof(Creature))]

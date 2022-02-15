@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class CharacterController {
@@ -9,13 +10,14 @@ public class CharacterController {
     private Rigidbody2D rigidbody;
     private Transform spriteSorterTransform;
     private Animator animator; // may be null
+    private CoroutineWrapper MoveCoroutine;
     private float? personalBubble = null;
     private bool setAnimatorDirectionDirectly = false;
-
+    private Action<Vector2Int> CrossedTile;
+    
     private bool snap = false;
     private Vector2 velocityChebyshevSubgridUnit;
     private float timeToChebyshevSubgridUnit;
-    private float timeDoneMoving = 0;
     private Vector2 animatorDirection;
 
     public CharacterController(MonoBehaviour parentComponent) {
@@ -26,6 +28,8 @@ public class CharacterController {
         if (spriteSorter != null) spriteSorterTransform = spriteSorter.transform;
         animator = parentComponent.GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
+        MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, parentComponent);
+        MoveCoroutine.Start();
     }
 
     public CharacterController WithPersonalBubble(float personalBubble) {
@@ -40,6 +44,11 @@ public class CharacterController {
 
     public CharacterController WithSnap() {
         snap = true;
+        return this;
+    }
+
+    public CharacterController WithCrossedTileHandler(Action<Vector2Int> CrossedTile) {
+        this.CrossedTile += CrossedTile;
         return this;
     }
 
@@ -101,24 +110,20 @@ public class CharacterController {
         return this;
     }
 
-    private Vector2? FixedUpdateReturnPosition() {
-        if (Time.fixedTime > timeDoneMoving)
-            if (velocityChebyshevSubgridUnit != Vector2Int.zero)
-                if (Move() is Vector2 move) {
-            rigidbody.MovePosition(move);
-            return move;
-        }
-        return null;
-    }
-    public void FixedUpdate() => FixedUpdateReturnPosition();
     private Vector2Int currentTile = Vector2Int.zero;
-    public Vector2Int? FixedUpdateReturnTileWhenEntered() {
-        if (FixedUpdateReturnPosition() is Vector2 newPos) {
-            Vector2Int oldTile = currentTile;
-            currentTile = terrain.CellAt(newPos);
-            return (oldTile != currentTile) ? currentTile : (Vector2Int?)null;
+    private IEnumerator MoveCoroutineE() {
+        while (true) {
+            if (velocityChebyshevSubgridUnit != Vector2Int.zero
+                    && Move() is Vector2 move) {
+                rigidbody.MovePosition(move);
+                if (CrossedTile != null) {
+                    Vector2Int oldTile = currentTile;
+                    currentTile = terrain.CellAt(move);
+                    if (oldTile != currentTile) CrossedTile(currentTile);
+                }
+                yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
+            } else yield return null;
         }
-        return null;
     }
 
     private Vector2? Move() {
@@ -130,7 +135,6 @@ public class CharacterController {
         if (snap) {
             newLocation = (Vector2)((newLocation * subGridUnit).RoundToInt()) / subGridUnit;
         }
-        timeDoneMoving = timeToChebyshevSubgridUnit + Time.fixedTime;
         return newLocation;
     }
 

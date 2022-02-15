@@ -27,7 +27,7 @@ public class Concealment {
         };
         transparentTiles = terrain.transform.Find("Transparent").GetComponent<Tilemap>();
         player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-        player.GetComponent<PlayerCharacter>().CrossedTile += HandleCrossedTile;
+        player.GetComponent<PlayerCharacter>().movement.WithCrossedTileHandler(HandleCrossedTile);
     }
 
     public bool CanSee(Transform seer, SpriteSorter seen) {
