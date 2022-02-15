@@ -84,13 +84,12 @@ public class Boat : MonoBehaviour {
         }
 
         currentShoreCorrection = shoreCorrection;
-        Debug.Log(currentShoreCorrection);
     }
 
     private void HandleCrossedTile(Vector2Int tile) {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
-            movement.IdleFacing(currentShoreCorrection);
+            movement.InDirection(currentShoreCorrection).Idle();
             inputVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
         } else {
