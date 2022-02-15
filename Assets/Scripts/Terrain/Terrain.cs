@@ -51,11 +51,11 @@ public class Terrain : MonoBehaviour {
         Terrain terrain;
         public FeatureIndex(Terrain terrain) => this.terrain = terrain;
         public Feature this[Vector2Int key] {
-            get => terrain.features[key.x, key.y];
+            get => terrain.InBounds(key) ? terrain.features[key.x, key.y] : null;
             set => terrain.PlaceFeature(key, value);
         }
         public Feature this[int x, int y] {
-            get => terrain.features[x, y];
+            get => terrain.InBounds(Vct.I(x, y)) ? terrain.features[x, y] : null;
             set => terrain.PlaceFeature(Vct.I(x, y), value);
         }
     }
