@@ -13,7 +13,7 @@ public class Fountain : MonoBehaviour {
 
     private int team = 0;
     private Health health;
-    private bool enemyPresent;
+    private int enemyPresent = 0;
     new private Collider2D collider;
     private Transform enemy;
 
@@ -40,16 +40,15 @@ public class Fountain : MonoBehaviour {
     void HandlePlayerEntered(PlayerCharacter target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
         if (playerTeam == team) return;
-        enemyPresent = true;
+        enemyPresent = 2; // Rather than using boolean, we need an extra frame for FixedUpdate to run
         enemy = target.transform;
     }
 
     void FixedUpdate() {
-        if (enemyPresent) {
-            Debug.Log(terrain.CellAt(transform.position) + " and " + terrain.CellAt(enemy.position));
+        if (enemyPresent > 0) {
             if (feature.tile == terrain.CellAt(enemy.position))
                 health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy);
-            else enemyPresent = false;
+            else enemyPresent--;
         } else if (!health.IsFull()) {
             health.Increase((int)(health.max * Time.fixedDeltaTime / timeToReset));
         }
@@ -57,6 +56,6 @@ public class Fountain : MonoBehaviour {
 
     void HandleDeath() {
         Team = enemy.GetComponentStrict<Team>().TeamId;
-        enemyPresent = false;
+        enemyPresent = 0;
     }
 }
