@@ -195,7 +195,6 @@ public class Terrain : MonoBehaviour {
         if (features[pos.x, pos.y] != null) return false;
         if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return false;
         feature.transform.position = CellCenter(pos).WithZ(GlobalConfig.I.elevation.features);
-        feature.transform.rotation = Quaternion.identity;
         features[pos.x, pos.y] = feature;
         feature.tile = pos;
         return true;
