@@ -71,7 +71,7 @@ public class Orientor : MonoBehaviour {
 
             } else if (character != null) {
 
-                // Update objects whose sprites should not be rotated
+                // Update character sprites
                 SetRotation(child.transform);
                 character.OrientFurther();
 

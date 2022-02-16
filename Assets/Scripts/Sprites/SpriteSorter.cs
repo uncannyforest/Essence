@@ -57,10 +57,12 @@ public class SpriteSorter : MonoBehaviour {
     public void Enable() => this.enabled = true;
 
     public void Disable() {
+        Vector2 worldSpriteDisplacement = Orientor.WorldFromScreen(spriteDisplacement);
         foreach (OrientableChild sortingGroup in SortingGroups)
-            sortingGroup.transform.localPosition = Vector3.zero;
+            sortingGroup.position = orientable.position + worldSpriteDisplacement;
+        Vector2 ppSpriteDisplacement = Orientor.WorldFromScreen(pixelPerfectCorrection  * new ScreenVector(0, -1));
         foreach (OrientableChild sprite in Sprites)
-            sprite.transform.localPosition = Vector3.zero;
+            sprite.position = orientable.position + worldSpriteDisplacement + ppSpriteDisplacement;
         this.enabled = false;
     }
 
