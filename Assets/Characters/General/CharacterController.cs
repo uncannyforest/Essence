@@ -8,7 +8,7 @@ public class CharacterController {
     private Terrain terrain;
     private Transform transform;
     private Rigidbody2D rigidbody;
-    private Transform spriteSorterTransform;
+    private SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
     private float? personalBubble = null;
@@ -24,29 +24,24 @@ public class CharacterController {
         terrain = GameObject.FindObjectOfType<Terrain>();
         transform = parentComponent.transform;
         rigidbody = parentComponent.GetComponentStrict<Rigidbody2D>();
-        SpriteSorter spriteSorter = parentComponent.GetComponentInChildren<SpriteSorter>();
-        if (spriteSorter != null) spriteSorterTransform = spriteSorter.transform;
+        spriteSorter = parentComponent.GetComponentInChildren<SpriteSorter>();
         animator = parentComponent.GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
         MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, parentComponent);
         MoveCoroutine.Start();
     }
-
     public CharacterController WithPersonalBubble(float personalBubble) {
         this.personalBubble = personalBubble;
         return this;
     }
-
     public CharacterController SettingAnimatorDirectionDirectly() {
         this.setAnimatorDirectionDirectly = true;
         return this;
     }
-
     public CharacterController WithSnap() {
         snap = true;
         return this;
     }
-
     public CharacterController WithCrossedTileHandler(Action<Vector2Int> CrossedTile) {
         this.CrossedTile += CrossedTile;
         return this;
@@ -95,7 +90,7 @@ public class CharacterController {
         } else {
             int x = Math.Sign(orientedDirection.x);
             animator?.SetFloat("X", Math.Abs(x));
-            spriteSorterTransform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
+            spriteSorter.transform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
             animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
         }
     }
@@ -104,9 +99,14 @@ public class CharacterController {
         animator?.SetBool(name, value);
         return this;
     }
-
     public CharacterController Trigger(string trigger) {
         animator?.SetTrigger(trigger);
+        return this;
+    }
+
+    public CharacterController Sitting(bool value) {
+        spriteSorter.LegsVisible = !value;
+        spriteSorter.VerticalDisplacement = value ? -.25f : 0;
         return this;
     }
 

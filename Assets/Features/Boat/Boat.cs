@@ -39,6 +39,7 @@ public class Boat : MonoBehaviour {
         player.transform.localPosition = Vector2.zero;
         player.EnteredVehicle(SetInputVelocity);
         charactersInBoat[0] = player.movement;
+        player.movement.Sitting(true);
         feature.Uninstall();
     }
 
@@ -47,6 +48,7 @@ public class Boat : MonoBehaviour {
         player.transform.parent = terrain.transform;
         player.transform.localPosition = ((Vector2)location).WithZ(2.01f); // TODO: fix
         player.ExitedVehicle();
+        player.movement.Sitting(false);
         charactersInBoat[0] = null;
         terrain.Feature[currentTile] = feature;
     }

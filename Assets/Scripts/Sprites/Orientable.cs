@@ -24,6 +24,7 @@ public class Orientable : MonoBehaviour {
 public class OrientableChild {
     public Transform transform;
 
+    public GameObject gameObject { get => transform.gameObject; }
     public Vector2 position {
         get => transform.position;
         set => transform.position = value.WithZ(transform.position.z);

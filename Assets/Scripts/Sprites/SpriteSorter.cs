@@ -22,6 +22,17 @@ public class SpriteSorter : MonoBehaviour {
     // Whew!  This was a nightmare to debug.
     private const float pixelPerfectCorrection = 1/32f;
 
+    public bool LegsVisible {
+        set => SortingGroups.First<OrientableChild>().gameObject.SetActive(value);
+    }
+    [SerializeField] private float verticalDisplacement = 0;
+    public float VerticalDisplacement {
+        set {
+            verticalDisplacement = value;
+            ForceUpdate(this.enabled);
+        }
+    }
+
     private IEnumerable<OrientableChild> SortingGroups {
         get => orientable.children;
     }
@@ -41,28 +52,27 @@ public class SpriteSorter : MonoBehaviour {
     }
 
     void Update() {
-        if (transform.hasChanged) {
-            Vector2 worldSpriteDisplacement = Orientor.WorldFromScreen(spriteDisplacement);
-            Vector2 sortingPosition = terrain.CellCenterAt(orientable.position + worldSpriteDisplacement);
-            foreach (OrientableChild sortingGroup in SortingGroups)
-                sortingGroup.position = sortingPosition;
-            Vector2 ppSpriteDisplacement = Orientor.WorldFromScreen(pixelPerfectCorrection  * new ScreenVector(0, -1));
-            foreach (OrientableChild sprite in Sprites)
-                sprite.position = orientable.position + worldSpriteDisplacement + ppSpriteDisplacement;
-            Debug.DrawLine(sortingPosition, orientable.position, Color.magenta);
-            Debug.DrawLine(orientable.position + worldSpriteDisplacement, sortingPosition, Color.white);
-        }
+        if (transform.hasChanged) ForceUpdate(true);
+    }
+
+    private void ForceUpdate(bool centerInCell) {
+        Vector2 worldSpriteDisplacement = Orientor.WorldFromScreen(spriteDisplacement + verticalDisplacement * new ScreenVector(0, 1));
+        Vector2 sortingPosition = centerInCell
+            ? terrain.CellCenterAt(orientable.position + worldSpriteDisplacement)
+            : orientable.position + worldSpriteDisplacement;
+        foreach (OrientableChild sortingGroup in SortingGroups)
+            sortingGroup.position = sortingPosition;
+        Vector2 ppSpriteDisplacement = Orientor.WorldFromScreen(pixelPerfectCorrection * new ScreenVector(0, -1));
+        foreach (OrientableChild sprite in Sprites)
+            sprite.position = orientable.position + worldSpriteDisplacement + ppSpriteDisplacement;
+        Debug.DrawLine(sortingPosition, orientable.position, Color.magenta);
+        Debug.DrawLine(orientable.position + worldSpriteDisplacement, sortingPosition, Color.white);    
     }
 
     public void Enable() => this.enabled = true;
 
     public void Disable() {
-        Vector2 worldSpriteDisplacement = Orientor.WorldFromScreen(spriteDisplacement);
-        foreach (OrientableChild sortingGroup in SortingGroups)
-            sortingGroup.position = orientable.position + worldSpriteDisplacement;
-        Vector2 ppSpriteDisplacement = Orientor.WorldFromScreen(pixelPerfectCorrection  * new ScreenVector(0, -1));
-        foreach (OrientableChild sprite in Sprites)
-            sprite.position = orientable.position + worldSpriteDisplacement + ppSpriteDisplacement;
+        ForceUpdate(false);
         this.enabled = false;
     }
 
