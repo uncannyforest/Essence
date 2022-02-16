@@ -50,8 +50,10 @@ public class Orientor : MonoBehaviour {
             CharacterController character = null;
             PlayerCharacter player = child.GetComponent<PlayerCharacter>();
             Creature creature = child.GetComponent<Creature>();
+            Boat boat = child.GetComponent<Boat>();
             if (creature != null) character = creature.controller;
             if (player != null) character = player.movement;
+            if (boat != null) character = boat.movement;
 
 
             if (tilemap != null) {

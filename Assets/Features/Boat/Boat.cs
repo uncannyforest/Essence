@@ -13,7 +13,7 @@ public class Boat : MonoBehaviour {
 
     private Terrain terrain;
     private Feature feature;
-    private CharacterController movement;
+    public CharacterController movement;
 
     private bool inUse;
     private PlayerCharacter player;
