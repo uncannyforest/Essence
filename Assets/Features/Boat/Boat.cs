@@ -46,7 +46,7 @@ public class Boat : MonoBehaviour {
     void HandlePlayerExited(Vector2 location) {
         inUse = false;
         player.transform.parent = terrain.transform;
-        player.transform.localPosition = ((Vector2)location).WithZ(2.01f); // TODO: fix
+        player.transform.localPosition = location;
         player.ExitedVehicle();
         player.movement.Sitting(false);
         charactersInBoat[0] = null;
