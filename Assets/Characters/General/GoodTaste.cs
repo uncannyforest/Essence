@@ -10,14 +10,13 @@ public class GoodTaste : StatusQuantity {
 
     private Transform tamer;
     private Action Tamed;
-    public Action TamerChanged;
     private ExpandableInfo? error = null;
 
     public Transform Tamer {
         get => tamer;
         set {
             tamer = value;
-            if (TamerChanged != null) TamerChanged();
+            HandleTamerChanged();
         }
     }
 
@@ -45,6 +44,15 @@ public class GoodTaste : StatusQuantity {
             ExpandableInfo? result = error;
             error = null;
             return result;
+        }
+    }
+
+    public void HandleTamerChanged() {
+        if (Tamer != null) {
+            CharacterController movement = GetComponent<Creature>().OverrideControl(this);
+            movement.IdleFacing(Tamer.position);
+        } else {
+            GetComponent<Creature>().ReleaseControl();
         }
     }
 

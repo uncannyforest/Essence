@@ -6,12 +6,14 @@ public class CharacterController {
     public const int subGridUnit = 8;
     
     private Terrain terrain;
-    private Transform transform;
-    private Rigidbody2D rigidbody;
-    private SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
+    public Transform transform;
+    public Rigidbody2D rigidbody;
+    private Collider2D collider;
+    public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
     private float? personalBubble = null;
+    private Action<Collider2D> HitCollider;
     private bool setAnimatorDirectionDirectly = false;
     private Action<Vector2Int> CrossedTile;
     
@@ -24,14 +26,16 @@ public class CharacterController {
         terrain = GameObject.FindObjectOfType<Terrain>();
         transform = parentComponent.transform;
         rigidbody = parentComponent.GetComponentStrict<Rigidbody2D>();
+        collider = parentComponent.GetComponentStrict<Collider2D>();
         spriteSorter = parentComponent.GetComponentInChildren<SpriteSorter>();
         animator = parentComponent.GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
         MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, parentComponent);
         MoveCoroutine.Start();
     }
-    public CharacterController WithPersonalBubble(float personalBubble) {
+    public CharacterController WithPersonalBubble(float personalBubble, Action<Collider2D> HitCollider) {
         this.personalBubble = personalBubble;
+        this.HitCollider += HitCollider;
         return this;
     }
     public CharacterController SettingAnimatorDirectionDirectly() {
@@ -70,6 +74,7 @@ public class CharacterController {
 
     // Chain after Toward() to indicate direction faced to the animator.
     public CharacterController Idle() {
+        Debug.Log(transform + " received Idle");
         velocityChebyshevSubgridUnit = Vector2.zero;
         animator?.SetBool("Moving", false);
         return this;
@@ -129,8 +134,14 @@ public class CharacterController {
     private Vector2? Move() {
         Vector2 newLocation = (Vector2)rigidbody.position + velocityChebyshevSubgridUnit;
         if (personalBubble is float realPersonalBubble) {
-            Collider2D[] overlaps = Physics2D.OverlapCircleAll(newLocation, realPersonalBubble, LayerMask.GetMask("Player", "Creature", "HealthCreature"));
-            if (overlaps.Length > 1) return null;
+            Collider2D[] overlaps = Physics2D.OverlapCircleAll(newLocation, realPersonalBubble, LayerMask.GetMask("Player", "Creature", "HealthCreature", "NoCreatures"));
+            bool doReturnNull = false;
+            foreach (Collider2D overlap in overlaps) {
+                if (overlap == collider) continue;
+                else if (overlap.gameObject.layer == LayerMask.NameToLayer("NoCreatures")) HitCollider(overlap);
+                else doReturnNull = true;
+            }
+            if (doReturnNull) return null;
         }
         if (snap) {
             newLocation = (Vector2)((newLocation * subGridUnit).RoundToInt()) / subGridUnit;

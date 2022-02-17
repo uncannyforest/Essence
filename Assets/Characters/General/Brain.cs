@@ -129,12 +129,10 @@ public class Brain {
             state == CreatureState.FollowOffensive ||
             (state == CreatureState.Follow && general.scanForFocusWhenFollowing);
     }
-    protected bool Listening {
-        get => taste?.Listening == true;
-    }
     private CreatureState state = CreatureState.Roam;
     private bool badState = false; // wait one frame for CleanUpState()
     private bool stateIsDirty = false;
+    private MonoBehaviour controlOverride = null; // character controller fully controlled by another script
     private Transform focus = null; // when Focused. Only written to inside Focus.set and ClearFocus()
     private Vector2? investigation = null; // focus character not identified, only location
     private RunOnce investigationCancel = null;
@@ -159,7 +157,6 @@ public class Brain {
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
         taste = GetComponent<GoodTaste>();
-        if (taste != null) taste.TamerChanged += TriggerStateChange;
         Health health = GetComponent<Health>();
         if (health != null) health.ReachedZero += OnHealthReachedZero;
         TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
@@ -199,7 +196,7 @@ public class Brain {
         if (Scanning) result += "; scanning";
         if (Focused) result += "; focus: " + focus;
         if (Investigating) result += "; investigation: " + investigation;
-        if (Listening) result += "; listening";
+        if (controlOverride != null) result += "; controlled by " + controlOverride;
         Debug.Log(result);
     }
     public void TriggerStateChange() {
@@ -208,8 +205,7 @@ public class Brain {
     }
     protected void OnStateChange() {
         DebugLogStateChange(false);
-        if (Listening) {
-            movement.IdleFacing(taste.Tamer.position);
+        if (controlOverride != null) {
             ScanningBehavior.Stop();
             FocusedBehavior.Stop();
             TrekkingBehavior.Stop();
@@ -240,6 +236,16 @@ public class Brain {
         }
     }
 
+    public CharacterController OverrideControl(MonoBehaviour source) {
+        controlOverride = source;
+        TriggerStateChange();
+        return movement;
+    }
+    public void ReleaseControl() {
+        controlOverride = null;
+        TriggerStateChange();
+    }
+
     public void CommandFollow(Transform directive) {
         followDirective = directive;
         ClearFocus();
@@ -254,6 +260,7 @@ public class Brain {
             playerInterface.EnqueueFollowing(creature);
         }
     }
+    public Transform FollowDirective { get => followDirective; }
     // param recipient may be null, which is a no-op
     protected Transform RequestPair(Creature recipient) {
         if (recipient?.TryPair(creature) == true) {
@@ -459,7 +466,7 @@ public class Brain {
             stateIsDirty = false;
             OnStateChange();
         }
-        if (!Listening) StateAssumptions(); // Listening overrides everything, so put off sanity checks
+        if (controlOverride == null) StateAssumptions(); // put off sanity checks if overriden
     }
 
     // Clean up state
@@ -482,6 +489,10 @@ public class Brain {
         if (pairDirective == null && !ReferenceEquals(pairDirective, null)) {
             Debug.Log("Cleanup pre-check: pairDirective died");
             RequestFollow();
+        }
+        if (controlOverride == null && !ReferenceEquals(controlOverride, null)) {
+            Debug.LogError("controlOverride died for some reason");
+            ReleaseControl();
         }
     }
 

@@ -81,7 +81,7 @@ public class Creature : MonoBehaviour {
     public SpriteSorter SpriteManager { get => spriteManager; }
 
     void Start() {
-        controller = new CharacterController(this).WithPersonalBubble(personalBubble);
+        controller = new CharacterController(this).WithPersonalBubble(personalBubble, HandleHitCollider);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         cMaybeDespawn = StartCoroutine(MaybeDespawn());
@@ -99,6 +99,9 @@ public class Creature : MonoBehaviour {
         species.transform.Find("SpriteSort/Torso/Heart").GetComponentStrict<SpriteRenderer>().color =
             GetComponent<Team>().Color;
     }
+
+    public CharacterController OverrideControl(MonoBehaviour source) => brain.OverrideControl(source);
+    public void ReleaseControl() => brain.ReleaseControl();
 
     public void Follow(Transform player) {
         brain.CommandFollow(player);
@@ -189,8 +192,14 @@ public class Creature : MonoBehaviour {
         }
     }
 
-    public void Update() {
+    void Update() {
         brain.Update();
+    }
+
+    public void HandleHitCollider(Collider2D collider) {
+        Boat boat = collider.GetComponent<Boat>();
+        if (boat != null && boat.player == brain.FollowDirective.GetComponent<PlayerCharacter>())
+            boat.RequestCreatureEnter(this);
     }
 }
 

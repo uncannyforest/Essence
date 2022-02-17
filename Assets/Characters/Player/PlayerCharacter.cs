@@ -62,17 +62,12 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     public void EnteredVehicle(Action<Vector2Int> ReceiveInput) {
-        movement.Idle();
         VehicleInput = ReceiveInput;
-        GetComponent<Rigidbody2D>().simulated = false;
         cameraTransform.parent = transform.parent.parent.parent;
-        GetComponentInChildren<SpriteSorter>().Disable();
     }
 
     public void ExitedVehicle() {
         VehicleInput = null;
-        GetComponent<Rigidbody2D>().simulated = true;
         cameraTransform.parent = transform;
-        GetComponentInChildren<SpriteSorter>().Enable();
     }
 }

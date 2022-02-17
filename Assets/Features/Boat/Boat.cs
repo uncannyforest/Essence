@@ -10,18 +10,21 @@ public class Boat : MonoBehaviour {
     public float minSpeed = 1/30f;
     public float shorePush = .5f;
     public float shorePushNoZone = .2f;
+    public float creatureDeboardDelay = .5f;
 
     private Terrain terrain;
     private Feature feature;
     public CharacterController movement;
 
     private bool inUse;
-    private PlayerCharacter player;
+    public PlayerCharacter player { get; private set; }
     public CharacterController[] charactersInBoat = new CharacterController[4];
     private Vector2 inputVelocity = Vector2.zero;
     private Vector2 currentVelocity = Vector2.zero;
     private Vector2Int currentTile;
     private Vector2 currentShoreCorrection;
+    private CoroutineWrapper CreatureExits;
+    private Vector2 exitLocation;
 
     void Start() {
         terrain = Terrain.I;
@@ -30,27 +33,65 @@ public class Boat : MonoBehaviour {
             .WithCrossedTileHandler(HandleCrossedTile);
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
+        CreatureExits = new CoroutineWrapper(CreatureExitE, this);
     }
 
     void HandlePlayerEntered(PlayerCharacter player) {
         this.player = player;
         inUse = true;
-        player.transform.parent = transform.Find("Seats").GetChild(0);
-        player.transform.localPosition = Vector2.zero;
+        CharacterEnter(0, player.movement);
         player.EnteredVehicle(SetInputVelocity);
-        charactersInBoat[0] = player.movement;
-        player.movement.Sitting(true);
         feature.Uninstall();
+        CreatureExits.Stop();
     }
 
-    void HandlePlayerExited(Vector2 location) {
+    private void HandlePlayerExited(Vector2 location) {
         inUse = false;
-        player.transform.parent = terrain.transform;
-        player.transform.localPosition = location;
+        exitLocation = location;
+        CharacterExit(0);
         player.ExitedVehicle();
-        player.movement.Sitting(false);
-        charactersInBoat[0] = null;
         terrain.Feature[currentTile] = feature;
+        CreatureExits.Start();
+    }
+
+    public bool RequestCreatureEnter(Creature creature) {
+        int seat;
+        if (charactersInBoat[1] == null) seat = 1;
+        else if (charactersInBoat[2] == null) seat = 2;
+        else if (charactersInBoat[3] == null) seat = 3;
+        else return false;
+        CharacterController movement = creature.OverrideControl(this);
+        CharacterEnter(seat, movement);
+        return true;
+    }
+
+    private IEnumerator CreatureExitE() {
+        for (int i = 1; i < 4; i++) {
+            CharacterController creature = charactersInBoat[i];
+            if (creature == null) continue;
+            yield return new WaitForSeconds(creatureDeboardDelay);
+            CharacterExit(i);
+            creature.transform.GetComponentStrict<Creature>().ReleaseControl();
+        }
+    }
+
+    private void CharacterEnter(int seat, CharacterController movement) {
+        movement.rigidbody.simulated = false;
+        movement.spriteSorter.Disable();
+        movement.transform.parent = transform.Find("Seats").GetChild(seat);
+        movement.transform.localPosition = Vector2.zero;
+        movement.Idle().Sitting(true);
+        charactersInBoat[seat] = movement;
+    }
+
+    private void CharacterExit(int seat) {
+        CharacterController movement = charactersInBoat[seat];
+        movement.rigidbody.simulated = true;
+        movement.spriteSorter.Enable();
+        movement.transform.parent = terrain.transform;
+        movement.rigidbody.position = exitLocation;
+        movement.Sitting(false);
+        charactersInBoat[seat] = null;
     }
 
     void SetInputVelocity(Vector2Int inputVelocity) {
@@ -68,20 +109,13 @@ public class Boat : MonoBehaviour {
         if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x - Mathf.Abs(sub.y)), 0);
         if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x + Mathf.Abs(sub.y)), 0);
         if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush * (-Mathf.Abs(sub.x) - sub.y));
-        // float expectedX = (shoreCorrection.x * inputVelocity.x) > 0 && Mathf.Abs(shoreCorrection.x) < Mathf.Abs(inputVelocity.x)
-        //     ? shoreCorrection.x : inputVelocity.x;
-        // float expectedY = (shoreCorrection.y * inputVelocity.y) > 0 && Mathf.Abs(shoreCorrection.y) < Mathf.Abs(inputVelocity.y)
-        //     ? shoreCorrection.y : inputVelocity.y;
         Vector2 expectedVelocity = inputVelocity + shoreCorrection;
-        Debug.Log("Input velocity: " + inputVelocity + " / shore max velocity: " + shoreCorrection + " / actual max velocity: " + expectedVelocity);
 
         if (currentVelocity != expectedVelocity) {
-            Debug.Log(currentVelocity + " towards " + expectedVelocity + " at " + acceleration * Time.fixedDeltaTime);
             currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, acceleration * Time.fixedDeltaTime);
             if (currentVelocity.magnitude < minSpeed) {
                 currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
             }
-            Debug.Log("is " + currentVelocity);
             movement.SetVelocity(currentVelocity);
         }
 
