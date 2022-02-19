@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Feature))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -15,6 +16,17 @@ public class Boat : MonoBehaviour {
     private Terrain terrain;
     private Feature feature;
     public CharacterController movement;
+    private SortingGroup[] seatSorters = new SortingGroup[4];
+    private int[][] seatSortings = new int[][] {
+        new int[] {2, 3, 1, 0},
+        new int[] {3, 2, 0, 1},
+        new int[] {3, 1, 0, 2},
+        new int[] {2, 0, 1, 3},
+        new int[] {1, 0, 2, 3},
+        new int[] {0, 1, 3, 2},
+        new int[] {0, 2, 3, 1},
+        new int[] {1, 3, 2, 0},
+    };
 
     private bool inUse;
     public PlayerCharacter player { get; private set; }
@@ -34,6 +46,10 @@ public class Boat : MonoBehaviour {
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new CoroutineWrapper(CreatureExitE, this);
+        Transform seats = transform.Find("Seats");
+        for (int i = 0; i < 4; i++) 
+            seatSorters[i] = seats.GetChild(i).GetComponentStrict<SortingGroup>();
+
     }
 
     void HandlePlayerEntered(PlayerCharacter player) {
@@ -117,6 +133,7 @@ public class Boat : MonoBehaviour {
                 currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
             }
             movement.SetVelocity(currentVelocity);
+            if (currentVelocity != Vector2.zero) AnimateSeatSorting(currentVelocity);
         }
 
         currentShoreCorrection = shoreCorrection;
@@ -126,6 +143,7 @@ public class Boat : MonoBehaviour {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
             movement.InDirection(currentShoreCorrection).Idle();
+            AnimateSeatSorting(currentShoreCorrection);
             inputVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
         } else {
@@ -133,4 +151,10 @@ public class Boat : MonoBehaviour {
         }
     }
 
+    // These properties are not available to the Animator
+    private void AnimateSeatSorting(Vector2 direction) {
+        int eightDirectionIndex = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, direction) + 360) % 360 / 45);
+        for (int i = 0; i < 4; i++)
+            seatSorters[i].sortingOrder = seatSortings[eightDirectionIndex][i];
+    }
 }
