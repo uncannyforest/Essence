@@ -92,7 +92,7 @@ public class Boat : MonoBehaviour {
     }
 
     private void CharacterEnter(int seat, CharacterController movement) {
-        movement.rigidbody.simulated = false;
+        movement.rigidbody.bodyType = RigidbodyType2D.Kinematic;
         movement.spriteSorter.Disable();
         movement.transform.parent = seats.GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
@@ -102,7 +102,7 @@ public class Boat : MonoBehaviour {
 
     private void CharacterExit(int seat) {
         CharacterController movement = passengers[seat];
-        movement.rigidbody.simulated = true;
+        movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         movement.spriteSorter.Enable();
         movement.transform.parent = terrain.transform;
         movement.rigidbody.position = exitLocation;
