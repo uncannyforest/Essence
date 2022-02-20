@@ -198,7 +198,7 @@ public class Creature : MonoBehaviour {
 
     public void HandleHitCollider(Collider2D collider) {
         Boat boat = collider.GetComponent<Boat>();
-        if (boat != null && boat.player == brain.FollowDirective.GetComponent<PlayerCharacter>())
+        if (boat != null && boat.player == brain.FollowDirective?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
     }
 }

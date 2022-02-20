@@ -55,6 +55,7 @@ public class Boat : MonoBehaviour {
     void HandlePlayerEntered(PlayerCharacter player) {
         this.player = player;
         inUse = true;
+        movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         CharacterEnter(0, player.movement);
         player.EnteredVehicle(transform, SetInputVelocity);
         feature.Uninstall();
@@ -63,11 +64,13 @@ public class Boat : MonoBehaviour {
 
     private void HandlePlayerExited(Vector2 location) {
         inUse = false;
+        movement.rigidbody.bodyType = RigidbodyType2D.Static;
         exitLocation = location;
         CharacterExit(0);
         player.ExitedVehicle();
         terrain.Feature[currentTile] = feature;
         CreatureExits.Start();
+        player = null;
     }
 
     public bool RequestCreatureEnter(Creature creature) {
@@ -76,8 +79,9 @@ public class Boat : MonoBehaviour {
         else if (passengers[2] == null) seat = 2;
         else if (passengers[3] == null) seat = 3;
         else return false;
-        CharacterController movement = creature.OverrideControl(this);
-        CharacterEnter(seat, movement);
+        CharacterController creatureMovement = creature.OverrideControl(this);
+        Physics2D.IgnoreCollision(movement.collider, creatureMovement.collider);
+        CharacterEnter(seat, creatureMovement);
         return true;
     }
 
@@ -86,6 +90,7 @@ public class Boat : MonoBehaviour {
             CharacterController creature = passengers[i];
             if (creature == null) continue;
             yield return new WaitForSeconds(creatureDeboardDelay);
+            Physics2D.IgnoreCollision(movement.collider, creature.collider, false);
             CharacterExit(i);
             creature.transform.GetComponentStrict<Creature>().ReleaseControl();
         }

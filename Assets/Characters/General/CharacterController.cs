@@ -8,7 +8,7 @@ public class CharacterController {
     private Terrain terrain;
     public Transform transform;
     public Rigidbody2D rigidbody;
-    private Collider2D collider;
+    public Collider2D collider;
     public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
@@ -127,7 +127,7 @@ public class CharacterController {
                     if (oldTile != currentTile) CrossedTile(currentTile);
                 }
                 yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
-            } else yield return null;
+            } else yield return new WaitForFixedUpdate();
         }
     }
 
