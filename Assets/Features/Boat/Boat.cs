@@ -12,6 +12,7 @@ public class Boat : MonoBehaviour {
     public float shorePush = .5f;
     public float shorePushNoZone = .2f;
     public float creatureDeboardDelay = .5f;
+    public Transform seats;
 
     private Terrain terrain;
     private Feature feature;
@@ -46,7 +47,6 @@ public class Boat : MonoBehaviour {
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new CoroutineWrapper(CreatureExitE, this);
-        Transform seats = transform.Find("Seats");
         for (int i = 0; i < 4; i++) 
             seatSorters[i] = seats.GetChild(i).GetComponentStrict<SortingGroup>();
 
@@ -56,7 +56,7 @@ public class Boat : MonoBehaviour {
         this.player = player;
         inUse = true;
         CharacterEnter(0, player.movement);
-        player.EnteredVehicle(SetInputVelocity);
+        player.EnteredVehicle(transform, SetInputVelocity);
         feature.Uninstall();
         CreatureExits.Stop();
     }
@@ -94,7 +94,7 @@ public class Boat : MonoBehaviour {
     private void CharacterEnter(int seat, CharacterController movement) {
         movement.rigidbody.simulated = false;
         movement.spriteSorter.Disable();
-        movement.transform.parent = transform.Find("Seats").GetChild(seat);
+        movement.transform.parent = seats.GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
         movement.Idle().Sitting(true);
         passengers[seat] = movement;

@@ -30,7 +30,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Seats/Seat0
+    path: PhysicalContents/Seats/Seat0
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -46,7 +46,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Seats/Seat1
+    path: PhysicalContents/Seats/Seat1
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -62,7 +62,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Seats/Seat2
+    path: PhysicalContents/Seats/Seat2
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -78,7 +78,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Seats/Seat3
+    path: PhysicalContents/Seats/Seat3
   m_ScaleCurves: []
   m_FloatCurves:
   - curve:
@@ -97,7 +97,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_FlipX
-    path: Sprite
+    path: PhysicalContents/Sprite
     classID: 212
     script: {fileID: 0}
   m_PPtrCurves:
@@ -105,7 +105,7 @@ AnimationClip:
     - time: 0
       value: {fileID: 7540364722606942347, guid: 6c133ecd46fdc41b7a322df611a35a1a, type: 3}
     attribute: m_Sprite
-    path: Sprite
+    path: PhysicalContents/Sprite
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 60
@@ -196,7 +196,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_FlipX
-    path: Sprite
+    path: PhysicalContents/Sprite
     classID: 212
     script: {fileID: 0}
   - curve:
@@ -215,7 +215,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: Seats/Seat0
+    path: PhysicalContents/Seats/Seat0
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -234,7 +234,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: Seats/Seat0
+    path: PhysicalContents/Seats/Seat0
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -253,7 +253,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: Seats/Seat0
+    path: PhysicalContents/Seats/Seat0
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -272,7 +272,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: Seats/Seat1
+    path: PhysicalContents/Seats/Seat1
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -291,7 +291,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: Seats/Seat1
+    path: PhysicalContents/Seats/Seat1
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -310,7 +310,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: Seats/Seat1
+    path: PhysicalContents/Seats/Seat1
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -329,7 +329,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: Seats/Seat2
+    path: PhysicalContents/Seats/Seat2
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -348,7 +348,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: Seats/Seat2
+    path: PhysicalContents/Seats/Seat2
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -367,7 +367,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: Seats/Seat2
+    path: PhysicalContents/Seats/Seat2
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -386,7 +386,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: Seats/Seat3
+    path: PhysicalContents/Seats/Seat3
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -405,7 +405,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: Seats/Seat3
+    path: PhysicalContents/Seats/Seat3
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -424,7 +424,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: Seats/Seat3
+    path: PhysicalContents/Seats/Seat3
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves: []

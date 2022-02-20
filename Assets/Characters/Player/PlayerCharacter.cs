@@ -61,9 +61,9 @@ public class PlayerCharacter : MonoBehaviour {
         transform.position = (Vector2)(teamSpawnPoints[randomIndex].transform.position);
     }
 
-    public void EnteredVehicle(Action<Vector2Int> ReceiveInput) {
+    public void EnteredVehicle(Transform vehicle, Action<Vector2Int> ReceiveInput) {
         VehicleInput = ReceiveInput;
-        pointOfView.parent = transform.parent.parent.parent;
+        pointOfView.parent = vehicle;
         pointOfView.localPosition = Vector3.zero;
     }
 
