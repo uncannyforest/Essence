@@ -5344,7 +5344,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1684077857}
-  - {fileID: 519420032}
+  - {fileID: 453021872}
   - {fileID: 440543400}
   - {fileID: 1607720306}
   m_Father: {fileID: 2120764631}
@@ -5781,6 +5781,50 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2125089558098251116, guid: 2230ef5eaf192412287ab938c31b89ee, type: 3}
   m_PrefabInstance: {fileID: 981116046808898326}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &453021871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 453021872}
+  - component: {fileID: 453021873}
+  m_Layer: 8
+  m_Name: Point of View
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &453021872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453021871}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 519420032}
+  m_Father: {fileID: 403460084}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &453021873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453021871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 043edb550804e4e9ea82e745bb7e758f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &482793574
 GameObject:
   m_ObjectHideFlags: 0
@@ -6060,12 +6104,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.75, z: -20}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children: []
-  m_Father: {fileID: 403460084}
-  m_RootOrder: 1
+  m_Father: {fileID: 453021872}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &557094551 stripped
 RectTransform:
@@ -37988,6 +38032,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   broadGirth: 0
+  verticalDisplacement: 0
 --- !u!114 &1684077859
 MonoBehaviour:
   m_ObjectHideFlags: 0

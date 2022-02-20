@@ -10,7 +10,7 @@ public class PlayerCharacter : MonoBehaviour {
     public Terrain terrain;
     public float defaultSpeed = 3f;
 
-    private Transform cameraTransform;
+    private Transform pointOfView;
 
     private Health health;
     private Vector2Int inputVelocity = Vector2Int.zero; // not scaled to speed, instant update on key change
@@ -21,7 +21,7 @@ public class PlayerCharacter : MonoBehaviour {
     public const int neighborhood = 8;
 
     void Start() {
-        cameraTransform = GetComponentInChildren<Camera>().transform;
+        pointOfView = GetComponentInChildren<PointOfView>().transform;
         movement = new CharacterController(this).WithSnap().WithCrossedTileHandler(HandleCrossedTile);
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
@@ -63,11 +63,13 @@ public class PlayerCharacter : MonoBehaviour {
 
     public void EnteredVehicle(Action<Vector2Int> ReceiveInput) {
         VehicleInput = ReceiveInput;
-        cameraTransform.parent = transform.parent.parent.parent;
+        pointOfView.parent = transform.parent.parent.parent;
+        pointOfView.localPosition = Vector3.zero;
     }
 
     public void ExitedVehicle() {
         VehicleInput = null;
-        cameraTransform.parent = transform;
+        pointOfView.parent = transform;
+        pointOfView.localPosition = Vector3.zero;
     }
 }

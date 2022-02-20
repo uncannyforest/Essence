@@ -8,7 +8,6 @@ public class Concealment {
     private Terrain terrain;
     private Tilemap[] mainTiles;
     private Tilemap transparentTiles;
-    private Transform player;
     private Dictionary<Construction, TileBase> buildingTiles;
 
     private Vector2Int currentCenter = Vector2Int.zero;
@@ -26,8 +25,7 @@ public class Concealment {
             [Construction.Wood] = terrain.tiles.woodBldg
         };
         transparentTiles = terrain.transform.Find("Transparent").GetComponent<Tilemap>();
-        player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-        player.GetComponent<PlayerCharacter>().movement.WithCrossedTileHandler(HandleCrossedTile);
+        GameObject.FindObjectOfType<PointOfView>().CrossedTile += HandleCrossedTile;
     }
 
     public bool CanSee(Transform seer, SpriteSorter seen) {
