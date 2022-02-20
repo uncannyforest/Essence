@@ -30,7 +30,7 @@ public class Boat : MonoBehaviour {
 
     private bool inUse;
     public PlayerCharacter player { get; private set; }
-    public CharacterController[] charactersInBoat = new CharacterController[4];
+    public CharacterController[] passengers = new CharacterController[4];
     private Vector2 inputVelocity = Vector2.zero;
     private Vector2 currentVelocity = Vector2.zero;
     private Vector2Int currentTile;
@@ -72,9 +72,9 @@ public class Boat : MonoBehaviour {
 
     public bool RequestCreatureEnter(Creature creature) {
         int seat;
-        if (charactersInBoat[1] == null) seat = 1;
-        else if (charactersInBoat[2] == null) seat = 2;
-        else if (charactersInBoat[3] == null) seat = 3;
+        if (passengers[1] == null) seat = 1;
+        else if (passengers[2] == null) seat = 2;
+        else if (passengers[3] == null) seat = 3;
         else return false;
         CharacterController movement = creature.OverrideControl(this);
         CharacterEnter(seat, movement);
@@ -83,7 +83,7 @@ public class Boat : MonoBehaviour {
 
     private IEnumerator CreatureExitE() {
         for (int i = 1; i < 4; i++) {
-            CharacterController creature = charactersInBoat[i];
+            CharacterController creature = passengers[i];
             if (creature == null) continue;
             yield return new WaitForSeconds(creatureDeboardDelay);
             CharacterExit(i);
@@ -97,17 +97,17 @@ public class Boat : MonoBehaviour {
         movement.transform.parent = transform.Find("Seats").GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
         movement.Idle().Sitting(true);
-        charactersInBoat[seat] = movement;
+        passengers[seat] = movement;
     }
 
     private void CharacterExit(int seat) {
-        CharacterController movement = charactersInBoat[seat];
+        CharacterController movement = passengers[seat];
         movement.rigidbody.simulated = true;
         movement.spriteSorter.Enable();
         movement.transform.parent = terrain.transform;
         movement.rigidbody.position = exitLocation;
         movement.Sitting(false);
-        charactersInBoat[seat] = null;
+        passengers[seat] = null;
     }
 
     void SetInputVelocity(Vector2Int inputVelocity) {
@@ -133,7 +133,7 @@ public class Boat : MonoBehaviour {
                 currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
             }
             movement.SetVelocity(currentVelocity);
-            if (currentVelocity != Vector2.zero) AnimateSeatSorting(currentVelocity);
+            if (currentVelocity != Vector2.zero) FaceDirection(currentVelocity);
         }
 
         currentShoreCorrection = shoreCorrection;
@@ -143,7 +143,7 @@ public class Boat : MonoBehaviour {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
             movement.InDirection(currentShoreCorrection).Idle();
-            AnimateSeatSorting(currentShoreCorrection);
+            FaceDirection(currentShoreCorrection);
             inputVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
         } else {
@@ -151,8 +151,12 @@ public class Boat : MonoBehaviour {
         }
     }
 
-    // These properties are not available to the Animator
-    private void AnimateSeatSorting(Vector2 direction) {
+    private void FaceDirection(Vector2 direction) {
+        // Update passenger controllers
+        for (int i = 0; i < 4; i++) if (passengers[i] != null)
+            passengers[i].InDirection(direction).Idle();
+
+        // Sort seat sprites: these properties are not available to the Animator
         int eightDirectionIndex = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, direction) + 360) % 360 / 45);
         for (int i = 0; i < 4; i++)
             seatSorters[i].sortingOrder = seatSortings[eightDirectionIndex][i];
