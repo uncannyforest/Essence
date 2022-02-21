@@ -13,7 +13,6 @@ public class CharacterController {
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
     private float? personalBubble = null;
-    private Action<Collider2D> HitCollider;
     private bool setAnimatorDirectionDirectly = false;
     private Action<Vector2Int> CrossedTile;
     
@@ -33,9 +32,8 @@ public class CharacterController {
         MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, parentComponent);
         MoveCoroutine.Start();
     }
-    public CharacterController WithPersonalBubble(float personalBubble, Action<Collider2D> HitCollider) {
+    public CharacterController WithPersonalBubble(float personalBubble) {
         this.personalBubble = personalBubble;
-        this.HitCollider += HitCollider;
         return this;
     }
     public CharacterController SettingAnimatorDirectionDirectly() {
@@ -138,7 +136,6 @@ public class CharacterController {
             bool doReturnNull = false;
             foreach (Collider2D overlap in overlaps) {
                 if (overlap == collider) continue;
-                else if (overlap.gameObject.layer == LayerMask.NameToLayer("NoCreatures")) HitCollider(overlap);
                 else doReturnNull = true;
             }
             if (doReturnNull) return null;

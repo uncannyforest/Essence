@@ -81,7 +81,7 @@ public class Creature : MonoBehaviour {
     public SpriteSorter SpriteManager { get => spriteManager; }
 
     void Start() {
-        controller = new CharacterController(this).WithPersonalBubble(personalBubble, HandleHitCollider);
+        controller = new CharacterController(this).WithPersonalBubble(personalBubble);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         cMaybeDespawn = StartCoroutine(MaybeDespawn());
@@ -196,7 +196,7 @@ public class Creature : MonoBehaviour {
         brain.Update();
     }
 
-    public void HandleHitCollider(Collider2D collider) {
+    void OnTriggerEnter2D(Collider2D collider) {
         Boat boat = collider.GetComponent<Boat>();
         if (boat != null && boat.player == brain.FollowDirective?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
