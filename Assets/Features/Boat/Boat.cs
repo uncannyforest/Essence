@@ -56,19 +56,22 @@ public class Boat : MonoBehaviour {
         this.player = player;
         inUse = true;
         movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
+        feature.Uninstall();
         CharacterEnter(0, player.movement);
         player.EnteredVehicle(transform, SetInputVelocity);
-        feature.Uninstall();
         CreatureExits.Stop();
     }
 
     private void HandlePlayerExited(Vector2 location) {
         inUse = false;
         movement.rigidbody.bodyType = RigidbodyType2D.Static;
-        exitLocation = location;
+        exitLocation = location * 2 - terrain.CellCenterAt(transform.position);
+        terrain.Feature[currentTile] = feature;
+        movement.InDirection(currentShoreCorrection).Idle();
+        FaceDirection(currentShoreCorrection);
+        Debug.DrawLine(location, exitLocation, Color.magenta, 5);
         CharacterExit(0);
         player.ExitedVehicle();
-        terrain.Feature[currentTile] = feature;
         CreatureExits.Start();
         player = null;
     }
@@ -107,10 +110,11 @@ public class Boat : MonoBehaviour {
 
     private void CharacterExit(int seat) {
         CharacterController movement = passengers[seat];
-        movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         movement.spriteSorter.Enable();
         movement.transform.parent = terrain.transform;
-        movement.rigidbody.position = exitLocation;
+        Debug.DrawLine(movement.transform.position, exitLocation, Color.red, 5);
+        movement.transform.position = exitLocation;
+        movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         movement.Sitting(false);
         passengers[seat] = null;
     }
@@ -147,8 +151,6 @@ public class Boat : MonoBehaviour {
     private void HandleCrossedTile(Vector2Int tile) {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
-            movement.InDirection(currentShoreCorrection).Idle();
-            FaceDirection(currentShoreCorrection);
             inputVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
         } else {

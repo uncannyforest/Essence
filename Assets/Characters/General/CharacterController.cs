@@ -136,6 +136,7 @@ public class CharacterController {
             bool doReturnNull = false;
             foreach (Collider2D overlap in overlaps) {
                 if (overlap == collider) continue;
+                else if (overlap.isTrigger) continue;
                 else doReturnNull = true;
             }
             if (doReturnNull) return null;
