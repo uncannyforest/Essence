@@ -18,7 +18,6 @@ public enum CreatureState {
 [Serializable]
 public class BrainConfig {
     public Pathfinding.AIDirections numMovementDirections;
-    public float movementSpeed;
     public float roamRestingFraction = .5f;
     public float reconsiderRateRoam = 5;
     public float reconsiderRateFollow = 2.5f;
@@ -108,7 +107,7 @@ public class Brain {
             investigationCancel?.Stop();
             investigation = value;
             if (investigation != null) investigationCancel =
-                RunOnce.Run(species, Creature.neighborhood * general.movementSpeed,
+                RunOnce.Run(species, Creature.neighborhood * movement.Speed,
                     () => Investigation = null);
             TriggerStateChange();
         }
@@ -374,7 +373,7 @@ public class Brain {
                 pathfinding.MoveToward((Vector3)Investigation);
                 yield return new WaitForSeconds(general.reconsiderRateTarget);
                 if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
-                        general.reconsiderRateTarget * general.movementSpeed) { // arrived at point, found nothing
+                        general.reconsiderRateTarget * movement.Speed) { // arrived at point, found nothing
                     DisableFollowOffensive();
                     Investigation = null;
                 }

@@ -427,30 +427,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &7488913179682336263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8529474584485842260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09aa00c22196a47b9878de848328e3c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 2
-  acceleration: 4
-  minSpeed: 0.33333334
-  shorePush: 0.5
-  shorePushNoZone: 0.2
-  creatureDeboardDelay: 0.5
-  seats: {fileID: 4223938831795130601}
-  passengers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!114 &7081211978706447294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,6 +457,31 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  defaultSpeed: 2
+  waterSpeed: 2
+--- !u!114 &7488913179682336263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529474584485842260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09aa00c22196a47b9878de848328e3c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  acceleration: 4
+  minSpeed: 0.33333334
+  shorePush: 0.5
+  shorePushNoZone: 0.2
+  creatureDeboardDelay: 0.5
+  seats: {fileID: 4223938831795130601}
+  passengers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1001 &9059841471045547052
 PrefabInstance:
   m_ObjectHideFlags: 0

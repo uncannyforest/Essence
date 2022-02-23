@@ -34,7 +34,7 @@ public class Pathfinding {
 
     private Vector2 RandomVelocity() {
         Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
-        return Randoms.RightAngleRotation(randomFromList) * general.movementSpeed;
+        return Randoms.RightAngleRotation(randomFromList);
     }
     
     private Vector2 IndexedVelocity(Vector2 targetDirection) {
@@ -42,7 +42,7 @@ public class Pathfinding {
         int index = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, targetDirection) + 360) % 360 / (90 / aiDirections.Length));
         int rotation = index / aiDirections.Length;
         int subIndex = index % aiDirections.Length;
-        return aiDirections[subIndex].RotateRightAngles(rotation) * general.movementSpeed;
+        return aiDirections[subIndex].RotateRightAngles(rotation);
     }
 
     public void MoveToward(Vector3 target) =>
@@ -88,7 +88,7 @@ public class Pathfinding {
         if (distance <= proximityToStop) {
             return true;
         } else {
-            if (distance < general.movementSpeed * general.reconsiderRateTarget) persist = null; // adjust faster when we're close
+            if (distance < movement.Speed * general.reconsiderRateTarget) persist = null; // adjust faster when we're close
             movement.InDirection(IndexedVelocity(target - transform.position));
             return false;
         }

@@ -9,7 +9,6 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerCharacter : MonoBehaviour {
     public Terrain terrain;
-    public float defaultSpeed = 3f;
 
     private Transform pointOfView;
 
@@ -42,7 +41,7 @@ public class PlayerCharacter : MonoBehaviour {
                 return;
             }
             if (value == Vector2Int.zero) movement.Idle();
-            else movement.InDirection((Vector2)value * defaultSpeed / value.magnitude);
+            else movement.InDirection(((Vector2)value).normalized);
         }
     }
 

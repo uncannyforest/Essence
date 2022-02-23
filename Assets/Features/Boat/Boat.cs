@@ -8,7 +8,6 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class Boat : MonoBehaviour {
-    public float speed = 2;
     public float acceleration = 4;
     public float minSpeed = 1/30f;
     public float shorePush = .5f;
@@ -120,7 +119,7 @@ public class Boat : MonoBehaviour {
     }
 
     void SetInputVelocity(Vector2Int inputVelocity) {
-        this.inputVelocity = speed * ((Vector2)inputVelocity).normalized;
+        this.inputVelocity = ((Vector2)inputVelocity).normalized;
     }
 
     void FixedUpdate() {
@@ -141,7 +140,7 @@ public class Boat : MonoBehaviour {
             if (currentVelocity.magnitude < minSpeed) {
                 currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
             }
-            movement.SetVelocity(currentVelocity);
+            movement.SetRelativeVelocity(currentVelocity);
             if (currentVelocity != Vector2.zero) FaceDirection(currentVelocity);
         }
 

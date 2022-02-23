@@ -5125,7 +5125,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrain: {fileID: 2120764633}
-  defaultSpeed: 2
 --- !u!114 &403460086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5359,6 +5358,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  defaultSpeed: 2
+  waterSpeed: 1
 --- !u!224 &406809448 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2125089558098251116, guid: 2230ef5eaf192412287ab938c31b89ee, type: 3}

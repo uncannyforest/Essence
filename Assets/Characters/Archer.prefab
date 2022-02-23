@@ -513,7 +513,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 3
-    movementSpeed: 1
     roamRestingFraction: 0.75
     reconsiderRateRoam: 5
     reconsiderRateFollow: 2.5
@@ -682,6 +681,8 @@ MonoBehaviour:
   CrossedTile:
     m_PersistentCalls:
       m_Calls: []
+  defaultSpeed: 1
+  waterSpeed: 0
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0
