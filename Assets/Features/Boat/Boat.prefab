@@ -446,6 +446,41 @@ MonoBehaviour:
   shorePushNoZone: 0.2
   creatureDeboardDelay: 0.5
   seats: {fileID: 4223938831795130601}
+  passengers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!114 &7081211978706447294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529474584485842260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2323b1e81ab644b03b06158ce6c9abb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalBubble: 0
+  setAnimatorDirectionDirectly: 1
+  snap: 0
+  CrossedTile:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7488913179682336263}
+        m_TargetAssemblyTypeName: Boat, Assembly-CSharp
+        m_MethodName: HandleCrossedTile
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &9059841471045547052
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -520,13 +555,13 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: -3810210497216287337, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
---- !u!1 &8529474584485842260 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 857304749228554616, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
-  m_PrefabInstance: {fileID: 9059841471045547052}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4100950376435188387 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4995201664197146255, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
+  m_PrefabInstance: {fileID: 9059841471045547052}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8529474584485842260 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 857304749228554616, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
   m_PrefabInstance: {fileID: 9059841471045547052}
   m_PrefabAsset: {fileID: 0}

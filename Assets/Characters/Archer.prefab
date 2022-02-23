@@ -475,6 +475,7 @@ GameObject:
   - component: {fileID: 4481103850635713299}
   - component: {fileID: 6486091420523554066}
   - component: {fileID: -36652973859218673}
+  - component: {fileID: 7053752420375890359}
   m_Layer: 10
   m_Name: Archer
   m_TagString: Untagged
@@ -531,7 +532,6 @@ MonoBehaviour:
 
     You can tame
     a fainted <creature/> as long as you have a bunny on your team within view.'
-  personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!114 &4481103850635713288
 MonoBehaviour:
@@ -664,6 +664,24 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7053752420375890359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2323b1e81ab644b03b06158ce6c9abb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalBubble: 0.25
+  setAnimatorDirectionDirectly: 0
+  snap: 0
+  CrossedTile:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0
@@ -725,6 +743,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   broadGirth: 0
+  verticalDisplacement: 0
 --- !u!1 &5653637094412575612
 GameObject:
   m_ObjectHideFlags: 0

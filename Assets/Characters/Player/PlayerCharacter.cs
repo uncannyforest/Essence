@@ -6,6 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Health))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerCharacter : MonoBehaviour {
     public Terrain terrain;
     public float defaultSpeed = 3f;
@@ -22,7 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     void Start() {
         pointOfView = GetComponentInChildren<PointOfView>().transform;
-        movement = new CharacterController(this).WithSnap().WithCrossedTileHandler(HandleCrossedTile);
+        movement = GetComponent<CharacterController>();
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
     }

@@ -394,7 +394,7 @@ public class Brain {
                     yield return pathfinding.ApproachThenIdle(stationDirective, 1f / CharacterController.subGridUnit);
                 break;
                 case CreatureState.Pair:
-                    yield return pathfinding.ApproachThenIdle(pairDirective.transform.position, creature.personalBubble);
+                    yield return pathfinding.ApproachThenIdle(pairDirective.transform.position, movement.personalBubble);
                 break;
                 default:
                     Debug.LogError("Weird state: " + state);

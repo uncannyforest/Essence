@@ -54,6 +54,7 @@ public struct CreatureAction {
 }
 
 [RequireComponent(typeof(Team))]
+[RequireComponent(typeof(CharacterController))]
 public class Creature : MonoBehaviour {
     public BrainConfig brainConfig;
     public Species species;
@@ -62,8 +63,6 @@ public class Creature : MonoBehaviour {
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
-    public float personalBubble = .25f;
-
     public CreatureState stateForEditorDebugging;
 
     public Brain brain;
@@ -76,12 +75,12 @@ public class Creature : MonoBehaviour {
     private const float despawnTime = 128f;
     public const float neighborhood = 6.5f;
 
-    public CharacterController controller;
+    [NonSerialized] public CharacterController controller;
     private SpriteSorter spriteManager;
     public SpriteSorter SpriteManager { get => spriteManager; }
 
     void Start() {
-        controller = new CharacterController(this).WithPersonalBubble(personalBubble);
+        controller = GetComponent<CharacterController>();
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         cMaybeDespawn = StartCoroutine(MaybeDespawn());

@@ -480,6 +480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   broadGirth: 0
+  verticalDisplacement: 0
 --- !u!1 &7016486793898893324
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +659,7 @@ GameObject:
   - component: {fileID: 3200447014513491315}
   - component: {fileID: -4473977856161058118}
   - component: {fileID: 714092040806779719}
+  - component: {fileID: 2407161138779641919}
   - component: {fileID: 2763505932110915963}
   m_Layer: 0
   m_Name: GenericCreature
@@ -776,6 +778,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamId: 0
+--- !u!114 &2407161138779641919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7775390753821550864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2323b1e81ab644b03b06158ce6c9abb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalBubble: 0.25
+  setAnimatorDirectionDirectly: 0
+  snap: 0
+  CrossedTile:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2763505932110915963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -793,8 +813,8 @@ MonoBehaviour:
     movementSpeed: 0
     roamRestingFraction: 0.5
     reconsiderRateRoam: 5
+    reconsiderRateFollow: 2.5
     reconsiderRateTarget: 2.5
-    reconsiderRatePursuit: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0

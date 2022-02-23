@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: -7616915303342351412}
   - component: {fileID: 3938203489945016266}
   - component: {fileID: 5977861657139729999}
+  - component: {fileID: 7186923944154328222}
   m_Layer: 9
   m_Name: Bunny
   m_TagString: Untagged
@@ -280,7 +281,6 @@ MonoBehaviour:
     sufficient time.  Press and hold the left mouse button to whistle a song.  A
     blue stat bar will appear beneath the <creature/> to indicate it can hear you;
     when the stat bar reaches the end the <creature/> will be tamed.
-  personalBubble: 0.25
   stateForEditorDebugging: 0
 --- !u!50 &4481103850635713295
 Rigidbody2D:
@@ -415,6 +415,24 @@ MonoBehaviour:
     a song for sufficient time.  Press and hold the left mouse button to whistle
     a song.  A blue stat bar will appear beneath the <creature/> to indicate it can
     hear you; when the stat bar reaches the end the <creature/> will be tamed.
+--- !u!114 &7186923944154328222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481103850635713290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2323b1e81ab644b03b06158ce6c9abb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalBubble: 0.25
+  setAnimatorDirectionDirectly: 0
+  snap: 0
+  CrossedTile:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4481103850873570948
 GameObject:
   m_ObjectHideFlags: 0
@@ -474,6 +492,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   broadGirth: 0
+  verticalDisplacement: 0
 --- !u!1 &5653637094412575612
 GameObject:
   m_ObjectHideFlags: 0

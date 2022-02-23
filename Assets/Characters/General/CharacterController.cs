@@ -1,52 +1,43 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class CharacterController {
+[Serializable] public class TileEvent : UnityEvent<Vector2Int> { }
+
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider2D))]
+public class CharacterController : MonoBehaviour {
     public const int subGridUnit = 8;
+
+    [SerializeField] public float personalBubble = 0;
+    [SerializeField] private bool setAnimatorDirectionDirectly = false;
+    [SerializeField] private bool snap = false;
+    [SerializeField] private TileEvent CrossedTile;
     
     private Terrain terrain;
-    public Transform transform;
-    public Rigidbody2D rigidbody;
-    public Collider2D collider;
-    public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
+    [NonSerialized] new public Rigidbody2D rigidbody;
+    [NonSerialized] new public Collider2D collider;
+    [NonSerialized] public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
-    private float? personalBubble = null;
-    private bool setAnimatorDirectionDirectly = false;
-    private Action<Vector2Int> CrossedTile;
     
-    private bool snap = false;
     private Vector2 velocityChebyshevSubgridUnit;
     private float timeToChebyshevSubgridUnit;
     private Vector2 animatorDirection;
 
-    public CharacterController(MonoBehaviour parentComponent) {
+    void Awake() {
         terrain = GameObject.FindObjectOfType<Terrain>();
-        transform = parentComponent.transform;
-        rigidbody = parentComponent.GetComponentStrict<Rigidbody2D>();
-        collider = parentComponent.GetComponentStrict<Collider2D>();
-        spriteSorter = parentComponent.GetComponentInChildren<SpriteSorter>();
-        animator = parentComponent.GetComponent<Animator>();
+        rigidbody = GetComponent<Rigidbody2D>();
+        collider = GetComponent<Collider2D>();
+        spriteSorter = GetComponentInChildren<SpriteSorter>();
+        animator = GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
-        MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, parentComponent);
+    }
+    
+    void Start() {
+        MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, this);
         MoveCoroutine.Start();
-    }
-    public CharacterController WithPersonalBubble(float personalBubble) {
-        this.personalBubble = personalBubble;
-        return this;
-    }
-    public CharacterController SettingAnimatorDirectionDirectly() {
-        this.setAnimatorDirectionDirectly = true;
-        return this;
-    }
-    public CharacterController WithSnap() {
-        snap = true;
-        return this;
-    }
-    public CharacterController WithCrossedTileHandler(Action<Vector2Int> CrossedTile) {
-        this.CrossedTile += CrossedTile;
-        return this;
     }
 
     public CharacterController SetVelocity(Vector2 velocity) {
@@ -122,7 +113,7 @@ public class CharacterController {
                 if (CrossedTile != null) {
                     Vector2Int oldTile = currentTile;
                     currentTile = terrain.CellAt(move);
-                    if (oldTile != currentTile) CrossedTile(currentTile);
+                    if (oldTile != currentTile) CrossedTile.Invoke(currentTile);
                 }
                 yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
             } else yield return new WaitForFixedUpdate();
@@ -131,8 +122,8 @@ public class CharacterController {
 
     private Vector2? Move() {
         Vector2 newLocation = (Vector2)rigidbody.position + velocityChebyshevSubgridUnit;
-        if (personalBubble is float realPersonalBubble) {
-            Collider2D[] overlaps = Physics2D.OverlapCircleAll(newLocation, realPersonalBubble, LayerMask.GetMask("Player", "Creature", "HealthCreature", "NoCreatures"));
+        if (personalBubble != 0) {
+            Collider2D[] overlaps = Physics2D.OverlapCircleAll(newLocation, personalBubble, LayerMask.GetMask("Player", "Creature", "HealthCreature", "NoCreatures"));
             bool doReturnNull = false;
             foreach (Collider2D overlap in overlaps) {
                 if (overlap == collider) continue;

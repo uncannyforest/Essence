@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Feature))]
+[RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class Boat : MonoBehaviour {
     public float speed = 2;
@@ -16,7 +18,7 @@ public class Boat : MonoBehaviour {
 
     private Terrain terrain;
     private Feature feature;
-    public CharacterController movement;
+    [NonSerialized] public CharacterController movement;
     private SortingGroup[] seatSorters = new SortingGroup[4];
     private int[][] seatSortings = new int[][] {
         new int[] {2, 3, 1, 0},
@@ -41,9 +43,7 @@ public class Boat : MonoBehaviour {
 
     void Start() {
         terrain = Terrain.I;
-        movement = new CharacterController(this)
-            .SettingAnimatorDirectionDirectly()
-            .WithCrossedTileHandler(HandleCrossedTile);
+        movement = GetComponent<CharacterController>();
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new CoroutineWrapper(CreatureExitE, this);
@@ -148,7 +148,7 @@ public class Boat : MonoBehaviour {
         currentShoreCorrection = shoreCorrection;
     }
 
-    private void HandleCrossedTile(Vector2Int tile) {
+    public void HandleCrossedTile(Vector2Int tile) {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
             inputVelocity = Vector2.zero;

@@ -5087,6 +5087,7 @@ GameObject:
   - component: {fileID: 403460093}
   - component: {fileID: 403460091}
   - component: {fileID: 403460095}
+  - component: {fileID: 403460096}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -5328,6 +5329,36 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &403460096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403460083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2323b1e81ab644b03b06158ce6c9abb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalBubble: 0
+  setAnimatorDirectionDirectly: 0
+  snap: 1
+  CrossedTile:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 403460085}
+        m_TargetAssemblyTypeName: PlayerCharacter, Assembly-CSharp
+        m_MethodName: HandleCrossedTile
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!224 &406809448 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2125089558098251116, guid: 2230ef5eaf192412287ab938c31b89ee, type: 3}
