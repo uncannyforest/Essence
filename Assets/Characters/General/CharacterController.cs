@@ -10,10 +10,12 @@ using UnityEngine.Events;
 public class CharacterController : MonoBehaviour {
     public const int subGridUnit = 8;
 
-    [SerializeField] public float personalBubble = 0;
-    [SerializeField] private bool setAnimatorDirectionDirectly = false;
-    [SerializeField] private bool snap = false;
-    [SerializeField] private TileEvent CrossedTile;
+    public float personalBubble = 0;
+    public bool setAnimatorDirectionDirectly = false;
+    public bool snap = false;
+    public TileEvent CrossedTile;
+
+    public float waterMovement = 0;
     
     private Terrain terrain;
     [NonSerialized] new public Rigidbody2D rigidbody;
@@ -22,7 +24,7 @@ public class CharacterController : MonoBehaviour {
     private Animator animator; // may be null
     private CoroutineWrapper MoveCoroutine;
     
-    private Vector2 velocityChebyshevSubgridUnit;
+    private Vector2 velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
     private Vector2 animatorDirection;
 
@@ -63,7 +65,6 @@ public class CharacterController : MonoBehaviour {
 
     // Chain after Toward() to indicate direction faced to the animator.
     public CharacterController Idle() {
-        Debug.Log(transform + " received Idle");
         velocityChebyshevSubgridUnit = Vector2.zero;
         animator?.SetBool("Moving", false);
         return this;
@@ -107,15 +108,12 @@ public class CharacterController : MonoBehaviour {
     private Vector2Int currentTile = Vector2Int.zero;
     private IEnumerator MoveCoroutineE() {
         while (true) {
-            if (velocityChebyshevSubgridUnit != Vector2Int.zero
-                    && Move() is Vector2 move) {
-                rigidbody.MovePosition(move);
-                if (CrossedTile != null) {
-                    Vector2Int oldTile = currentTile;
-                    currentTile = terrain.CellAt(move);
-                    if (oldTile != currentTile) CrossedTile.Invoke(currentTile);
-                }
-                yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
+            if (velocityChebyshevSubgridUnit != Vector2Int.zero) {
+                Vector2? maybeMove = Move();
+                if (maybeMove is Vector2 move) {
+                    rigidbody.MovePosition(move);
+                    yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
+                } else yield return new WaitForFixedUpdate();
             } else yield return new WaitForFixedUpdate();
         }
     }
@@ -135,7 +133,17 @@ public class CharacterController : MonoBehaviour {
         if (snap) {
             newLocation = (Vector2)((newLocation * subGridUnit).RoundToInt()) / subGridUnit;
         }
+        Vector2Int newTile = terrain.CellAt(newLocation);
+        if (newTile != currentTile) {
+            CrossedTile?.Invoke(newTile);
+            if (CanCrossTile(newTile)) currentTile = newTile;
+            else return null;
+        }
         return newLocation;
+    }
+
+    private bool CanCrossTile(Vector2Int tile) {
+        return waterMovement != 0f || (terrain.GetLand(tile) ?? terrain.Depths) != Land.Water;
     }
 
     public void OrientFurther() {
