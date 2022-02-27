@@ -50,10 +50,15 @@ public class CharacterController : MonoBehaviour {
     }
 
     public float Speed { get; set; }
-    private void UpdateSpeed() {
-        Speed = (waterSpeed != 0 &&
-            (terrain.GetLand(currentTile) ?? terrain.Depths) == Land.Water) ?
-            waterSpeed : defaultSpeed;
+    private void UpdateTileSpecificParams() {
+        Land land = terrain.GetLand(currentTile) ?? terrain.Depths;
+
+        Speed = (waterSpeed != 0 && land == Land.Water) ? waterSpeed : defaultSpeed;
+            
+        float elevation = land == Land.Water ? -.375f : land == Land.Ditch ? -.25f : 0;
+        spriteSorter.VerticalDisplacement = elevation;
+
+        spriteSorter.LegsVisible = land != Land.Water;
     }
 
     public CharacterController InDirection(Vector2 inputVelocity) {
@@ -101,13 +106,16 @@ public class CharacterController : MonoBehaviour {
     }
 
     public CharacterController Sitting(bool value) {
-        spriteSorter.LegsVisible = !value;
-        spriteSorter.VerticalDisplacement = value ? -.25f : 0;
+        if (value) {
+            spriteSorter.LegsVisible = false;
+            spriteSorter.VerticalDisplacement = -.25f;
+        } else UpdateTileSpecificParams();
         return this;
     }
 
     private Vector2Int currentTile = Vector2Int.zero;
     private IEnumerator MoveCoroutineE() {
+        yield return new WaitForFixedUpdate();
         while (true) {
             if (velocityChebyshevSubgridUnit != Vector2Int.zero) {
                 Vector2? maybeMove = Move();
@@ -138,7 +146,7 @@ public class CharacterController : MonoBehaviour {
         if (newTile != currentTile) {
             if (CanCrossTile(newTile)) {
                 currentTile = newTile;
-                UpdateSpeed();
+                UpdateTileSpecificParams();
                 CrossedTile?.Invoke(newTile);
             }
             else return null;

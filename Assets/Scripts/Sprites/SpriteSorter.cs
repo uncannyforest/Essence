@@ -25,6 +25,7 @@ public class SpriteSorter : MonoBehaviour {
     public bool LegsVisible {
         set => SortingGroups.First<OrientableChild>().gameObject.SetActive(value);
     }
+    // Set by boats and CharacterController on terrain
     [SerializeField] private float verticalDisplacement = 0;
     public float VerticalDisplacement {
         set {
