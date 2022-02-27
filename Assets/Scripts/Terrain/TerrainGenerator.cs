@@ -45,7 +45,15 @@ public class TerrainGenerator {
                     for (var j = 0; j < 2; j++) { // j is sub y in new image
                         var useAdjX = Mathf.FloorToInt(Random.value * (1+modPos));
                         var useAdjY = Mathf.FloorToInt(Random.value * (1+modPos));
-                        if (mutateX == i && mutateY == j) {
+                        if (newImage.width >= 16 && 2*x+i >= newImage.width / 8 - 2 && 2*x+i < newImage.width / 8 + 2
+                            && 2*y+j >= newImage.width / 8 - 2 && 2*y+j < newImage.width / 8 + 2) {
+                            // Tutorial Island
+                            setPixel(newImage, 2*x+i, 2*y+j, Land.Hill);
+                        } else if (newImage.width >= 16 && 2*x+i < newImage.width / 4 && 2*y+j < newImage.height / 4 &&
+                            (nearEdge(2*x+i, newImage.width / 4, newImage.width / 4) || nearEdge(2*y+j, newImage.width / 4, newImage.height / 4))) {
+                            // Tutorial Island shore
+                            setPixel(newImage, 2*x+i, 2*y+j, Land.Water);
+                        } else if (mutateX == i && mutateY == j) {
                             if ((nearEdge(2*x+i, 16, newImage.width) || nearEdge(2*y+j, 16, newImage.height))
                                 && Random.value < .33f) {
                                 setPixel(newImage, 2*x+i, 2*y+j, DEPTHS);
@@ -381,9 +389,9 @@ public class TerrainGenerator {
         Vector2Int location;
         Vector2Int startLocation = Vector2Int.zero;
         // water
-        for (int t = 0; t < 1000; t++) {
-            startLocation = Randoms.Vector2Int(0, 0, subDim, subDim);
-            if (terrain.Land[startLocation] == Land.Water || terrain.Land[startLocation] == Land.Hill) continue;
+        for (int x = DIM / 8 - 1; x >= 0; x--) {
+            startLocation = new Vector2Int(x, x);
+            if (terrain.Land[startLocation] == Land.Hill || terrain.Land[startLocation + new Vector2Int(1, 1)] == Land.Hill) continue;
             terrain.Land[startLocation] = Land.Grass;
             Feature first = terrain.BuildFeature(startLocation, FeatureLibrary.P.fountain);
             first.GetComponentStrict<Fountain>().Team = 1;
