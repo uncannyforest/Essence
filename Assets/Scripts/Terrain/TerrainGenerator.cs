@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 static class HandyExtensionsFromJavascript {
-    public static bool includes(this int[] array, int value) {
+    public static bool includes(this Land[] array, Land value) {
         return System.Array.IndexOf(array, value) >= 0;
     }
 }
@@ -12,26 +12,26 @@ static class HandyExtensionsFromJavascript {
 // Minimally edited copy from javascript
 public class TerrainGenerator {
     class ImageData {
-        public readonly int[] data;
+        public readonly Land[] data;
         public readonly int width;
         public readonly int height;
-        public ImageData(int[] data, int width, int height) {
+        public ImageData(Land[] data, int width, int height) {
             this.data = data;
             this.width = width;
             this.height = height;
         }
         public static ImageData Create(int width, int height) {
-            return new ImageData(new int[width * height], width, height);
+            return new ImageData(new Land[width * height], width, height);
         }
     }
 
     const int DIM = 128;
-    int[] DEPTHS = {0, 64, 192};
+    Land DEPTHS = Land.Water;
 
     // MAGNIFICATION
     const int INIT_DIM = 2;
-    int[] INIT_IMG = {64, 255, 0, 128};
-    void copyArrayToNewArray(int[] oldArray, int[] newArray) {
+    Land[] INIT_IMG = {Land.Water, Land.Grass, Land.Hill, Land.Forest};
+    void copyArrayToNewArray(Land[] oldArray, Land[] newArray) {
         for (var i = 0; i < oldArray.Length; i++) {
             newArray[i] = oldArray[i];
         }
@@ -48,14 +48,14 @@ public class TerrainGenerator {
                         if (mutateX == i && mutateY == j) {
                             if ((nearEdge(2*x+i, 16, newImage.width) || nearEdge(2*y+j, 16, newImage.height))
                                 && Random.value < .33f) {
-                                setPixel(newImage, 2*x+i, 2*y+j, DEPTHS[0], DEPTHS[1], DEPTHS[2]);
+                                setPixel(newImage, 2*x+i, 2*y+j, DEPTHS);
                             } else if (Random.value < .49f) {
-                                setPixel(newImage, 2*x+i, 2*y+j, 192, 0, 0);
+                                setPixel(newImage, 2*x+i, 2*y+j, Land.Hill);
                             } else {
-                                setPixel(newImage, 2*x+i, 2*y+j, 0, 64, 192);
+                                setPixel(newImage, 2*x+i, 2*y+j, Land.Water);
                             }
                         } else {
-                            copyPixel(oldImage, x + useAdjX*(i*2-1), y + useAdjY*(j*2-1), newImage, 2*x+i, 2*y+j, DEPTHS[1]);
+                            copyPixel(oldImage, x + useAdjX*(i*2-1), y + useAdjY*(j*2-1), newImage, 2*x+i, 2*y+j, DEPTHS);
                         }
                     }
                 }
@@ -66,17 +66,17 @@ public class TerrainGenerator {
     bool nearCorners(int x, int y, int dim) => Mathf.Min(x, dim-x-1) + Mathf.Min(y, dim-y-1) < dim/4 - 1;
 
     // IMAGE PROCESSING
-    void setPixel(ImageData image, int x, int y, int r, int g, int b) {
+    void setPixel(ImageData image, int x, int y, Land land) {
         var rPos = image.width * y + x;
-        image.data[rPos] = g;
+        image.data[rPos] = land;
     }
-    static int getPixel(ImageData image, int x, int y) {
+    static Land getPixel(ImageData image, int x, int y) {
         var rPos = image.width * y + x;
         return image.data[rPos];
     }
-    void copyPixel(ImageData oldImage, int oldX, int oldY, ImageData newImage, int newX, int newY, int def) {
+    void copyPixel(ImageData oldImage, int oldX, int oldY, ImageData newImage, int newX, int newY, Land def) {
         if (oldX < 0 || oldY < 0 || oldX >= oldImage.width || oldY >= oldImage.height) {
-            setPixel(newImage, newX, newY, 0, def, 0);
+            setPixel(newImage, newX, newY, def);
             return;
         }
         var oPos = oldImage.width * oldY + oldX;
@@ -85,19 +85,19 @@ public class TerrainGenerator {
     }
 
     // FLOOD FILL
-    void floodFill(ImageData image, int x, int y, int oldColor, int newColor) {
+    void floodFill(ImageData image, int x, int y, Land oldColor, Land newColor) {
         var q = new Queue<Vector2Int>();
         q.Enqueue(new Vector2Int(x, y));
         while (q.Count > 0) floodFillStep(image, q, oldColor, newColor);
     }
-    void floodFillStep(ImageData image, Queue<Vector2Int> q, int oldColor, int newColor) {
+    void floodFillStep(ImageData image, Queue<Vector2Int> q, Land oldColor, Land newColor) {
         var next = q.Dequeue();
         var x = next.x;
         var y = next.y;
         if (x < 0 || y < 0 || x >= image.width || y >= image.height) return;
         var oldPixel = getPixel(image, x, y);
         if (oldPixel == oldColor) {
-            setPixel(image, x, y, 0, newColor, 0);
+            setPixel(image, x, y, newColor);
             q.Enqueue(new Vector2Int(x + 1, y));
             q.Enqueue(new Vector2Int(x, y + 1));
             q.Enqueue(new Vector2Int(x - 1, y));
@@ -106,13 +106,13 @@ public class TerrainGenerator {
     }
 
     // CELLULAR AUTOMATA
-    int neighborCheck(ImageData image, int x, int y, int[] from) {
+    int neighborCheck(ImageData image, int x, int y, Land[] from) {
         if (x < 0 || y < 0 || x >= DIM || y >= DIM) {
-            return from.includes(DEPTHS[1]) ? 1 : 0;
+            return from.includes(DEPTHS) ? 1 : 0;
         }
         return from.includes(getPixel(image, x, y)) ? 1 : 0;
     }
-    int neighborCount(ImageData image, int x, int y, int[] from) {
+    int neighborCount(ImageData image, int x, int y, params Land[] from) {
         var count = 0;
             count += neighborCheck(image, x+1, y, from);
             count += neighborCheck(image, x+1, y+1, from);
@@ -124,15 +124,12 @@ public class TerrainGenerator {
             count += neighborCheck(image, x+1, y-1, from);
         return count;
     }
-    int neighborCount(ImageData image, int x, int y, int from) {
-        return neighborCount(image, x, y, new int[] {from});
-    }
 
     int bound(int n, int dim) => n < 0 ? 0 : n >= dim ? dim-1 : n;
 
     int randomSign() => Random.Range(0, 2) * 2 - 1;
 
-    Vector2Int? selectEmptyArea(ImageData image, int[] check, int maxTries) {
+    Vector2Int? selectEmptyArea(ImageData image, Land[] check, int maxTries) {
         for (var i = 0; i < maxTries; i++) {
             var x = Random.Range(0, DIM);
             var y = Random.Range(0, DIM);
@@ -162,16 +159,16 @@ public class TerrainGenerator {
             idn = ImageData.Create(DIM, DIM);
             for (var x = 0; x < DIM; x++) {
                 for (var y = 0; y < DIM; y++) {
-                    if (neighborCount(id, x, y, 0) > 4) {
-                        setPixel(idn, x, y, 192, 0, 0);
-                    } else if (neighborCount(id, x, y, 64) > 4) {
-                        setPixel(idn, x, y, 0, 64, 192);
-                    } else if (neighborCount(id, x, y, new int[] {128,0}) > 4) {
-                        setPixel(idn, x, y, 0, 128, 0);
-                    } else if (neighborCount(id, x, y, new int[] {255,0}) > 4) {
-                        setPixel(idn, x, y, 0, 255, 0);
+                    if (neighborCount(id, x, y, Land.Hill) > 4) {
+                        setPixel(idn, x, y, Land.Hill);
+                    } else if (neighborCount(id, x, y, Land.Water) > 4) {
+                        setPixel(idn, x, y, Land.Water);
+                    } else if (neighborCount(id, x, y, Land.Forest,Land.Hill) > 4) {
+                        setPixel(idn, x, y, Land.Forest);
+                    } else if (neighborCount(id, x, y, Land.Grass,Land.Hill) > 4) {
+                        setPixel(idn, x, y, Land.Grass);
                     } else {
-                        copyPixel(id, x, y, idn, x, y, -1);
+                        copyPixel(id, x, y, idn, x, y, Land.Woodpile);
                     }
                 }
             }
@@ -188,22 +185,22 @@ public class TerrainGenerator {
             idn = ImageData.Create(DIM, DIM);
             for (var x = 0; x < DIM; x++) {
                 for (var y = 0; y < DIM; y++) {
-                    if (neighborCount(id, x, y, 0) > 0 && neighborCount(id, x, y, 128) > 0 && neighborCount(id, x, y, 64) > 0) {
-                        setPixel(idn, x, y, 0, 64, 192);
-                    } else if (neighborCount(id, x, y, 255) > 3 && getPixel(id, x, y) == 64) {
-                        setPixel(idn, x, y, 0, 255, 0);
-                    } else if (getPixel(id, x, y) == 64 && neighborCount(id, x, y, 0) > 3) {
-                        setPixel(idn, x, y, 192, 0, 0);
-                    } else if (getPixel(id, x, y) == 255 && neighborCount(id, x, y, 0) > 2) {
-                        setPixel(idn, x, y, 192, 0, 0);
-                    } else if (getPixel(id, x, y) == 64 && neighborCount(id, x, y, 128) > 1) {
-                        setPixel(idn, x, y, 0, 128, 0);
-                    } else if (getPixel(id, x, y) != 0 && neighborCount(id, x, y, 128) > 2) {
-                        setPixel(idn, x, y, 0, 128, 0);
-                    } else if (neighborCount(id, x, y, 64) > 5) {
-                        setPixel(idn, x, y, 0, 64, 192);
+                    if (neighborCount(id, x, y, Land.Hill) > 0 && neighborCount(id, x, y, Land.Forest) > 0 && neighborCount(id, x, y, Land.Water) > 0) {
+                        setPixel(idn, x, y, Land.Water);
+                    } else if (neighborCount(id, x, y, Land.Grass) > 3 && getPixel(id, x, y) == Land.Water) {
+                        setPixel(idn, x, y, Land.Grass);
+                    } else if (getPixel(id, x, y) == Land.Water && neighborCount(id, x, y, Land.Hill) > 3) {
+                        setPixel(idn, x, y, Land.Hill);
+                    } else if (getPixel(id, x, y) == Land.Grass && neighborCount(id, x, y, Land.Hill) > 2) {
+                        setPixel(idn, x, y, Land.Hill);
+                    } else if (getPixel(id, x, y) == Land.Water && neighborCount(id, x, y, Land.Forest) > 1) {
+                        setPixel(idn, x, y, Land.Forest);
+                    } else if (getPixel(id, x, y) != 0 && neighborCount(id, x, y, Land.Forest) > 2) {
+                        setPixel(idn, x, y, Land.Forest);
+                    } else if (neighborCount(id, x, y, Land.Water) > 5) {
+                        setPixel(idn, x, y, Land.Water);
                     } else {
-                        copyPixel(id, x, y, idn, x, y, -1);
+                        copyPixel(id, x, y, idn, x, y, Land.Woodpile);
                     }
                 }
             }
@@ -219,16 +216,16 @@ public class TerrainGenerator {
             idn = ImageData.Create(DIM, DIM);
             for (var x = 0; x < DIM; x++) {
                 for (var y = 0; y < DIM; y++) {
-                    if (getPixel(id, x, y) == 128 && neighborCount(id, x, y, 64) > i) {
-                        setPixel(idn, x, y, 0, 64, 192);
-                    } else if (getPixel(id, x, y) == 255 && neighborCount(id, x, y, 128) > i) {
-                        setPixel(idn, x, y, 0, 128, 0);
-                    } else if (new int[] {128,255}.includes(getPixel(id, x, y)) && neighborCount(id, x, y, 0) > 2) {
-                        setPixel(idn, x, y, 192, 0, 0);
-                    } else if (neighborCount(id, x, y, 64) > 3) {
-                        setPixel(idn, x, y, 0, 64, 192);
+                    if (getPixel(id, x, y) == Land.Forest && neighborCount(id, x, y, Land.Water) > i) {
+                        setPixel(idn, x, y, Land.Water);
+                    } else if (getPixel(id, x, y) == Land.Grass && neighborCount(id, x, y, Land.Forest) > i) {
+                        setPixel(idn, x, y, Land.Forest);
+                    } else if (new Land[] {Land.Forest,Land.Grass}.includes(getPixel(id, x, y)) && neighborCount(id, x, y, Land.Hill) > 2) {
+                        setPixel(idn, x, y, Land.Hill);
+                    } else if (neighborCount(id, x, y, Land.Water) > 3) {
+                        setPixel(idn, x, y, Land.Water);
                     } else {
-                        copyPixel(id, x, y, idn, x, y, -1);
+                        copyPixel(id, x, y, idn, x, y, Land.Woodpile);
                     }
                 }
             }
@@ -236,59 +233,59 @@ public class TerrainGenerator {
         }
         Debug.Log("4a");
         // line of grass around trees
-        idn = new ImageData((int[]) id.data.Clone(), DIM, DIM);
+        idn = new ImageData((Land[]) id.data.Clone(), DIM, DIM);
         for (var x = 0; x < DIM; x++)
             for (var y = 0; y < DIM; y++)
-                if (getPixel(id, x, y) == 128 && neighborCount(id, x, y, 64) > 0)
-                    setPixel(idn, x, y, 0, 255, 0);
+                if (getPixel(id, x, y) == Land.Forest && neighborCount(id, x, y, Land.Water) > 0)
+                    setPixel(idn, x, y, Land.Grass);
         id = idn;
         Debug.Log("4");
 
         // generate rivers
         for (var x = 0; x < DIM; x++)
             for (var y = 0; y < DIM; y++)
-                if (getPixel(id, x, y) == 64)
-                    setPixel(id, x, y, 96, 96, 96);
+                if (getPixel(id, x, y) == Land.Water)
+                    setPixel(id, x, y, Land.Ditch);
         Debug.Log("5a");
-        if (DEPTHS[1] != 64) while (true) {
+        if (DEPTHS != Land.Water) while (true) {
             var x = Random.Range(0, 128);
             var y = Random.Range(128, 256);
-            if (getPixel(id, x, y) == 96) {
+            if (getPixel(id, x, y) == Land.Ditch) {
                 Debug.Log("5b");
-                floodFill(id, x, y, 96, 64);
+                floodFill(id, x, y, Land.Ditch, Land.Water);
                 break;
             }
         }
         Debug.Log("5");
         var vel = new Vector2Int(0, randomSign());
         for (var i = 0; i < 1000; i++) {
-            idn = new ImageData((int[]) id.data.Clone(), DIM, DIM);
-            var possCoord = selectEmptyArea(id, new int[] {96, 255, 128, 0}, 9);
+            idn = new ImageData((Land[]) id.data.Clone(), DIM, DIM);
+            var possCoord = selectEmptyArea(id, new Land[] {Land.Ditch, Land.Grass, Land.Forest, Land.Hill}, 9);
             if (possCoord == null) break;
             var coord = (Vector2Int) possCoord;
-            while (neighborCount(idn, coord[0], coord[1], new int[] {96, 255, 128, 0}) == 8) {
+            while (neighborCount(idn, coord[0], coord[1], Land.Ditch, Land.Grass, Land.Forest, Land.Hill) == 8) {
                 var pos = new Vector2Int(coord[0], coord[1]);
-                while (neighborCount(idn, pos[0], pos[1], new int[] {96, 255, 128, 0}) == 8) {
+                while (neighborCount(idn, pos[0], pos[1], Land.Ditch, Land.Grass, Land.Forest, Land.Hill) == 8) {
                     if (Random.value < .5)
                     vel = new Vector2Int(vel[1] * randomSign(), vel[0] * randomSign());
                     pos[0] = bound(pos[0] + vel[0], DIM);
                     pos[1] = bound(pos[1] + vel[1], DIM);
                 }
-                if (getPixel(idn, pos[0], pos[1]) == 96) {
-                    floodFill(idn, pos[0], pos[1], 96, 64);
+                if (getPixel(idn, pos[0], pos[1]) == Land.Ditch) {
+                    floodFill(idn, pos[0], pos[1], Land.Ditch, Land.Water);
                 } else {
-                    setPixel(idn, pos[0], pos[1], 0, 64, 192);
+                    setPixel(idn, pos[0], pos[1], Land.Water);
                 }
             }
             id = idn;
         }
         Debug.Log("6b");
         for (var x = 0; x < DIM/2; x++) for (var y = 0; y < DIM/2; y++)
-            if (getPixel(id, x, y) == 96) floodFill(id, x, y, 96, 64);
+            if (getPixel(id, x, y) == Land.Ditch) floodFill(id, x, y, Land.Ditch, Land.Water);
         for (var x = DIM/2; x < DIM; x++) for (var y = DIM/2; y < DIM; y++)
-            if (getPixel(id, x, y) == 96) floodFill(id, x, y, 96, 64);
+            if (getPixel(id, x, y) == Land.Ditch) floodFill(id, x, y, Land.Ditch, Land.Water);
         for (var x = 0; x < DIM; x++) for (var y = 0; y < DIM; y++)
-            if (getPixel(id, x, y) == 96) setPixel(id, x, y, 0, 255, 0);
+            if (getPixel(id, x, y) == Land.Ditch) setPixel(id, x, y, Land.Grass);
         Debug.Log("6");
 
 
@@ -296,12 +293,12 @@ public class TerrainGenerator {
         idn = ImageData.Create(DIM, DIM);
         for (var x = 0; x < DIM; x++) {
             for (var y = 0; y < DIM; y++) {
-                if (getPixel(id, x, y) == 128 && neighborCount(id, x, y, 128) == 8) {
-                    setPixel(idn, x, y, 192, 0, 0);
-                } else if (getPixel(id, x, y) == 0 && neighborCount(id, x, y, 64) > 0) {
-                    setPixel(idn, x, y, 0, 255, 0);
+                if (getPixel(id, x, y) == Land.Forest && neighborCount(id, x, y, Land.Forest) == 8) {
+                    setPixel(idn, x, y, Land.Hill);
+                } else if (getPixel(id, x, y) == Land.Hill && neighborCount(id, x, y, Land.Water) > 0) {
+                    setPixel(idn, x, y, Land.Grass);
                 } else {
-                    copyPixel(id, x, y, idn, x, y, -1);
+                    copyPixel(id, x, y, idn, x, y, Land.Woodpile);
                 }
             }
         }
@@ -310,17 +307,17 @@ public class TerrainGenerator {
 
         // reduce rivers
         for (var i = 0; i < 32; i++) {
-            idn = new ImageData((int[]) id.data.Clone(), DIM, DIM);
+            idn = new ImageData((Land[]) id.data.Clone(), DIM, DIM);
 
             for (var x = 0; x < DIM; x++) {
                 for (var y = 0; y < DIM; y++) {
-                    if (getPixel(id, x, y) == 64) {
-                        if (neighborCount(id, x, y, 255) == 7) {
-                            setPixel(idn, x, y, 0, 255, 0);
-                        } else if (neighborCount(id, x, y, new int[] {128, 255}) == 7) {
-                            setPixel(idn, x, y, 0, 128, 0);
-                        } else if (neighborCount(id, x, y, 0) == 7) {
-                            setPixel(idn, x, y, 192, 0, 0);
+                    if (getPixel(id, x, y) == Land.Water) {
+                        if (neighborCount(id, x, y, Land.Grass) == 7) {
+                            setPixel(idn, x, y, Land.Grass);
+                        } else if (neighborCount(id, x, y, Land.Forest, Land.Grass) == 7) {
+                            setPixel(idn, x, y, Land.Forest);
+                        } else if (neighborCount(id, x, y, Land.Hill) == 7) {
+                            setPixel(idn, x, y, Land.Hill);
                         }
                     }
                 }
@@ -335,14 +332,14 @@ public class TerrainGenerator {
 
             for (var x = 0; x < DIM; x++) {
                 for (var y = 0; y < DIM; y++) {
-                    if (getPixel(id, x, y) == 0 && neighborCount(id, x, y, 128) > (i < 4 ? 1 : 3)) {
-                        setPixel(idn, x, y, 0, 128, 0);
-                    } else if (getPixel(id, x, y) == 0 && neighborCount(id, x, y, new int[] {255, 128}) > 3 && i < 3) {
-                        setPixel(idn, x, y, 0, 255, 0);
-                    } else if (neighborCount(id, x, y, 0) >= 6) {
-                        setPixel(idn, x, y, 192, 0, 0);
+                    if (getPixel(id, x, y) == Land.Hill && neighborCount(id, x, y, Land.Forest) > (i < 4 ? 1 : 3)) {
+                        setPixel(idn, x, y, Land.Forest);
+                    } else if (getPixel(id, x, y) == Land.Hill && neighborCount(id, x, y, Land.Grass, Land.Forest) > 3 && i < 3) {
+                        setPixel(idn, x, y, Land.Grass);
+                    } else if (neighborCount(id, x, y, Land.Hill) >= 6) {
+                        setPixel(idn, x, y, Land.Hill);
                     } else {
-                        copyPixel(id, x, y, idn, x, y, -1);
+                        copyPixel(id, x, y, idn, x, y, Land.Woodpile);
                     }
                 }
             }
@@ -351,17 +348,17 @@ public class TerrainGenerator {
         Debug.Log("9");
 
         // fix rivers
-        idn = new ImageData((int[])id.data.Clone(), DIM, DIM);
+        idn = new ImageData((Land[])id.data.Clone(), DIM, DIM);
         for (var x = 0; x < DIM - 1; x++) {
             for (var y = 0; y < DIM - 1; y++) {
-                if (getPixel(id, x, y) == 64 && new int[] {255,128}.includes(getPixel(id, x+1, y)) &&
-                        new int[] {255,128}.includes(getPixel(id, x, y+1)) &&  getPixel(id, x+1, y+1) == 64) {
-                    setPixel(idn, x, y+1, 0, 64, 192);
-                    setPixel(idn, x+1, y, 0, 64, 192);
-                } else if (new int[] {255,128}.includes(getPixel(id, x, y)) && getPixel(id, x+1, y) == 64 &&
-                        getPixel(id, x, y+1) == 64 &&  new int[] {255,128}.includes(getPixel(id, x+1, y+1))) {
-                    setPixel(idn, x, y, 0, 64, 192);
-                    setPixel(idn, x+1, y+1, 0, 64, 192);
+                if (getPixel(id, x, y) == Land.Water && new Land[] {Land.Grass,Land.Forest}.includes(getPixel(id, x+1, y)) &&
+                        new Land[] {Land.Grass,Land.Forest}.includes(getPixel(id, x, y+1)) &&  getPixel(id, x+1, y+1) == Land.Water) {
+                    setPixel(idn, x, y+1, Land.Water);
+                    setPixel(idn, x+1, y, Land.Water);
+                } else if (new Land[] {Land.Grass,Land.Forest}.includes(getPixel(id, x, y)) && getPixel(id, x+1, y) == Land.Water &&
+                        getPixel(id, x, y+1) == Land.Water && new Land[] {Land.Grass,Land.Forest}.includes(getPixel(id, x+1, y+1))) {
+                    setPixel(idn, x, y, Land.Water);
+                    setPixel(idn, x+1, y+1, Land.Water);
                 }
             }
         }
@@ -374,23 +371,7 @@ public class TerrainGenerator {
         ImageData intArray = new TerrainGenerator().GenerateIntArray();
         for (int x = 0; x < intArray.width; x++) {
             for (int y = 0; y < intArray.height; y++) {
-                switch(getPixel(intArray, x, y)) {
-                    case 0:
-                        terrain.Land[x, y] = Land.Hill;
-                        break;
-                    case 64:
-                        terrain.Land[x, y] = Land.Water;
-                        break;
-                    case 128:
-                        terrain.Land[x, y] = Land.Forest;
-                        break;
-                    case 255:
-                        terrain.Land[x, y] = Land.Grass;
-                        break;
-                    default:
-                        Debug.Log("Uh oh, " + x + "," + y + ": color " + getPixel(intArray, x, y));
-                        break;
-                }
+                terrain.Land[x, y] = getPixel(intArray, x, y);
             }
         }
     }
