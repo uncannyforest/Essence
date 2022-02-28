@@ -40,7 +40,7 @@ public class Fauna : MonoBehaviour {
         for (int i = 0; i < 100; i++) {
             Vector2Int possLocation = RandomLocation();
             if (!terrain.Land[possLocation].IsPassable() ||
-                (terrain.Land[possLocation].IsWatery() && Randoms.CoinFlip)) continue;
+                terrain.Land[possLocation].IsWatery()) continue;
             if (Physics2D.OverlapCircleAll(terrain.CellCenter(possLocation), PlayerCharacter.neighborhood).Length != 0) continue;
             if (0 != Random.Range(0, 1 + Physics2D.OverlapCircleAll(terrain.CellCenter(possLocation), PlayerCharacter.neighborhood).Length)) continue;
             return possLocation;
