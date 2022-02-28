@@ -43,6 +43,7 @@ public class Boat : MonoBehaviour {
     void Start() {
         terrain = Terrain.I;
         movement = GetComponent<CharacterController>();
+        movement.CrossingTile += HandleCrossingTile;
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new CoroutineWrapper(CreatureExitE, this);
@@ -147,13 +148,15 @@ public class Boat : MonoBehaviour {
         currentShoreCorrection = shoreCorrection;
     }
 
-    public void HandleCrossedTile(Vector2Int tile) {
+    public bool HandleCrossingTile(Vector2Int tile) {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
             inputVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
+            return false;
         } else {
             currentTile = tile;
+            return true;
         }
     }
 

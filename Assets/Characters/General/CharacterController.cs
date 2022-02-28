@@ -3,8 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-[Serializable] public class TileEvent : UnityEvent<Vector2Int> { }
-
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class CharacterController : MonoBehaviour {
@@ -13,7 +11,7 @@ public class CharacterController : MonoBehaviour {
     public float personalBubble = 0;
     public bool setAnimatorDirectionDirectly = false;
     public bool snap = false;
-    public TileEvent CrossedTile;
+    public Func<Vector2Int, bool> CrossingTile; // return false to cancel
 
     public float defaultSpeed = 2f;
     public float waterSpeed = 0;
@@ -56,9 +54,11 @@ public class CharacterController : MonoBehaviour {
         Speed = (waterSpeed != 0 && land == Land.Water) ? waterSpeed : defaultSpeed;
             
         float elevation = land == Land.Water ? -.375f : land == Land.Ditch ? -.25f : 0;
-        spriteSorter.VerticalDisplacement = elevation;
 
-        spriteSorter.LegsVisible = land != Land.Water;
+        if (!setAnimatorDirectionDirectly) {
+            spriteSorter.VerticalDisplacement = elevation;
+            spriteSorter.LegsVisible = land != Land.Water;
+        }
     }
 
     public CharacterController InDirection(Vector2 inputVelocity) {
@@ -147,7 +147,8 @@ public class CharacterController : MonoBehaviour {
             if (CanCrossTile(newTile)) {
                 currentTile = newTile;
                 UpdateTileSpecificParams();
-                CrossedTile?.Invoke(newTile);
+                bool? continueCrossingTile = CrossingTile?.Invoke(newTile);
+                if (continueCrossingTile == false) return null;
             }
             else return null;
         }

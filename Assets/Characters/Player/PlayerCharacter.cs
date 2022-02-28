@@ -23,6 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     void Start() {
         pointOfView = GetComponentInChildren<PointOfView>().transform;
         movement = GetComponent<CharacterController>();
+        movement.CrossingTile += HandleCrossingTile;
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
     }
@@ -45,9 +46,12 @@ public class PlayerCharacter : MonoBehaviour {
         }
     }
 
-    public void HandleCrossedTile(Vector2Int newTile) {
-        if (terrain.Feature[newTile] is Feature feature && feature.PlayerEntered != null)
+    public bool HandleCrossingTile(Vector2Int newTile) {
+        if (terrain.Feature[newTile] is Feature feature && feature.PlayerEntered != null) {
             feature.PlayerEntered(this);
+            return false;
+        }
+        return true;
     }
 
     public void HandleDeath() {
