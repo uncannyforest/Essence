@@ -14,9 +14,10 @@ public struct CreatureAction {
     public readonly bool canQueue;
     public readonly bool isRoam;
     public readonly bool isStation;
+    public readonly Feature feature;
     private CreatureAction(Sprite icon, Action<Creature> instantDirective, 
             Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective,
-            TeleFilter filter, bool canQueue, bool isRoam, bool isStation) {
+            TeleFilter filter, Feature feature, bool canQueue, bool isRoam, bool isStation) {
         this.icon = icon;
         this.instantDirective = instantDirective;
         this.pendingDirective = pendingDirective;
@@ -24,32 +25,41 @@ public struct CreatureAction {
         this.canQueue = canQueue;
         this.isRoam = isRoam;
         this.isStation = isStation;
+        this.feature = feature;
     }
 
     public static CreatureAction Instant(Sprite icon, Action<Creature> instantDirective) =>
-        new CreatureAction(icon, instantDirective, null, null, false, false, false);
+        new CreatureAction(icon, instantDirective, null, null, null, false, false, false);
     public static CreatureAction WithObject(Sprite icon,
             CoroutineWrapper executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.Execute(executingBehavior, target),
-            filter, false, false, false);
+            filter, null, false, false, false);
     public static CreatureAction QueueableWithObject(Sprite icon,
             CoroutineWrapper executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
-            filter, true, false, false);
+            filter, null, true, false, false);
+    public static CreatureAction QueueableFeature(Feature feature,
+            CoroutineWrapper executingBehavior) =>
+        new CreatureAction(null, null,
+            (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
+            new TeleFilter(TeleFilter.Terrain.TILES, null), feature, true, false, false);
     public static CreatureAction Roam =
-        new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, false, true, false);
+        new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, null, false, true, false);
     public static CreatureAction Station =
         new CreatureAction(null, null,
             (creature, location) => creature.Station(((Terrain.Position)location).Coord),
             new TeleFilter(TeleFilter.Terrain.TILES, null),
-            false, false, true);
+            null, false, false, true);
 
     public bool IsInstant {
         get => instantDirective != null;
+    }
+    public bool UsesFeature {
+        get => feature != null;
     }
 }
 

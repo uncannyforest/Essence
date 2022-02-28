@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class ActionDisplay : MonoBehaviour {
     public Sprite noAction;
+    public Sprite featureBackground;
     public Sprite sword;
     public Sprite arrow;
     public Sprite praxel;
@@ -23,6 +24,7 @@ public class ActionDisplay : MonoBehaviour {
 
     void Awake() {
         interaction.interactionChanged += InteractionChanged;
+        interaction.creatureChanged += CreatureChanged;
     }
 
     void Start() {
@@ -42,11 +44,11 @@ public class ActionDisplay : MonoBehaviour {
             Transform element = hotbar.GetChild(i);
             Transform creature = element.Find("Creature");
             if (i < actions.Count) {
-                element.GetComponent<Image>().sprite = GetSprite(actions[i]);
+                UpdateSprite(element.GetComponentStrict<Image>(), actions[i]);
                 creature.gameObject.SetActive(actions[i].IsCreatureAction);
                 if (actions[i].IsCreatureAction) UpdateCreatureIcon(creature, actions[i].creature);
             } else {
-                element.GetComponent<Image>().sprite = noAction;
+                ClearSprite(element.GetComponentStrict<Image>());
                 creature.gameObject.SetActive(false);
             }
         }
@@ -62,17 +64,38 @@ public class ActionDisplay : MonoBehaviour {
     }
 
     private void InteractionChanged(Interaction action, Creature creature) {
-        Debug.Log("Updating UI with creature " + creature + " so active should be " + (creature != null));
-        currentAction.sprite = GetSprite(action);
-        currentCreature.gameObject.SetActive(creature != null);
-        if (creature != null) UpdateCreatureIcon(currentCreature.transform, creature);
+        UpdateSprite(currentAction, action);
 
         List<Interaction> actions = interaction.Actions();
         for (int i = 0; i < 10; i++) {
             GameObject selected = hotbar.GetChild(i).Find("Selected").gameObject;
             selected.SetActive(i < actions.Count && action == actions[i]);
         }
+    }
+
+    private void CreatureChanged(Interaction action, Creature creature) {
+        Debug.Log("Updating UI with creature " + creature + " so active should be " + (creature != null));
+        currentCreature.gameObject.SetActive(creature != null);
+        if (creature != null) UpdateCreatureIcon(currentCreature.transform, creature);
+
         UpdateHotbar();
+        InteractionChanged(action, creature);
+    }
+
+    private void UpdateSprite(Image actionDisplay, Interaction action) {
+        actionDisplay.sprite = GetSprite(action);
+        Transform featureDisplay = actionDisplay.transform.Find("Feature");
+        foreach (Transform feature in featureDisplay) GameObject.Destroy(feature.gameObject);
+        if (action.IsCreatureAction && action.CreatureAction.UsesFeature) {
+            Feature feature = GameObject.Instantiate(action.CreatureAction.feature, featureDisplay);
+            feature.transform.SetLayer(LayerMask.NameToLayer("UI"));
+        }
+    }
+
+    private void ClearSprite(Image actionDisplay) {
+        actionDisplay.sprite = noAction;
+        Transform featureDisplay = actionDisplay.transform.Find("Feature");
+        foreach (Transform feature in featureDisplay) GameObject.Destroy(feature.gameObject);
     }
 
     private Sprite GetSprite(Interaction action) {
@@ -92,6 +115,7 @@ public class ActionDisplay : MonoBehaviour {
             case WorldInteraction.Mode.Directing:
                 if (action.CreatureAction.isRoam) return roam;
                 else if (action.CreatureAction.isStation) return station;
+                else if (action.CreatureAction.UsesFeature) return featureBackground;
                 else return action.CreatureAction.icon;
             default:
                 throw new InvalidOperationException("Bad WorldInteraction Mode");

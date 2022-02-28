@@ -26,8 +26,14 @@ public class RedDwarfBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.QueueableWithObject(redDwarf.woodBuildAction,
-                new CoroutineWrapper(WoodBuildBehaviorE, species),
-                new TeleFilter(TeleFilter.Terrain.WOODBUILDING, null))
+                new PathfindingEnumerator.ApproachThenBuild(this,
+                    redDwarf.buildDistance, redDwarf.buildTime,
+                    (loc) => terrain[loc] = Construction.Wood).C,
+                new TeleFilter(TeleFilter.Terrain.WOODBUILDING, null)),
+            CreatureAction.QueueableFeature(FeatureLibrary.P.boat,
+                new PathfindingEnumerator.ApproachThenBuild(this,
+                    redDwarf.buildDistance, redDwarf.buildTime,
+                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).C)
         };
     }
 
@@ -42,19 +48,5 @@ public class RedDwarfBrain : Brain {
 
     override protected IEnumerator FocusedBehaviorE() {
         yield break; // not implemented
-    }
-
-    private IEnumerator WoodBuildBehaviorE() {
-        for (int i = 0; i < 100_000; i++) {
-            Terrain.Position buildLocation = (Terrain.Position)executeDirective;
-            bool reached = pathfinding.Approach(buildLocation, redDwarf.buildDistance)
-                    .ThenCheckIfReached(null, out WaitForSeconds approachWait);
-            if (reached) {
-                terrain[buildLocation] = Construction.Wood;
-                yield return new WaitForSeconds(redDwarf.buildTime);
-                CompleteExecution(); 
-                yield break;
-            } else yield return approachWait;
-        }
     }
 }

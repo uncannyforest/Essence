@@ -103,6 +103,7 @@ public class WorldInteraction : MonoBehaviour {
     private Dictionary<Terrain.Grid, Tilemap> uiMaps;
 
     public Action<Interaction, Creature> interactionChanged;
+    public Action<Interaction, Creature> creatureChanged;
 
     public enum Mode {
         Sword,
@@ -188,7 +189,7 @@ public class WorldInteraction : MonoBehaviour {
     public void ActiveCharacterToFollowing() {
         followingCharacters.Push(activeCharacter);
         Debug.Log("Updating UI with active character " + activeCharacter);
-        if (interactionChanged != null) interactionChanged(CurrentAction, activeCharacter.GetCharacterComponent<Creature>());
+        if (creatureChanged != null) creatureChanged(CurrentAction, activeCharacter.GetCharacterComponent<Creature>());
         if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
         followingCharacterHighlight = activeCharacterHighlight;
         followingCharacterHighlight.GetComponentInChildren<SpriteRenderer>().color = followingCharacterColor;
@@ -200,7 +201,7 @@ public class WorldInteraction : MonoBehaviour {
     public Creature ForcePopFollowing() {
         Debug.Log("Popping, num following characters: " + followingCharacters.Count);
         Creature result = followingCharacters.Pop().GetCharacterComponent<Creature>();
-        if (interactionChanged != null) interactionChanged(CurrentAction, PeekFollowing());
+        if (creatureChanged != null) creatureChanged(CurrentAction, PeekFollowing());
         if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
         if (followingCharacters.Count > 0) {
             SpriteSorter followingCharacter = followingCharacters.Peek();
@@ -226,7 +227,7 @@ public class WorldInteraction : MonoBehaviour {
         QuickCleanUpFollowingCharacters();
         followingCharacters.PushToBottom(characterSprite);
         if (followingCharacters.Count == 1) {
-            if (interactionChanged != null) interactionChanged(CurrentAction, creature);
+            if (creatureChanged != null) creatureChanged(CurrentAction, creature);
             followingCharacterHighlight = NewCharacterHighlight(characterSprite, false);
         }
     }
@@ -463,9 +464,9 @@ public class WorldInteraction : MonoBehaviour {
             if (CurrentAction.mode == Mode.Directing) CurrentAction = Interaction.Player(Mode.Taming);
             if (followingCharacters.Count > 0) {
                 followingCharacterHighlight = NewCharacterHighlight(followingCharacters.Peek(), false);
-                if (interactionChanged != null) interactionChanged(CurrentAction,
+                if (creatureChanged != null) creatureChanged(CurrentAction,
                         followingCharacters.Peek().GetCharacterComponent<Creature>());
-            } else if (interactionChanged != null) interactionChanged(CurrentAction, null);
+            } else if (creatureChanged != null) creatureChanged(CurrentAction, null);
         }
     }
 

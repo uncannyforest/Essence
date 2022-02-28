@@ -22,7 +22,7 @@ public class Pathfinding {
         }
     };
 
-    private Brain brain;
+    public readonly Brain brain;
     public Pathfinding(Brain brain) {
         this.brain = brain;
     }
@@ -82,6 +82,7 @@ public class Pathfinding {
         if (result) movement.Idle();
         return persist;
     }
+
     public bool ReachTarget(Vector3 target, float proximityToStop, out WaitForSeconds persist) {
         persist = new WaitForSeconds(general.reconsiderRateTarget);
         float distance = Vector2.Distance(target, transform.position);
@@ -135,5 +136,44 @@ public class PathfindingOperation<T> {
             if (animationTrigger != null) movement.Trigger(animationTrigger);
             return true;
         } else return false;
+    }
+}
+
+public abstract class PathfindingEnumerator {
+    private readonly Brain brain;
+    PathfindingEnumerator(Brain brain) { this.brain = brain; }
+    public CoroutineWrapper C {
+        get => new CoroutineWrapper(E, brain.species);
+    }
+    abstract public IEnumerator E();
+
+    public class ApproachThenBuild : PathfindingEnumerator {
+        private readonly float buildDistance;
+        private readonly float buildTime;
+        private readonly Action<Terrain.Position> buildAction;
+
+        public ApproachThenBuild (
+                Brain brain,
+                float buildDistance,
+                float buildTime,
+                Action<Terrain.Position> buildAction) : base(brain) {
+            this.buildDistance = buildDistance;
+            this.buildTime = buildTime;
+            this.buildAction = buildAction;
+        }
+
+        override public IEnumerator E() {
+            for (int i = 0; i < 100_000; i++) {
+                Terrain.Position buildLocation = (Terrain.Position)brain.executeDirective;
+                bool reached = brain.pathfinding.Approach(buildLocation, buildDistance)
+                        .ThenCheckIfReached(null, out WaitForSeconds approachWait);
+                if (reached) {
+                    buildAction(buildLocation);
+                    yield return new WaitForSeconds(buildTime);
+                    brain.CompleteExecution(); 
+                    yield break;
+                } else yield return approachWait;
+            }
+        }
     }
 }

@@ -50,13 +50,13 @@ public class BrainConfig {
 
 public class Brain {
     public BrainConfig general;
-    protected Species species;
+    public Species species;
     protected Creature creature;
     public Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     protected int team { get => GetComponentStrict<Team>().TeamId; }
     public CharacterController movement { get => creature.controller; }
-    protected Pathfinding pathfinding;
+    public Pathfinding pathfinding;
     private GoodTaste taste;
 
     public Transform transform { get => species.transform; }
@@ -139,7 +139,7 @@ public class Brain {
     protected Transform followDirective = null; // for Follow
     protected Vector3 stationDirective = Vector3.zero; // for Station
     protected Transform attackDirective = null; // for FollowOffensive, can be null
-    protected OneOf<Terrain.Position, SpriteSorter> executeDirective = null; // for Execute
+    public OneOf<Terrain.Position, SpriteSorter> executeDirective { get; protected set; } // for Execute
     protected Queue<Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>>> executeCommandQueue = null; // null when not used
     protected Creature pairDirective = null;
     protected Creature focusOrExecuteDirectiveIsPair = null;

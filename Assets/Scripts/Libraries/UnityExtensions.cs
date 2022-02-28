@@ -50,6 +50,15 @@ public static class GameObjectExtensions {
     }
 }
 
+public static class TransformExtensions {
+    // copied from http://answers.unity.com/answers/509669/view.html
+    public static void SetLayer(this Transform transform, int layer)  {
+        transform.gameObject.layer = layer;
+        foreach(Transform child in transform)
+                child.SetLayer(layer);
+    }
+}
+
 public static class VectorExtensions {
     public static float? VelocityToDirection(this Vector2 value) {
         if (value == Vector2.zero) return (float?)null;
