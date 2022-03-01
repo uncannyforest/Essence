@@ -122,6 +122,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: 6
   quantity: 1
+  collectAnimationTime: 0.125
+  collectAnimationDistance: 2
 --- !u!114 &3593069473741288846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   broadGirth: 0
+  verticalDisplacement: 0
 --- !u!60 &6485630421010659343
 PolygonCollider2D:
   m_ObjectHideFlags: 0
