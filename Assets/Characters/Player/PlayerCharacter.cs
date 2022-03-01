@@ -48,8 +48,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     public bool HandleCrossingTile(Vector2Int newTile) {
         if (terrain.Feature[newTile] is Feature feature && feature.PlayerEntered != null) {
-            feature.PlayerEntered(this);
-            return false;
+            return feature.PlayerEntered(this);
         }
         return true;
     }

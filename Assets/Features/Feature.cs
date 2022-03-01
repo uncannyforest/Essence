@@ -6,7 +6,7 @@ public class Feature : MonoBehaviour {
     [SerializeField] public bool roofValid;
 
     public Vector2Int? tile;
-    public Action<PlayerCharacter> PlayerEntered;
+    public Func<PlayerCharacter, bool> PlayerEntered;
 
     public bool IsValidTerrain(Land land) {
         return ((int)validLand & 1 << (int)land) != 0;

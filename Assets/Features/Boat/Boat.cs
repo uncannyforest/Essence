@@ -52,7 +52,7 @@ public class Boat : MonoBehaviour {
 
     }
 
-    void HandlePlayerEntered(PlayerCharacter player) {
+    bool HandlePlayerEntered(PlayerCharacter player) {
         this.player = player;
         inUse = true;
         movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
@@ -60,6 +60,7 @@ public class Boat : MonoBehaviour {
         CharacterEnter(0, player.movement);
         player.EnteredVehicle(transform, SetInputVelocity);
         CreatureExits.Stop();
+        return false;
     }
 
     private void HandlePlayerExited(Vector2 location) {

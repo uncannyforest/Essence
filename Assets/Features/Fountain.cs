@@ -30,18 +30,18 @@ public class Fountain : MonoBehaviour {
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         terrain = GameObject.FindObjectOfType<Terrain>();
-        GetComponent<Feature>().PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
         if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
     }
 
-    void HandlePlayerEntered(PlayerCharacter target) {
+    bool HandlePlayerEntered(PlayerCharacter target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
-        if (playerTeam == team) return;
+        if (playerTeam == team) return true;
         enemyPresent = 2; // Rather than using boolean, we need an extra frame for FixedUpdate to run
         enemy = target.transform;
+        return true;
     }
 
     void FixedUpdate() {
