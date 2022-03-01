@@ -22,7 +22,7 @@ public class Fountain : MonoBehaviour {
         set {
             team = value;
             if (value == 0) GetComponentInChildren<SpriteRenderer>().color = Color.gray;
-            else GetComponentInChildren<SpriteRenderer>().color = Color.white;
+            else GetComponentInChildren<SpriteRenderer>().color = new Color(.99f, .99f, .99f);
         }
     }
 

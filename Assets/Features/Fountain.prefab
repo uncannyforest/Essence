@@ -215,7 +215,7 @@ MonoBehaviour:
   max: 300
   startAtMax: 1
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
-  statBarColor: {r: 1, g: 1, b: 1, a: 1}
+  statBarColor: {r: 0.99607843, g: 0.99607843, b: 0.99607843, a: 1}
   itemDrop: {fileID: 0}
   itemDropSize: 0
   collectiblePrefab: {fileID: 0}
