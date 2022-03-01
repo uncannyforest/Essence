@@ -395,7 +395,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8529474584485842260}
-  m_BodyType: 0
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -442,21 +442,6 @@ MonoBehaviour:
   personalBubble: 0
   setAnimatorDirectionDirectly: 1
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7488913179682336263}
-        m_TargetAssemblyTypeName: Boat, Assembly-CSharp
-        m_MethodName: HandleCrossedTile
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   defaultSpeed: 2
   waterSpeed: 2
 --- !u!114 &7488913179682336263
