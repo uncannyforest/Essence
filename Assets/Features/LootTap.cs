@@ -34,8 +34,8 @@ public class LootTap : MonoBehaviour {
 
     private void Tap(PlayerCharacter player) {
         PluralCollectible drop = drops[UnityEngine.Random.Range(0, drops.Length)];
-        Collectible.InstantiateAndCollect(drop.prefab,
+        bool collected = Collectible.InstantiateAndCollect(drop.prefab,
             grid, transform.position, itemStartY, drop.quantity, player.GetComponentStrict<Inventory>());
-        TextDisplay.I.ShowMiniText("Found " + drop.name + "!");
+        TextDisplay.I.ShowMiniText("Found " + drop.name + (collected ? "!" : " but inventory full"));
     }
 }

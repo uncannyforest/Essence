@@ -29,11 +29,12 @@ public class Collectible : MonoBehaviour {
         if (inventory != null) TryCollect(inventory);
     }
 
-    private void TryCollect(Inventory inventory) {
+    private bool TryCollect(Inventory inventory) {
         if (!inventory.materials[material].IsFull) {
             inventory.Add(material, quantity);
             StartCoroutine(CollectAnimation());
-        }
+            return true;
+        } else return false;
     }
 
     private IEnumerator CollectAnimation() {
@@ -50,10 +51,14 @@ public class Collectible : MonoBehaviour {
     }
 
 
-    public static void InstantiateAndCollect(Collectible prefab,
+    public static bool InstantiateAndCollect(Collectible prefab,
             Transform parent, Vector2 location, float startY, int quantity, Inventory inventory) {
         Collectible collectible = Instantiate(prefab, parent, location, quantity);
         collectible.GetComponentStrict<SpriteSorter>().VerticalDisplacement = startY;
-        collectible.TryCollect(inventory);
+        if (collectible.TryCollect(inventory)) return true;
+        else {
+            Destroy(collectible.gameObject);
+            return false; 
+        }
     }
 }
