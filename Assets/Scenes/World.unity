@@ -41797,6 +41797,7 @@ GameObject:
   - component: {fileID: 2120764635}
   - component: {fileID: 2120764637}
   - component: {fileID: 2120764638}
+  - component: {fileID: 2120764640}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -42021,6 +42022,27 @@ MonoBehaviour:
     groundLevelHighlight: 1
     collectibles: 2.001
     features: 2.001
+--- !u!114 &2120764640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470181030de3f4c3bbf0ced33fe8b6fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config:
+    collectAnimationTime: 0.125
+    collectAnimationDistance: 2
+  prefabs:
+    arrow: {fileID: 2811642717277558146, guid: a9460bc4561224266bbf5d2502106dad, type: 3}
+    wood: {fileID: 2811642717277558146, guid: 79f2050408da74f5297bb509fec433b2, type: 3}
+    soil: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
+    scale: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
+    gemstone: {fileID: 8238377403104507416, guid: 5ddbbb3666fbd44399deaf5313a6c4b8, type: 3}
 --- !u!1001 &981116046808898326
 PrefabInstance:
   m_ObjectHideFlags: 0

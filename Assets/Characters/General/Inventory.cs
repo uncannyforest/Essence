@@ -35,7 +35,7 @@ public class Inventory : MonoBehaviour {
     public Sprite soil;
 
     public Dictionary<Material.Type, Material> materials = new Dictionary<Material.Type, Material>();
-    public Action<Material.Type, int, Sprite> itemsAddedEventHandler;
+    public Action<Material.Type, int> itemsAddedEventHandler;
     public Action<Material.Type, int> itemsRetrievedEventHandler;
     public Action itemsClearedEventHandler;
 
@@ -52,9 +52,9 @@ public class Inventory : MonoBehaviour {
         materials[Material.Type.Soil] = Material.InBucket(Material.Type.Soil, soilBucket);
     }
 
-    public int Add(Material.Type material, int quantity, Sprite sprite) {
+    public int Add(Material.Type material, int quantity) {
         int added = materials[material].TryAdd(quantity);
-        if (added > 0 && itemsAddedEventHandler != null) itemsAddedEventHandler(material, added, sprite);
+        if (added > 0 && itemsAddedEventHandler != null) itemsAddedEventHandler(material, added);
         return added;
     }
 

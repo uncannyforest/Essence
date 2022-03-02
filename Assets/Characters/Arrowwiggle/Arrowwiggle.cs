@@ -9,7 +9,6 @@ public class ArrowwiggleConfig {
     public float restockDistance = 1f;
     public int restockQuantity = 10;
     public float restockTime = .1f;
-    public Sprite arrowCollectibleSprite;
 }
 
 public class Arrowwiggle : Species<ArrowwiggleConfig> {
@@ -58,7 +57,7 @@ public class ArrowwiggleBrain : Brain {
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
             yield return pathfinding.Approach(Focus, arrowwiggle.restockDistance).Then(null, arrowwiggle.restockTime, (target) => {
-                Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity, arrowwiggle.arrowCollectibleSprite);
+                Focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity);
             });
         }
     }

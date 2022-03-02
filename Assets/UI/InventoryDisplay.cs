@@ -9,8 +9,8 @@ public class InventoryDisplay : MonoBehaviour {
     public Inventory inventory;
     public int columns = 5;
     public int rows = 2;
-    public float offset = 3f;
-    public Image itemPrefab;
+    public float offset = 2f;
+    public Vector3 localScale = new Vector3(16, 16, 1);
     public Material.Type material1;
     public Material.Type material2;
 
@@ -23,7 +23,7 @@ public class InventoryDisplay : MonoBehaviour {
         inventory.itemsClearedEventHandler += RemoveAllItems;
     }
 
-    public void AddItems(Material.Type material, int number, Sprite sprite) {
+    public void AddItems(Material.Type material, int number) {
         int indexPosition = transform.childCount;
         for (int i = 0; i < number; i++) {
             if (material == material1) {
@@ -35,10 +35,11 @@ public class InventoryDisplay : MonoBehaviour {
                 count2++;
             }
             else return;
-            Image newSprite = GameObject.Instantiate(itemPrefab, transform);
-            newSprite.sprite = sprite;
-            RectTransform newTransform = newSprite.GetComponent<RectTransform>();
-            newTransform.anchoredPosition = PositionForIndex(indexPosition);
+            GameObject newSprite = GameObject.Instantiate(CollectibleLibrary.P[material].transform.GetComponentInChildren<SpriteRenderer>().gameObject, transform);
+            newSprite.layer = LayerMask.NameToLayer("UI");
+            Transform newTransform = newSprite.transform;
+            newTransform.localScale = localScale;
+            newTransform.localPosition = PositionForIndex(indexPosition);
             newTransform.SetSiblingIndex(indexPosition);
         }
         UpdateChildrenFromIndex(indexPosition + 1);
@@ -71,10 +72,11 @@ public class InventoryDisplay : MonoBehaviour {
 
     public void UpdateChildrenFromIndex(int indexPosition) {
         for (int i = indexPosition; i < transform.childCount; i++) {
-            ((RectTransform)transform.GetChild(i)).anchoredPosition = PositionForIndex(i);
+            transform.GetChild(i).localPosition = PositionForIndex(i);
         }
     }
 
+    // Pivot point of collectibles is bottom center, so add (offset / 2f, 0)
     public Vector2 PositionForIndex(int i) =>
-        new Vector2(i / rows * offset, i % rows * offset);
+        new Vector2(i / rows * offset + offset / 2f, i % rows * offset);
 }

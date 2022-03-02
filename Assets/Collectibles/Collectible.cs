@@ -7,22 +7,20 @@ using UnityEngine;
 public class Collectible : MonoBehaviour {
     public Material.Type material;
     public int quantity;
-    public float collectAnimationTime = .5f;
-    public float collectAnimationDistance = 1;
 
     private SpriteSorter spriteSorter;
     public void Awake() { spriteSorter = GetComponent<SpriteSorter>(); }
 
-    public static Collectible Instantiate(Collectible prefab, Transform parent, Vector2 location, int quantity) {
-        Collectible collectible = Instantiate<Collectible>(prefab, location.WithZ(GlobalConfig.I.elevation.collectibles), Quaternion.identity, parent);
-        collectible.quantity = quantity;
+    public static Collectible Instantiate(Material material, Vector2 location) {
+        Collectible collectible = Instantiate<Collectible>(CollectibleLibrary.P[material.MaterialType],
+            location.WithZ(GlobalConfig.I.elevation.collectibles), Quaternion.identity, Terrain.I.transform);
+        collectible.quantity = material.Quantity;
         return collectible;
     }
 
-    public static Collectible Instantiate(Collectible prefab, Material material, Transform parent, Vector2 location) {
+    public static Collectible Instantiate(Collectible prefab, Transform parent, Vector2 location, int quantity) {
         Collectible collectible = Instantiate<Collectible>(prefab, location.WithZ(GlobalConfig.I.elevation.collectibles), Quaternion.identity, parent);
-        collectible.material = material.MaterialType;
-        collectible.quantity = material.Quantity;
+        collectible.quantity = quantity;
         return collectible;
     }
 
@@ -33,15 +31,15 @@ public class Collectible : MonoBehaviour {
 
     private void TryCollect(Inventory inventory) {
         if (!inventory.materials[material].IsFull) {
-            inventory.Add(material, quantity, GetComponentInChildren<SpriteRenderer>().sprite);
+            inventory.Add(material, quantity);
             StartCoroutine(CollectAnimation());
         }
     }
 
     private IEnumerator CollectAnimation() {
         float startTime = Time.time;
-        float endTime = startTime + collectAnimationTime;
-        float speed = collectAnimationDistance / collectAnimationTime;
+        float endTime = startTime + CollectibleLibrary.C.collectAnimationTime;
+        float speed = CollectibleLibrary.C.collectAnimationDistance / CollectibleLibrary.C.collectAnimationTime;
         float startY = spriteSorter.VerticalDisplacement;
         while (Time.time < endTime) {
             spriteSorter.VerticalDisplacement = startY + speed * (Time.time - startTime);
