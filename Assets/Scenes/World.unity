@@ -411,7 +411,7 @@ MonoBehaviour:
   columns: 10
   rows: 1
   offset: 2
-  itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
+  localScale: {x: 16, y: 16, z: 1}
   material1: 9
   material2: 3
 --- !u!1 &91696533
@@ -36678,7 +36678,7 @@ MonoBehaviour:
   columns: 10
   rows: 1
   offset: 2
-  itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
+  localScale: {x: 16, y: 16, z: 1}
   material1: 0
   material2: 5
 --- !u!1 &1028049339
@@ -36988,7 +36988,7 @@ MonoBehaviour:
   columns: 30
   rows: 1
   offset: 2
-  itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
+  localScale: {x: 16, y: 16, z: 1}
   material1: 7
   material2: 8
 --- !u!1 &1300298273
@@ -38441,7 +38441,7 @@ MonoBehaviour:
   columns: 30
   rows: 1
   offset: 2
-  itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
+  localScale: {x: 16, y: 16, z: 1}
   material1: 6
   material2: 3
 --- !u!1001 &1892094271
@@ -41953,6 +41953,7 @@ MonoBehaviour:
   stipule: {fileID: 4481103850635713290, guid: 9d441d971641f40d18b8e2dd75da009a, type: 3}
   archer: {fileID: 4481103850635713290, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
   redDwarf: {fileID: 755594374484330081, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
+  moose: {fileID: 3722983441315835238, guid: 589a3cf3c5b784847963621b5a7f3166, type: 3}
 --- !u!114 &2120764636
 MonoBehaviour:
   m_ObjectHideFlags: 0

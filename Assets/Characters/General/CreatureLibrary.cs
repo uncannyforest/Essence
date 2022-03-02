@@ -6,4 +6,5 @@ public class CreatureLibrary : MonoBehaviour {
     public GameObject stipule;
     public GameObject archer;
     public GameObject redDwarf;
+    public GameObject moose;
 }

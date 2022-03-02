@@ -50,12 +50,13 @@ public class Fauna : MonoBehaviour {
 
     private GameObject IdentifyCreature() {
         if (Randoms.CoinFlip) return creatureLibrary.stipule;
-        int justARandomNumberForNow = Random.Range(0, 4);
+        int justARandomNumberForNow = Random.Range(0, 5);
         switch (justARandomNumberForNow) {
             case 0: return creatureLibrary.bunny;
             case 1: return creatureLibrary.arrowwiggle;
             case 2: return creatureLibrary.archer;
-            default: return creatureLibrary.redDwarf;
+            case 3: return creatureLibrary.redDwarf;
+            default: return creatureLibrary.moose;
         }
     }
 
