@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     woodBuildAction: {fileID: 1659339631126922887, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
-    boat: {fileID: 515407244984913832, guid: a176caffd352747409ffad0dba6806f6, type: 3}
     buildTime: 0.5
     buildDistance: 0.70710677
+    tamingCost: 1
 --- !u!1001 &7033450149092257649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75,6 +75,19 @@ PrefabInstance:
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureName
       value: Red Dwarf
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoLong
+      value: 'To tame a <creature/>, you must lure it with a gemstone.
+
+
+        Gemstones
+        can sometimes be found in Windmills. Give a Windmill one tap of your praxel
+        (action #3) to look inside it.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoShort
+      value: You need one gemstone to tame a
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.timidity
