@@ -36680,7 +36680,7 @@ MonoBehaviour:
   offset: 2
   itemPrefab: {fileID: 436899038169669076, guid: 54c60f6d29f434cad8d8831f7fe6d4bb, type: 3}
   material1: 0
-  material2: 4
+  material2: 5
 --- !u!1 &1028049339
 GameObject:
   m_ObjectHideFlags: 0

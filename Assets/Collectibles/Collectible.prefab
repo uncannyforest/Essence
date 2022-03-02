@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1805208688413922080}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8231429724379362993}
   - component: {fileID: 8501493358680827197}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: SpriteSort
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 3593069473741288846}
   - component: {fileID: 7817728453593580390}
   - component: {fileID: 6485630421010659343}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Collectible
   m_TagString: Untagged
   m_Icon: {fileID: 0}
