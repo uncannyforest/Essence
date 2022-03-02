@@ -331,12 +331,14 @@ public class WorldInteraction : MonoBehaviour {
                         terrain.Land[coord] = Land.Woodpile;
                         terrain.Roof[coord] = Construction.None;
                     }
-                } else if (terrain.Land[coord] == Land.Grass) {
+                } else if (terrain.Feature[coord] != null) {
+                    terrain.Feature[coord].Attack(player);
+                } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
                     Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), 1);
-                } else if (terrain.Land[coord].IsPlanty()) {
-                    int woodQuantity = terrain.Land[coord] == Land.Meadow ? 1 :
-                        terrain.Land[coord] == Land.Shrub ? 3 : 6;
+                } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
+                    int woodQuantity = terrain.GetLand(coord) == Land.Meadow ? 1 :
+                        terrain.GetLand(coord) == Land.Shrub ? 3 : 6;
                     terrain.Land[coord] = Land.Grass;
                     Collectible.Instantiate(wood, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
                 }

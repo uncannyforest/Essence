@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Team))]
 public class Health : StatusQuantity {
     public Collectible itemDrop;
     public int itemDropSize = 0;
-    public Collectible collectiblePrefab;
     public float damageVisual1Time = .1f;
     public float damageVisual2Time = .4f;
 

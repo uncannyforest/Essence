@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 public class StatusQuantity : MonoBehaviour {
-    public int max = 0;
+    public int max = 1;
     public bool startAtMax = true;
     public GameObject statBarPrefab;
     public Color statBarColor = new Color(.8f, 0, .2f);
@@ -11,7 +11,7 @@ public class StatusQuantity : MonoBehaviour {
     public Action ReachedMax;
 
     protected int level;
-    protected StatBar statBar;
+    protected StatBar statBar = null;
     
     public int Level {
         get => level;
@@ -22,7 +22,7 @@ public class StatusQuantity : MonoBehaviour {
 
     virtual protected void Awake() {
         if (startAtMax) level = max;
-        statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
+        if (statBarPrefab != null) statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
     }
 
     virtual public void Reset() {
@@ -32,8 +32,8 @@ public class StatusQuantity : MonoBehaviour {
 
     virtual public void ResetTo(int level) {
         this.level = level;
-        statBar.SetPercentWithoutVisibility((float) level / max);
-        statBar.Hide();
+        statBar?.SetPercentWithoutVisibility((float) level / max);
+        statBar?.Hide();
     }
 
 
@@ -45,18 +45,18 @@ public class StatusQuantity : MonoBehaviour {
     virtual public void Decrease(int quantity) {
         level -= quantity;
         if (level > 0) {
-            statBar.SetPercent((float) level / max);
+            statBar?.SetPercent((float) level / max);
         }
         else if (ReachedZero != null) ReachedZero();
     }
 
     virtual public void Increase(int quantity) {
         level = Math.Min(max, level + quantity);
-        statBar.SetPercent((float) level / max);
+        statBar?.SetPercent((float) level / max);
         if (IsFull() && ReachedMax != null) ReachedMax();
     }
 
     public void HideStatBar() {
-        statBar.Hide();
+        statBar?.Hide();
     }
 }

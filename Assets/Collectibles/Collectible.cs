@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class Collectible : MonoBehaviour {
     public float collectAnimationDistance = 1;
 
     private SpriteSorter spriteSorter;
-    void Start() { spriteSorter = GetComponent<SpriteSorter>(); }
+    public void Awake() { spriteSorter = GetComponent<SpriteSorter>(); }
 
     public static Collectible Instantiate(Collectible prefab, Transform parent, Vector2 location, int quantity) {
         Collectible collectible = Instantiate<Collectible>(prefab, location.WithZ(GlobalConfig.I.elevation.collectibles), Quaternion.identity, parent);
@@ -27,8 +28,11 @@ public class Collectible : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other) {
         Inventory inventory = other.GetComponent<Inventory>();
+        if (inventory != null) TryCollect(inventory);
+    }
 
-        if (inventory != null && !inventory.materials[material].IsFull) {
+    private void TryCollect(Inventory inventory) {
+        if (!inventory.materials[material].IsFull) {
             inventory.Add(material, quantity, GetComponentInChildren<SpriteRenderer>().sprite);
             StartCoroutine(CollectAnimation());
         }
@@ -38,10 +42,19 @@ public class Collectible : MonoBehaviour {
         float startTime = Time.time;
         float endTime = startTime + collectAnimationTime;
         float speed = collectAnimationDistance / collectAnimationTime;
+        float startY = spriteSorter.VerticalDisplacement;
         while (Time.time < endTime) {
-            spriteSorter.VerticalDisplacement = speed * (Time.time - startTime);
+            spriteSorter.VerticalDisplacement = startY + speed * (Time.time - startTime);
             yield return null;
         }
         Destroy(gameObject);
+    }
+
+
+    public static void InstantiateAndCollect(Collectible prefab,
+            Transform parent, Vector2 location, float startY, int quantity, Inventory inventory) {
+        Collectible collectible = Instantiate(prefab, parent, location, quantity);
+        collectible.GetComponentStrict<SpriteSorter>().VerticalDisplacement = startY;
+        collectible.TryCollect(inventory);
     }
 }

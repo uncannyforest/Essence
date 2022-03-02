@@ -28,6 +28,7 @@ public class SpriteSorter : MonoBehaviour {
     // Set by boats and CharacterController on terrain
     [SerializeField] private float verticalDisplacement = 0;
     public float VerticalDisplacement {
+        get => verticalDisplacement;
         set {
             verticalDisplacement = value;
             ForceUpdate(this.enabled);
@@ -44,7 +45,7 @@ public class SpriteSorter : MonoBehaviour {
         get => orientable.childCount;
     }
 
-    void Start() {
+    void Awake() {
         orientable = new OrientableChild(transform);
         terrain = GameObject.FindObjectOfType<Terrain>();
         spriteDisplacement =

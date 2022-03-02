@@ -177,6 +177,8 @@ GameObject:
   - component: {fileID: 1701968480936570841}
   - component: {fileID: -25566807075259578}
   - component: {fileID: -3697892114251822067}
+  - component: {fileID: 9203515329138306239}
+  - component: {fileID: 2998764763587065230}
   m_Layer: 7
   m_Name: Windmill
   m_TagString: Untagged
@@ -214,6 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   validLand: 1
   roofValid: 0
+  canHit: 1
 --- !u!210 &1701968480936570841
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -270,3 +273,51 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
+--- !u!114 &9203515329138306239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679020868515697513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9649124963f654409a76e06ba4a9504a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reloadTime: 120
+  itemStartY: 0.5
+  drops:
+  - prefab: {fileID: 2811642717277558146, guid: 79f2050408da74f5297bb509fec433b2, type: 3}
+    quantity: 15
+    name: 15 pieces of wood
+  - prefab: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
+    quantity: 1
+    name: a scale
+  - prefab: {fileID: 2811642717277558146, guid: a9460bc4561224266bbf5d2502106dad, type: 3}
+    quantity: 10
+    name: 10 arrows
+  - prefab: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
+    quantity: 5
+    name: a pile of fresh soil
+--- !u!114 &2998764763587065230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679020868515697513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max: 5
+  startAtMax: 1
+  statBarPrefab: {fileID: 0}
+  statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
+  itemDrop: {fileID: 0}
+  itemDropSize: 0
+  collectiblePrefab: {fileID: 0}
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4

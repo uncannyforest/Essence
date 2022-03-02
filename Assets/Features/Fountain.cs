@@ -29,10 +29,11 @@ public class Fountain : MonoBehaviour {
     void Start() {
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
+        feature.Attacked += (doNothing => {});
+        feature.Died += HandleDeath;
         terrain = GameObject.FindObjectOfType<Terrain>();
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
-        health.ReachedZero += HandleDeath;
         if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
     }
 
