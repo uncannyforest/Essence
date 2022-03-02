@@ -37,6 +37,7 @@ public class Collectible : MonoBehaviour {
     }
 
     private IEnumerator CollectAnimation() {
+        GetComponent<Collider2D>().enabled = false;
         float startTime = Time.time;
         float endTime = startTime + CollectibleLibrary.C.collectAnimationTime;
         float speed = CollectibleLibrary.C.collectAnimationDistance / CollectibleLibrary.C.collectAnimationTime;
