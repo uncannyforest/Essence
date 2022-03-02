@@ -8,6 +8,7 @@ public class RedDwarfConfig {
     public Sprite woodBuildAction;
     public float buildTime;
     public float buildDistance;
+    public int tamingCost = 1;
 }
 
 public class RedDwarf : Species<RedDwarfConfig> {
@@ -37,8 +38,12 @@ public class RedDwarfBrain : Brain {
         };
     }
 
-    override public bool CanTame(Transform player) => true;
-    override public bool ExtractTamingCost(Transform player) => true;
+    override public bool CanTame(Transform player) =>
+        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Gemstone, redDwarf.tamingCost);
+
+    public override bool ExtractTamingCost(Transform player) =>
+        player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Gemstone, redDwarf.tamingCost);
+
 
     override protected IEnumerator ScanningBehaviorE() {
         while (true) {

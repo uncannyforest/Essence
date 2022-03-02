@@ -300,6 +300,12 @@ MonoBehaviour:
   - prefab: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
     quantity: 5
     name: a pile of fresh soil
+  - prefab: {fileID: 8238377403104507416, guid: 5ddbbb3666fbd44399deaf5313a6c4b8, type: 3}
+    quantity: 1
+    name: a gemstone
+  - prefab: {fileID: 8238377403104507416, guid: 5ddbbb3666fbd44399deaf5313a6c4b8, type: 3}
+    quantity: 1
+    name: a gemstone
 --- !u!114 &2998764763587065230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,6 +324,5 @@ MonoBehaviour:
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   itemDrop: {fileID: 0}
   itemDropSize: 0
-  collectiblePrefab: {fileID: 0}
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
