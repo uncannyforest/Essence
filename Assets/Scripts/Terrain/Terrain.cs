@@ -120,6 +120,7 @@ public class Terrain : MonoBehaviour {
             [global::Land.Forest] = new TileBase[] { tiles.grass, null, null, null, tiles.forest, null},
             [global::Land.Water] = new TileBase[] { tiles.ditch, tiles.water, null, null, null, null},
             [global::Land.Ditch] = new TileBase[] { tiles.ditch, null, null, null, null, null},
+            [global::Land.Dirtpile] = new TileBase[] { tiles.grass, null, null, null, null, tiles.dirtpile},
             [global::Land.Woodpile] = new TileBase[] { tiles.grass, tiles.woodpile, null, null, null, null},
             [global::Land.Hill] = new TileBase[] { tiles.grass, null, null, null, null, tiles.hill}
         };

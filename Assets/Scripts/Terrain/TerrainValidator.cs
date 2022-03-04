@@ -93,7 +93,7 @@ public class TerrainValidator {
                 if (land == Land.Meadow ||
                     land == Land.Shrub ||
                     land == Land.Forest ||
-                    land == Land.Quirk ||
+                    land == Land.Dirtpile ||
                     land == Land.Hill ||
                     land == Land.PavedTunnel ||
                     land == Land.WaterTunnel ||

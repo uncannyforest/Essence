@@ -59,8 +59,8 @@ public class WorldInteraction : MonoBehaviour {
     public float swordRate = 1/2f;
     public float arrowRate = 1/3f;
     public ExpandableInfo noArrowsTip;
-    public int soilCost = 1;
-    public int scaleCost = 2;
+    public int sodCost = 1;
+    public int dirtPileCost = 2;
     public Arrow flyingArrowPrefab;
     public GameObject swordSwipePrefab;
     public Color followingCharacterColor;
@@ -335,7 +335,10 @@ public class WorldInteraction : MonoBehaviour {
                     terrain.Feature[coord].Attack(player);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
-                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), 1);
+                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);
+                } else if (terrain.GetLand(coord) == Land.Dirtpile) {
+                    terrain.Land[coord] = Land.Grass;
+                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), dirtPileCost);
                 } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
                     int woodQuantity = terrain.GetLand(coord) == Land.Meadow ? 1 :
                         terrain.GetLand(coord) == Land.Shrub ? 3 : 6;
@@ -350,9 +353,15 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Sod:
                 coord = teleSelect.SelectSquareOnly(worldPoint);
-                if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water)
-                    if (inventory.Retrieve(Material.Type.Soil, soilCost))
+                if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water) {
+                    if (inventory.Retrieve(Material.Type.Soil, sodCost))
                         terrain.Land[coord] = Land.Grass;
+                    else TextDisplay.I.ShowMiniText("You don't have any soil to place");
+                } else if (terrain.Land[coord] == Land.Grass) {
+                    if (inventory.Retrieve(Material.Type.Soil, dirtPileCost))
+                        terrain.Land[coord] = Land.Dirtpile;
+                    else TextDisplay.I.ShowMiniText("You don't have enough soil to place pile");
+                }
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;

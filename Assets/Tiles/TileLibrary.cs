@@ -10,6 +10,7 @@ public class TileLibrary : MonoBehaviour {
     public TileBase forest;
     public TileBase water;
     public TileBase ditch;
+    public TileBase dirtpile;
     public TileBase woodpile;
     public TileBase hill;
     public TileBase xFence;

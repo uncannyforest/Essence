@@ -3,10 +3,11 @@ public enum Land {
     Meadow,
     Shrub,
     Forest,
-    Quirk,
+    Bramble,
     Road,
     Water,
     Ditch,
+    Dirtpile,
     Woodpile,
     Rockpile,
     Hill,
@@ -22,16 +23,17 @@ public enum LandFlags {
     Meadow = 1 << 1,
     Shrub = 1 << 2,
     Forest = 1 << 3,
-    Quirk = 1 << 4,
+    Bramble = 1 << 4,
     Road = 1 << 5,
     Water = 1 << 6,
     Ditch = 1 << 7,
-    Woodpile = 1 << 8,
-    Rockpile = 1 << 9,
-    Hill = 1 << 10,
-    PavedTunnel = 1 << 11,
-    WaterTunnel = 1 << 12,
-    DirtTunnel = 1 << 13,
+    Dirtpile = 1 << 8,
+    Woodpile = 1 << 9,
+    Rockpile = 1 << 10,
+    Hill = 1 << 11,
+    PavedTunnel = 1 << 12,
+    WaterTunnel = 1 << 13,
+    DirtTunnel = 1 << 14,
 }
 
 public enum Construction {
@@ -42,7 +44,7 @@ public enum Construction {
 
 public static class LandExtensions {
     public static bool IsPassable(this Land land) {
-        return land != Land.Quirk && land != Land.Rockpile && land != Land.Hill;
+        return land != Land.Dirtpile && land != Land.Rockpile && land != Land.Hill;
     }
 
     public static bool IsHilly(this Land land) {
