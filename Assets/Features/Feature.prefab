@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8834969526643243908}
   - component: {fileID: -3810210497216287337}
   - component: {fileID: -1241174672703289724}
+  - component: {fileID: 8903826603888223434}
   m_Layer: 7
   m_Name: Feature
   m_TagString: Untagged
@@ -47,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   validLand: 0
   roofValid: 0
+  canHit: 1
 --- !u!210 &-3810210497216287337
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -87,3 +89,23 @@ PolygonCollider2D:
       - {x: 0, y: 0.25}
       - {x: -0.5, y: 0}
       - {x: 0, y: -0.25}
+--- !u!114 &8903826603888223434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857304749228554616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max: 1
+  startAtMax: 1
+  statBarPrefab: {fileID: 0}
+  statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
+  itemDrop: {fileID: 0}
+  itemDropSize: 0
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4

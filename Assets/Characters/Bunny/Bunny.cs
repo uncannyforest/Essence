@@ -6,11 +6,9 @@ using UnityEngine;
 [Serializable]
 public class BunnyConfig {
     public Sprite healAction;
-    public float healDistance = 1f;
-    public int healQuantity = 10;
-    public float healTime = .1f;
 }
 
+[RequireComponent(typeof(Healing))]
 public class Bunny : Species<BunnyConfig> {
     override public Brain Brain(BrainConfig generalConfig) {
         return new BunnyBrain(this, generalConfig, speciesConfig);
@@ -19,9 +17,11 @@ public class Bunny : Species<BunnyConfig> {
 
 public class BunnyBrain : Brain {
     private BunnyConfig bunny;
+    private Healing healing;
 
     public BunnyBrain(Bunny species, BrainConfig general, BunnyConfig bunny) : base(species, general) {
         this.bunny = bunny;
+        this.healing = species.GetComponentStrict<Healing>();
     }
 
     override public List<CreatureAction> Actions() {
@@ -37,20 +37,14 @@ public class BunnyBrain : Brain {
             yield return new WaitForSeconds(general.scanningRate);
 
             if (Focused) {
-                if (CanHeal(Focus)) continue;
+                if (healing.CanHeal(Focus, Creature.neighborhood)) continue;
                 else Focus = null;
             }
             
             Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-            if (CanHeal(player)) Focus = player;
-            else Focus = RequestPair(FindCreatureToHeal()); 
+            if (healing.CanHeal(player, Creature.neighborhood)) Focus = player;
+            else Focus = RequestPair(healing.FindOneCreatureToHeal()); 
         }
-    }
-
-    private bool CanHeal(Transform character) {
-        return character.GetComponentStrict<Team>().TeamId == team &&
-                !character.GetComponentStrict<Health>().IsFull() &&
-                Vector2.Distance(transform.position, character.position) <= Creature.neighborhood;
     }
 
     private bool ShouldHealPlayer() {
@@ -60,29 +54,10 @@ public class BunnyBrain : Brain {
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }
 
-    private Creature FindCreatureToHeal() {
-        Collider2D[] charactersNearby =
-            Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("HealthCreature"));
-        Creature result = null;
-        float resultPriority = 1;
-        foreach (Collider2D character in charactersNearby) {
-            if (character.GetComponentStrict<Team>().TeamId == team && character.GetComponentStrict<Creature>().CanPair()) {
-                float priority = character.GetComponentStrict<Health>().LevelPercent
-                    + Vector2.Distance(character.transform.position, transform.position) / Creature.neighborhood;
-                Debug.Log("To heal? " + character.gameObject + " priority " + priority + (priority < resultPriority ? ": updating" : null));
-                if (priority < resultPriority) {
-                    result = character.GetComponentStrict<Creature>();
-                    resultPriority = priority;
-                }
-            }
-        }
-        return result;
-    }
-
     override protected IEnumerator FocusedBehaviorE() {
         while (Focused) {
-            yield return pathfinding.Approach(Focus, bunny.healDistance).Then(null, bunny.healTime, (target) => {
-                target.GetComponentStrict<Health>().Increase(bunny.healQuantity);
+            yield return pathfinding.Approach(Focus, healing.healDistance).Then(null, healing.healTime, (target) => {
+                target.GetComponentStrict<Health>().Increase(healing.healQuantity);
             });
         }
     }

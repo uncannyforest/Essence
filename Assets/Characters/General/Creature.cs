@@ -143,11 +143,11 @@ public class Creature : MonoBehaviour {
             tamingInfoLong.Replace("<creature/>", "<color=creature>" + creatureName + "</color>"));
     }
 
-    public bool CanPair() => brain.TrekkingSolo;
+    public bool CanPair() => brain.TrekkingFree;
     
-    public bool TryPair(Creature initiator) => brain.TryCommandPair(initiator);
+    public bool TryPair(Transform initiator) => brain.TryCommandPair(initiator);
 
-    public void EndPairCommand() => brain.EndPairCommand(); // call this method on recipient
+    public void EndPairCommand(Transform initiator) => brain.EndPairCommand(initiator); // call this method on recipient
 
     public void EndPairRequest() => brain.EndPairRequest(); // call this method on initiator
 

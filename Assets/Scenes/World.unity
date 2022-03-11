@@ -1062,7 +1062,7 @@ CompositeCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_GeometryType: 0
+  m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
   m_ColliderPaths:
@@ -41728,8 +41728,8 @@ MonoBehaviour:
       To collect
       a dropped arrow from an <color=creature>Archer</color>, you must dodge its
       shots and then pick up the arrow.'
-  soilCost: 1
-  scaleCost: 2
+  sodCost: 1
+  dirtPileCost: 2
   flyingArrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
   swordSwipePrefab: {fileID: 1998722872617208, guid: 235d96e1b4f334589b775bf0d7ead730, type: 3}
   followingCharacterColor: {r: 0.6, g: 0.8666667, b: 0.73333335, a: 1}

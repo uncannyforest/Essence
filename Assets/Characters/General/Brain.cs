@@ -44,7 +44,7 @@ public class BrainConfig {
 // * always except iff State is Following and scanForFocusWhileFollowing is off
 
 // Note: always exactly one in each row is true:
-// * Focused | Busy | TrekkingSolo
+// * Focused | Busy | TrekkingFree
 // * Focused | Trekking | Execute | Faint
 // These rules are encoded in StateAssumptions() at the bottom, which runs every Update().
 
@@ -85,7 +85,7 @@ public class Brain {
             focus = value;
             if (ReferenceEquals(value, null)) {
                 if (focusOrExecuteDirectiveIsPair != null) {
-                    focusOrExecuteDirectiveIsPair.EndPairCommand();
+                    focusOrExecuteDirectiveIsPair.EndPairCommand(transform);
                     focusOrExecuteDirectiveIsPair = null;
                 }
             } else FocusedBehavior.Start();
@@ -118,7 +118,7 @@ public class Brain {
     public bool Busy { // not available to focus
         get => state == CreatureState.Execute || state == CreatureState.Pair || state == CreatureState.Faint;
     }
-    public bool TrekkingSolo { // available for pairing
+    public bool TrekkingFree { // available for pairing
         get => !Focused && !Busy;
     }
     protected bool Scanning {
@@ -141,7 +141,7 @@ public class Brain {
     protected Transform attackDirective = null; // for FollowOffensive, can be null
     public OneOf<Terrain.Position, SpriteSorter> executeDirective { get; protected set; } // for Execute
     protected Queue<Tuple<CoroutineWrapper, OneOf<Terrain.Position, SpriteSorter>>> executeCommandQueue = null; // null when not used
-    protected Creature pairDirective = null;
+    protected Transform pairDirective = null;
     protected Creature focusOrExecuteDirectiveIsPair = null;
 
     /////////////////////////////////////////////
@@ -216,7 +216,7 @@ public class Brain {
 
         // run coroutines
         ScanningBehavior.RunIf(Scanning);
-        TrekkingBehavior.RunIf(TrekkingSolo || State == CreatureState.Pair);
+        TrekkingBehavior.RunIf(TrekkingFree || State == CreatureState.Pair);
         ExecutingBehavior?.RunIf(State == CreatureState.Execute);
 
         // clear directives
@@ -230,7 +230,8 @@ public class Brain {
             executeCommandQueue = null;
         }
         if (State != CreatureState.Pair && pairDirective != null) {
-            pairDirective.EndPairRequest();
+            Creature pairCreature = pairDirective.GetComponent<Creature>();
+            if (pairCreature != null) pairCreature.EndPairRequest();
             pairDirective = null;
         }
     }
@@ -262,14 +263,14 @@ public class Brain {
     public Transform FollowDirective { get => followDirective; }
     // param recipient may be null, which is a no-op
     protected Transform RequestPair(Creature recipient) {
-        if (recipient?.TryPair(creature) == true) {
+        if (recipient?.TryPair(transform) == true) {
             focusOrExecuteDirectiveIsPair = recipient;
             return recipient.transform;
         }
         else return null;
     }
-    public bool TryCommandPair(Creature initiator) {
-        if (TrekkingSolo) {
+    public bool TryCommandPair(Transform initiator) {
+        if (TrekkingFree) {
             State = CreatureState.Pair;
             pairDirective = initiator;
             return true;
@@ -281,7 +282,8 @@ public class Brain {
         else if (State == CreatureState.Execute) RequestFollow();
         else Debug.LogError(species.name + ": Why was there a pair when state " + State);
     }
-    public void EndPairCommand() {
+    public void EndPairCommand(Transform initiator) {
+        if (pairDirective != initiator) return; // third parties are not allowed to do this
         if (followDirective == null) State = CreatureState.Roam;
         else State = CreatureState.Follow;
     }
