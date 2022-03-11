@@ -43,7 +43,7 @@ public class BunnyBrain : Brain {
 
     private bool ShouldHealPlayer() {
         PlayerCharacter player = GameObject.FindObjectOfType<PlayerCharacter>();
-        return player.GetComponentStrict<Team>().TeamId == team &&
+        return player.GetComponentStrict<Team>().TeamId == teamId &&
                 !player.GetComponentStrict<Health>().IsFull() &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }

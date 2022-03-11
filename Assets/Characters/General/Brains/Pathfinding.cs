@@ -84,9 +84,9 @@ public class Pathfinding {
         if (distance <= proximityToStop) {
             return Optional<YieldInstruction>.Empty();
         } else {
-            if (distance < movement.Speed * general.reconsiderRateTarget) return Optional<YieldInstruction>.Of(null); // adjust faster when we're close
             movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
-            return Optional.Of(TypicalWait);
+            if (distance < movement.Speed * general.reconsiderRateTarget) return Optional<YieldInstruction>.Of(null); // adjust faster when we're close
+            else return Optional.Of(TypicalWait);
         }
     }
 

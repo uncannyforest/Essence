@@ -71,7 +71,8 @@ public class Brain {
     protected Creature creature;
     public Terrain terrain;
     protected Transform grid { get => terrain.transform; }
-    public int team { get => GetComponentStrict<Team>().TeamId; }
+    public int teamId { get => GetComponentStrict<Team>().TeamId; }
+    protected Team team { get => GetComponentStrict<Team>(); }
     public CharacterController movement { get => creature.controller; }
     public Pathfinding pathfinding;
     private GoodTaste taste;
@@ -117,7 +118,7 @@ public class Brain {
 
     virtual public IEnumerator FocusedBehavior(Transform characterFocus) { yield break; }
     virtual public bool IsValidFocus(Transform characterFocus) =>
-        general.hasAttack ? Will.IsThreat(team, transform.position, characterFocus) : true;
+        general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) : true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
 
     /////////////////////////

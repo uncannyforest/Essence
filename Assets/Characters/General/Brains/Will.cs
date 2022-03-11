@@ -172,7 +172,7 @@ public class Will {
 
     public static Optional<Transform> NearestThreat(Brain brain) => NearestThreat(brain, null);
     public static Optional<Transform> NearestThreat(Brain brain, Func<Collider2D, bool> filter) {
-        int team = brain.team;
+        int team = brain.teamId;
         Vector3 creaturePosition = brain.transform.position;
         Collider2D[] charactersNearby =
             Physics2D.OverlapCircleAll(creaturePosition, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));

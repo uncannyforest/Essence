@@ -46,6 +46,8 @@ public class RestrictNearbyBehavior : BehaviorNode {
 }
 
 public class TargetedBehavior<T> {
+    virtual public bool canQueue { get; protected set; } = false;
+
     public Func<T, IEnumerator> enumeratorWithParam;
 
     protected TargetedBehavior() {}
@@ -112,13 +114,6 @@ public class QueueOperator : BehaviorNode {
         return (queue.Count > 0);
     }
 
-    public class Targeted<T> : TargetedBehavior<T> {
-        public Targeted(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
-
-        override public BehaviorNode WithTarget(T target) =>
-            QueueOperator.Of(base.WithTarget(target));
-    }
-
     private IEnumerator QueueEnumerator() {
         while (queue.Count > 0) {
             IEnumerator subBehavior = queue.Peek().enumerator(); // saved here, not reset unless RunBehavior() is called again
@@ -127,5 +122,14 @@ public class QueueOperator : BehaviorNode {
             }
             Pop();
         }
+    }
+    
+    public class Targeted<T> : TargetedBehavior<T> {
+        public Targeted(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {
+            this.canQueue = true;
+        }
+
+        override public BehaviorNode WithTarget(T target) =>
+            QueueOperator.Of(base.WithTarget(target));
     }
 }

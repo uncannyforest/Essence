@@ -45,7 +45,7 @@ public class ArrowwiggleBrain : Brain {
 
     private bool ShouldRestockPlayer() {
         PlayerCharacter player = GameObject.FindObjectOfType<PlayerCharacter>();
-        return player.GetComponentStrict<Team>().TeamId == team &&
+        return player.GetComponentStrict<Team>().TeamId == teamId &&
                 !player.GetComponentStrict<Inventory>().materials[Material.Type.Arrow].IsFull &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }

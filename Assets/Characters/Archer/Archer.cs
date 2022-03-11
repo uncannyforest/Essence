@@ -47,7 +47,7 @@ public class ArcherBrain : Brain {
                 new CharacterTargetedBehavior(FocusedBehavior),
                 (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != team ;}
+                    c.GetComponentStrict<Team>().TeamId != teamId;}
                 )
         };
     }

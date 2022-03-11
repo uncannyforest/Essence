@@ -57,6 +57,7 @@ public class Fauna : MonoBehaviour {
             case 0: return CreatureLibrary.P.bunny;
             case 1: return CreatureLibrary.P.arrowwiggle;
             case 2: return CreatureLibrary.P.archer;
+            case 3: return CreatureLibrary.P.moose;
             default: return CreatureLibrary.P.redDwarf;
         }
     }

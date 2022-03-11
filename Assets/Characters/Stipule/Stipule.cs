@@ -42,7 +42,7 @@ public class StipuleBrain : Brain {
                 AttackBehavior,
                 (c) => 
                     c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != team
+                    c.GetComponentStrict<Team>().TeamId != teamId
                 )
         };
     }
@@ -61,7 +61,7 @@ public class StipuleBrain : Brain {
 
     private void Attack(Transform target) {
         Health health = target.GetComponentStrict<Health>();
-        if (target.GetComponent<Team>()?.TeamId == team) {
+        if (target.GetComponent<Team>()?.TeamId == teamId) {
             Debug.LogError("Unexpected state, target is same team");
             return;
         }
