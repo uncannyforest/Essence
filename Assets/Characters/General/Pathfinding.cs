@@ -15,6 +15,10 @@ public class Pathfinding {
         [AIDirections.Four] = new Vector2[] {
             Vct.F(0.7071067812f, 0.7071067812f),
         },
+        [AIDirections.Eight] = new Vector2[] {
+            Vct.F(1f, 0f),
+            Vct.F(0.7071067812f, 0.7071067812f),
+        },
         [AIDirections.Twelve] = new Vector2[] {
             Vct.F(1f, 0.2679491924f), // tan(15)
             Vct.F(0.7071067812f, 0.7071067812f),
