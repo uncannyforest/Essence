@@ -5138,7 +5138,6 @@ GameObject:
   - component: {fileID: 403460089}
   - component: {fileID: 403460090}
   - component: {fileID: 403460092}
-  - component: {fileID: 403460094}
   - component: {fileID: 403460093}
   - component: {fileID: 403460091}
   - component: {fileID: 403460095}
@@ -5346,23 +5345,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamId: 1
---- !u!114 &403460094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 403460083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5af2d80748a7946e59f7612669dc557c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  possibilityRate: 0.0078125
-  creatureLibrary: {fileID: 2120764635}
-  terrain: {fileID: 2120764633}
-  parent: {fileID: 2120764631}
-  player: {fileID: 403460084}
 --- !u!95 &403460095
 Animator:
   serializedVersion: 3
@@ -41615,6 +41597,8 @@ GameObject:
   - component: {fileID: 2120764637}
   - component: {fileID: 2120764638}
   - component: {fileID: 2120764640}
+  - component: {fileID: 2120764642}
+  - component: {fileID: 2120764641}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -41811,6 +41795,7 @@ MonoBehaviour:
   fountain: {fileID: -6226454821118147200, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
   windmill: {fileID: 5500238641662902520, guid: 2e73418e674d34064a27d30599c45843, type: 3}
   boat: {fileID: 515407244984913832, guid: a176caffd352747409ffad0dba6806f6, type: 3}
+  jasmine: {fileID: 4485684207470832518, guid: 74a580025ebe14410acde5939a72d8f1, type: 3}
 --- !u!114 &2120764638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41862,6 +41847,39 @@ MonoBehaviour:
     soil: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
     scale: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
     gemstone: {fileID: 8238377403104507416, guid: 5ddbbb3666fbd44399deaf5313a6c4b8, type: 3}
+--- !u!114 &2120764641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a54e09bbbff58493fb47545fb36cce9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  possibilityRate: 0.00390625
+  terrain: {fileID: 2120764633}
+  parent: {fileID: 2120764631}
+  player: {fileID: 403460084}
+--- !u!114 &2120764642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af2d80748a7946e59f7612669dc557c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  possibilityRate: 0.0078125
+  creatureLibrary: {fileID: 2120764635}
+  terrain: {fileID: 2120764633}
+  parent: {fileID: 2120764631}
+  player: {fileID: 403460084}
 --- !u!1001 &981116046808898326
 PrefabInstance:
   m_ObjectHideFlags: 0

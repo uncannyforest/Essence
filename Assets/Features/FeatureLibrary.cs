@@ -11,4 +11,5 @@ public class FeatureLibrary : MonoBehaviour {
     public Feature fountain;
     public Feature windmill;
     public Feature boat;
+    public Feature jasmine;
 }

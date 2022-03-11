@@ -1,16 +1,15 @@
 using System.Collections;
 using UnityEngine;
 
-public class Fauna : MonoBehaviour {
+public class Flora : MonoBehaviour{
     public float possibilityRate = 1/256f;
-    public CreatureLibrary creatureLibrary;
     public Terrain terrain;
     public Transform parent;
     public Transform player;
 
     private Vector2 beyondPlayer;
 
-    private int creatureCount = 0;
+    private int floraCount = 0;
 
     void Start() {
         StartCoroutine(Repeat());
@@ -26,8 +25,12 @@ public class Fauna : MonoBehaviour {
     }
 
     private float GetRepeatRate() {
-        int numCreatures = GameObject.FindObjectsOfType<Creature>().Length;
-        return numCreatures * numCreatures * possibilityRate;
+        int numFlora = floraCount;
+        return numFlora * numFlora * possibilityRate;
+    }
+
+    private Feature IdentifyFeature() {
+        return FeatureLibrary.P.jasmine;
     }
 
     private Vector2Int RandomLocation() {
@@ -42,33 +45,22 @@ public class Fauna : MonoBehaviour {
     private Vector2Int? IdentifyLocation() {
         for (int i = 0; i < 100; i++) {
             Vector2Int possLocation = RandomLocation();
-            if (!terrain.Land[possLocation].IsPassable() ||
-                terrain.Land[possLocation].IsWatery()) continue;
+            if (terrain.Land[possLocation] != Land.Meadow) continue;
             if (Physics2D.OverlapCircleAll(terrain.CellCenter(possLocation), PlayerCharacter.neighborhood, LayerMask.GetMask("Player")).Length != 0) continue;
-            if (0 != Random.Range(0, 1 + Physics2D.OverlapCircleAll(terrain.CellCenter(possLocation), PlayerCharacter.neighborhood, LayerMask.GetMask("Creature", "HealthCreature")).Length)) continue;
+            Debug.Log("FAR ENOUGH FROM PLAYER!");
             return possLocation;
         }
         return null;
     }
 
-    private GameObject IdentifyCreature() {
-        if (Randoms.CoinFlip) return creatureLibrary.stipule;
-        int justARandomNumberForNow = Random.Range(0, 5);
-        switch (justARandomNumberForNow) {
-            case 0: return creatureLibrary.bunny;
-            case 1: return creatureLibrary.arrowwiggle;
-            case 2: return creatureLibrary.archer;
-            case 3: return creatureLibrary.redDwarf;
-            default: return creatureLibrary.moose;
-        }
-    }
-
     private void Populate() {
         Vector2Int? possRandomTile = IdentifyLocation();
         if (possRandomTile is Vector2Int randomTile) {
-            GameObject prefab = IdentifyCreature();
-            GameObject newCreature = Instantiate(prefab, terrain.CellCenter(randomTile), Quaternion.identity, parent);
-            newCreature.name = prefab.name + " " + creatureCount++;
+            Feature prefab = IdentifyFeature();
+            terrain.Land[randomTile] = Land.Grass;
+            terrain.BuildFeature(randomTile, prefab);
+            floraCount++;
         }
     }
+
 }
