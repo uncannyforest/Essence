@@ -54,14 +54,15 @@ public class Healing : MonoBehaviour {
 
     private IEnumerator HealAutomatically() {
         while (true) {
-            Collider2D[] healthCreaturesNearby =
-                Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("HealthCreature"));
-            foreach (Collider2D creature in healthCreaturesNearby) if (SameTeam(creature.transform)) {
-                if (CanHeal(creature.transform, healDistance)) ForceHeal(creature.transform, healQuantity);
-                if (creature.GetComponentStrict<Health>().IsFull())
-                    creature.GetComponentStrict<Creature>().EndPairCommand(transform);    
-                else if (HealPriority(creature) < 1 && creature.GetComponentStrict<Creature>().CanPair())
-                    creature.GetComponentStrict<Creature>().TryPair(transform);
+            Collider2D[] charactersNearby =
+                Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
+            foreach (Collider2D character in charactersNearby) if (SameTeam(character.transform)) {
+                if (CanHeal(character.transform, healDistance)) ForceHeal(character.transform, healQuantity);
+                Creature creature = character.GetComponent<Creature>();
+                if (creature != null) {
+                    if (character.GetComponentStrict<Health>().IsFull()) creature.EndPairCommand(transform);    
+                    else if (HealPriority(character) < 1 && creature.CanPair()) creature.TryPair(transform);
+                }
             }
             yield return new WaitForSeconds(healTime);
         }
