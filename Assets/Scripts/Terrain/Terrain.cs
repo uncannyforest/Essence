@@ -72,8 +72,8 @@ public class Terrain : MonoBehaviour {
 
     private const int Dim = 128;
     private Land[,] land = new Land[Dim, Dim];
-    private Construction[,] xWalls = new Construction[Dim, Dim];
-    private Construction[,] yWalls = new Construction[Dim, Dim];
+    private Construction[,] xWalls = new Construction[Dim, Dim + 1];
+    private Construction[,] yWalls = new Construction[Dim + 1, Dim];
     private Construction[,] roofs = new Construction[Dim, Dim];
     private Feature[,] features = new Feature[Dim, Dim];
 
@@ -96,6 +96,8 @@ public class Terrain : MonoBehaviour {
         concealment = new Concealment(this);
         instance = this;
     }
+
+    public Action Started; // must be set before Start() is run
 
     void Start() {
         Land = new LandIndex(this);
@@ -125,10 +127,8 @@ public class Terrain : MonoBehaviour {
             [global::Land.Hill] = new TileBase[] { tiles.grass, null, null, null, null, tiles.hill}
         };
 
-        TerrainGenerator.GenerateTerrain(this);
+        if (Started != null) Started();
         AddDepths();
-        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
-        TerrainGenerator.FinalDecor(this, startLocation);
     }
 
     private Dictionary<Land, int> voluminousTiles = new Dictionary<Land, int> {
@@ -175,12 +175,13 @@ public class Terrain : MonoBehaviour {
         return InBounds(coord) ? (Land?)Land[coord] : null;
     }
 
-    public bool SetLand(Vector2Int pos, Land terrain) {
-        if (!validator.IsValidLand(pos, terrain)) return false;
+    public bool SetLand(Vector2Int pos, Land terrain, bool force = false) {
+        if (!force && !validator.IsValidLand(pos, terrain)) return false;
         land[pos.x, pos.y] = terrain;
         for (int i = 0; i < RoofLevel; i++) {
             mainTiles[i].SetTile((Vector3Int)pos, landTiles[terrain][i]);
         }
+        if (force) return true;
         validator.StabilizeNext(() => validator.StabilizeLand(pos));
         validator.StabilizeAdjacentLandNext(pos);
         return true;
@@ -220,12 +221,12 @@ public class Terrain : MonoBehaviour {
         } else return false;
     }
 
-    private void SetXWall(int x, int y, Construction construction) {
+    private void SetXWall(int x, int y, Construction construction, bool force = false) {
         xWalls[x, y] = construction;
         switch (construction) {
             case Construction.None:
                 xWallTiles.SetTile(new Vector3Int(x, y, 0), null);
-                validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
+                if (!force) validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
             break;
             case Construction.Wood:
                 xWallTiles.SetTile(new Vector3Int(x, y, 0), tiles.xFence);
@@ -233,12 +234,12 @@ public class Terrain : MonoBehaviour {
         }
     }
 
-    private void SetYWall(int x, int y, Construction construction) {
+    private void SetYWall(int x, int y, Construction construction, bool force = false) {
         yWalls[x, y] = construction;
         switch (construction) {
             case Construction.None:
                 yWallTiles.SetTile(new Vector3Int(x, y, 0), null);
-                validator.StabilizeAdjacentConstructionNext(new Position(Grid.YWalls, x, y));
+                if (!force) validator.StabilizeAdjacentConstructionNext(new Position(Grid.YWalls, x, y));
             break;
             case Construction.Wood:
                 yWallTiles.SetTile(new Vector3Int(x, y, 0), tiles.yFence);
@@ -246,13 +247,14 @@ public class Terrain : MonoBehaviour {
         }
     }
 
-    private void SetRoof(Vector2Int pos, Construction construction) {
+    private void SetRoof(Vector2Int pos, Construction construction, bool force = false) {
         Vector3Int coord = (Vector3Int) pos;
         Construction oldRoof = roofs[coord.x, coord.y];
         roofs[coord.x, coord.y] = construction;
         switch (construction) {
             case Construction.None:
                 mainTiles[RoofLevel].SetTile(coord, null);
+                if (force) return;
                 validator.StabilizeAdjacentConstructionNext(new Position(Grid.Roof, pos));
                 if (oldRoof == Construction.Wood) {
                     GameObject collapse = GameObject.Instantiate(collapsePrefab, gameGrid.transform);
@@ -304,6 +306,33 @@ public class Terrain : MonoBehaviour {
             y++;
             if (y == 0) y = Bounds.y;
         }
+    }
+
+    public Land[,] AllLandTiles => land;
+    public Construction[,] AllXWallTiles => xWalls;
+    public Construction[,] AllYWallTiles => yWalls;
+    public Construction[,] AllRoofTiles => roofs;
+
+    public void PopulateTerrainFromData(Land[,] land,
+            Construction[,] xWalls,
+            Construction[,] yWalls,
+            Construction[,] roofs) {
+        for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
+            SetLand(Vct.I(x, y), land[x, y], true);
+        for (int x = 0 ; x < Dim; x++) for (int y = 0; y <= Dim; y++)
+            SetXWall(x, y, xWalls[x, y], true);
+        for (int x = 0 ; x <= Dim; x++) for (int y = 0; y < Dim; y++)
+            SetYWall(x, y, yWalls[x, y], true);
+        for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
+            SetRoof(Vct.I(x, y), roofs[x, y], true);
+        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
+        TerrainGenerator.FinalDecor(this, startLocation);
+    }
+
+    public void GenerateNewWorld() {
+        TerrainGenerator.GenerateTerrain(this);
+        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
+        TerrainGenerator.FinalDecor(this, startLocation);
     }
 
     private void PopulateTerrainFromUnityEditor() {

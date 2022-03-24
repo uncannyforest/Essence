@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour {
         "<color=key>,</color> (<color=key><</color>) and <color=key>.</color> (<color=key>></color>) - rotate view\n" +
         "<color=key>Shift</color> - aim with directional keys\n" +
         "<color=key>P</color> or <color=key>Esc</color> - pause\n" +
+        "<color=key>S</color> - save\n" +
         "<color=key>/</color> - expand info message / if none, this page";
 
     void Start() {
@@ -68,6 +69,10 @@ public class InputManager : MonoBehaviour {
 
         if (SimpleInput.GetButtonDown("Pause")) {
             textDisplay.ToggleFullText();
+        }
+        if (SimpleInput.GetButtonDown("Save")) {
+            MapPersistence.SaveGame();
+            textDisplay.ShowMiniText("Game saved!");
         }
         if (SimpleInput.GetButtonDown("Help")) {
             textDisplay.ToggleExpandedInfo();
