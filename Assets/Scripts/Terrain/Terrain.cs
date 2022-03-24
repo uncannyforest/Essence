@@ -313,26 +313,24 @@ public class Terrain : MonoBehaviour {
     public Construction[,] AllYWallTiles => yWalls;
     public Construction[,] AllRoofTiles => roofs;
 
-    public void PopulateTerrainFromData(Land[,] land,
-            Construction[,] xWalls,
-            Construction[,] yWalls,
-            Construction[,] roofs) {
+    public void PopulateTerrainFromData(MapData mapData) {
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
-            SetLand(Vct.I(x, y), land[x, y], true);
+            SetLand(Vct.I(x, y), mapData.land[x, y], true);
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y <= Dim; y++)
-            SetXWall(x, y, xWalls[x, y], true);
+            SetXWall(x, y, mapData.xWalls[x, y], true);
         for (int x = 0 ; x <= Dim; x++) for (int y = 0; y < Dim; y++)
-            SetYWall(x, y, yWalls[x, y], true);
+            SetYWall(x, y, mapData.yWalls[x, y], true);
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
-            SetRoof(Vct.I(x, y), roofs[x, y], true);
-        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
-        TerrainGenerator.FinalDecor(this, startLocation);
+            SetRoof(Vct.I(x, y), mapData.roofs[x, y], true);
+        foreach (Feature.Data featureData in mapData.features)
+            BuildFeature(featureData.tile, FeatureLibrary.P.ByTypeName(featureData.type))
+                .Deserialize(featureData.customFields);
     }
 
-    public void GenerateNewWorld() {
-        TerrainGenerator.GenerateTerrain(this);
-        Vector2Int startLocation = TerrainGenerator.PlaceFountains(this);
-        TerrainGenerator.FinalDecor(this, startLocation);
+    public static void GenerateNewWorld() {
+        TerrainGenerator.GenerateTerrain(I);
+        Vector2Int startLocation = TerrainGenerator.PlaceFountains(I);
+        TerrainGenerator.FinalDecor(I, startLocation);
     }
 
     private void PopulateTerrainFromUnityEditor() {

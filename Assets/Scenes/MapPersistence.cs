@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
@@ -9,13 +10,7 @@ public struct MapData {
     [SerializeField] public Construction[,] xWalls;
     [SerializeField] public Construction[,] yWalls;
     [SerializeField] public Construction[,] roofs;
-
-    public override string ToString() {
-        return land.GetUpperBound(0) + " " + land.GetUpperBound(1) + "\n"
-            + xWalls.GetUpperBound(0) + " " + xWalls.GetUpperBound(1) + "\n"
-            + yWalls.GetUpperBound(0) + " " + yWalls.GetUpperBound(1) + "\n"
-            + roofs.GetUpperBound(0) + " " + roofs.GetUpperBound(1);
-    }
+    [SerializeField] public Feature.Data[] features;
 }
 
 public class MapPersistence : MonoBehaviour {
@@ -29,6 +24,12 @@ public class MapPersistence : MonoBehaviour {
         mapData.xWalls = terrain.AllXWallTiles;
         mapData.yWalls = terrain.AllYWallTiles;
         mapData.roofs = terrain.AllRoofTiles;
+
+        List<Feature.Data> features = new List<Feature.Data>();
+        for (int x = 0; x < terrain.Bounds.x; x++) for (int y = 0; y < terrain.Bounds.y; y++) {
+            if (terrain.Feature[x, y] != null) features.Add(terrain.Feature[x, y].Serialize());
+        }
+        mapData.features = features.ToArray();
 
         BinaryFormatter bf = new BinaryFormatter(); 
         FileStream file = File.Create(Application.persistentDataPath 
@@ -47,7 +48,7 @@ public class MapPersistence : MonoBehaviour {
             MapData mapData = (MapData)bf.Deserialize(file);
             Debug.Log(mapData);
             file.Close();
-            Terrain.I.PopulateTerrainFromData(mapData.land, mapData.xWalls, mapData.yWalls, mapData.roofs);
+            Terrain.I.PopulateTerrainFromData(mapData);
             Debug.Log("Game data loaded!");
         } else Debug.LogError("There is no save data!");
     }

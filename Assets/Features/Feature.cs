@@ -12,6 +12,10 @@ public class Feature : MonoBehaviour {
     public Action<Transform> Attacked;
     public Action Died; // if set, overrides Destroy() as response
 
+    [HideInInspector] public string type;
+    [NonSerialized] public Func<int[]> SerializeFields;
+    [NonSerialized] public int[] deserializedFields;
+
     void Start() { GetComponent<Health>().ReachedZero += HandleDied; }
 
     public bool IsValidTerrain(Land land) {
@@ -42,5 +46,32 @@ public class Feature : MonoBehaviour {
     void HandleDied() {
         if (Died != null) Died();
         else Destroy();
+    }
+
+    [Serializable] public struct Data {
+        public int x;
+        public int y;
+        public string type;
+        public int[] customFields; // serialization hack
+
+        public Vector2Int tile { get => Vct.I(x, y); }
+
+        public Data(Vector2Int tile, string type, int[] customFields) {
+            this.x = tile.x;
+            this.y = tile.y;
+            this.type = type;
+            this.customFields = customFields;
+        }
+    }
+
+    public Data Serialize() {
+        int[] customFields;
+        if (SerializeFields == null) customFields = new int[0];
+        else customFields = SerializeFields();
+        if (tile is Vector2Int actualTile) return new Data(actualTile, type, customFields);
+        else throw new InvalidOperationException("Feature not instantiated");
+    }
+    public void Deserialize(int[] customFields) {
+        deserializedFields = customFields;
     }
 }

@@ -28,6 +28,8 @@ public class Fountain : MonoBehaviour {
 
     void Start() {
         feature = GetComponent<Feature>();
+        if (feature.deserializedFields != null) Deserialize(feature.deserializedFields);
+        feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
         feature.Attacked += (doNothing => {});
         feature.Died += HandleDeath;
@@ -36,6 +38,9 @@ public class Fountain : MonoBehaviour {
         health = GetComponent<Health>();
         if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
     }
+
+    int[] Serialize() => new int[] { team };
+    void Deserialize(int[] fields) => Team = fields[0];
 
     bool HandlePlayerEntered(PlayerCharacter target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
