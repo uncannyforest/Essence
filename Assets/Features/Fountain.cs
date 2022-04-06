@@ -28,7 +28,7 @@ public class Fountain : MonoBehaviour {
 
     void Start() {
         feature = GetComponent<Feature>();
-        if (feature.deserializedFields != null) Deserialize(feature.deserializedFields);
+        if (feature.serializedFields != null) Deserialize(feature.serializedFields);
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
         feature.Attacked += (doNothing => {});

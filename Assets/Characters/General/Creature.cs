@@ -89,13 +89,16 @@ public class Creature : MonoBehaviour {
     private SpriteSorter spriteManager;
     public SpriteSorter SpriteManager { get => spriteManager; }
 
+    [NonSerialized] public Creature.Data? serializedData;
     void Start() {
         controller = GetComponent<CharacterController>();
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
-        cMaybeDespawn = StartCoroutine(MaybeDespawn());
         spriteManager = GetComponentInChildren<SpriteSorter>();
         GetComponent<Team>().changed += TeamChangedEventHandler;
+
+        if (serializedData is Data data) DeserializeNow(data);
+        else cMaybeDespawn = StartCoroutine(MaybeDespawn());
     }
 
     private void InitializeActionList(Brain brain) {
@@ -127,9 +130,11 @@ public class Creature : MonoBehaviour {
         return brain.CanTame(player);
     }
     public void ForceTame(Transform player) { // bypasses ExtractTamingCost
-        StopCoroutine(cMaybeDespawn);
+        if (cMaybeDespawn != null) StopCoroutine(cMaybeDespawn);
         GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
         Follow(player);
+    }
+    public void ForceTame(int team) {
     }
     public ExpandableInfo TamingInfo {
         get => GenerateTamingInfo(creatureName, tamingInfoShort, tamingInfoLong);
@@ -209,6 +214,41 @@ public class Creature : MonoBehaviour {
         Boat boat = collider.transform.parent.GetComponent<Boat>();
         if (boat != null && boat.player == brain.FollowDirective?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
+    }
+
+    [Serializable] public struct Data {
+        public int x;
+        public int y;
+        public string species;
+        public int team;
+        public bool stationed;
+        public string name;
+
+        public Vector2Int tile { get => Vct.I(x, y); }
+
+        public Data(Vector2Int tile, string species, int team, bool stationed, string name) {
+            this.x = tile.x;
+            this.y = tile.y;
+            this.species = species;
+            this.team = team;
+            this.stationed = stationed;
+            this.name = name;
+        }
+    }
+    public Data Serialize() {
+        return new Data(Terrain.I.CellAt(transform.position),
+            creatureName,
+            GetComponent<Team>().TeamId,
+            brain.State == CreatureState.Station,
+            gameObject.name);
+    }
+    public void DeserializeUponStart(Data data) {
+        serializedData = data;
+    }
+    private void DeserializeNow(Data data) {
+        gameObject.name = data.name;
+        GetComponent<Team>().TeamId = data.team;
+        if (data.stationed) Station(data.tile);
     }
 }
 

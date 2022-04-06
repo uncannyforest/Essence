@@ -14,7 +14,7 @@ public class Feature : MonoBehaviour {
 
     [HideInInspector] public string type;
     [NonSerialized] public Func<int[]> SerializeFields;
-    [NonSerialized] public int[] deserializedFields;
+    [NonSerialized] public int[] serializedFields;
 
     void Start() { GetComponent<Health>().ReachedZero += HandleDied; }
 
@@ -63,15 +63,17 @@ public class Feature : MonoBehaviour {
             this.customFields = customFields;
         }
     }
-
-    public Data Serialize() {
+    public Data? Serialize() {
         int[] customFields;
         if (SerializeFields == null) customFields = new int[0];
         else customFields = SerializeFields();
         if (tile is Vector2Int actualTile) return new Data(actualTile, type, customFields);
-        else throw new InvalidOperationException("Feature not instantiated");
+        else {
+            Debug.LogError("Feature not instantiated! Not writing it to data");
+            return null;
+        }
     }
-    public void Deserialize(int[] customFields) {
-        deserializedFields = customFields;
+    public void DeserializeUponStart(int[] customFields) {
+        serializedFields = customFields;
     }
 }

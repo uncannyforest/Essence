@@ -11,6 +11,7 @@ public struct MapData {
     [SerializeField] public Construction[,] yWalls;
     [SerializeField] public Construction[,] roofs;
     [SerializeField] public Feature.Data[] features;
+    [SerializeField] public Creature.Data[] creatures;
 }
 
 public class MapPersistence : MonoBehaviour {
@@ -27,9 +28,21 @@ public class MapPersistence : MonoBehaviour {
 
         List<Feature.Data> features = new List<Feature.Data>();
         for (int x = 0; x < terrain.Bounds.x; x++) for (int y = 0; y < terrain.Bounds.y; y++) {
-            if (terrain.Feature[x, y] != null) features.Add(terrain.Feature[x, y].Serialize());
+            if (terrain.Feature[x, y] != null) {
+                Feature.Data? maybeFeatureData = terrain.Feature[x, y].Serialize();
+                if (maybeFeatureData is Feature.Data featureData) features.Add(featureData);
+            }
         }
         mapData.features = features.ToArray();
+
+        Creature[] allCreatures = GameObject.FindObjectsOfType<Creature>();
+        List<Creature.Data> teamCreatures = new List<Creature.Data>();
+        foreach (Creature creature in allCreatures) {
+            if (creature.GetComponentStrict<Team>().TeamId != 0) {
+                teamCreatures.Add(creature.Serialize());
+            }
+        }
+        mapData.creatures = teamCreatures.ToArray();
 
         BinaryFormatter bf = new BinaryFormatter(); 
         FileStream file = File.Create(Application.persistentDataPath 
@@ -48,7 +61,15 @@ public class MapPersistence : MonoBehaviour {
             MapData mapData = (MapData)bf.Deserialize(file);
             Debug.Log(mapData);
             file.Close();
+
             Terrain.I.PopulateTerrainFromData(mapData);
+
+            foreach (Creature.Data creature in mapData.creatures) {
+                Instantiate(CreatureLibrary.P.BySpeciesName(creature.species),
+                        Terrain.I.CellCenter(creature.tile), Quaternion.identity, Terrain.I.transform)
+                    .DeserializeUponStart(creature);
+            }
+
             Debug.Log("Game data loaded!");
         } else Debug.LogError("There is no save data!");
     }

@@ -41749,12 +41749,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8f4a38f4686249f890bf523cb7d51b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bunny: {fileID: 4481103850635713290, guid: d4d4ebbc99b91449e90944b5e778759e, type: 3}
-  arrowwiggle: {fileID: 4481103850635713290, guid: 52a225b6ed0ec4c9bb92580f490fd0f7, type: 3}
-  stipule: {fileID: 4481103850635713290, guid: 9d441d971641f40d18b8e2dd75da009a, type: 3}
-  archer: {fileID: 4481103850635713290, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
-  redDwarf: {fileID: 755594374484330081, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
-  moose: {fileID: 3722983441315835238, guid: 589a3cf3c5b784847963621b5a7f3166, type: 3}
+  bunny: {fileID: 6284982019010971546, guid: d4d4ebbc99b91449e90944b5e778759e, type: 3}
+  arrowwiggle: {fileID: 6284982019010971546, guid: 52a225b6ed0ec4c9bb92580f490fd0f7, type: 3}
+  stipule: {fileID: 6284982019010971546, guid: 9d441d971641f40d18b8e2dd75da009a, type: 3}
+  archer: {fileID: 6284982019010971546, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
+  redDwarf: {fileID: 5170738914887468554, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
+  moose: {fileID: 9085166757081951501, guid: 589a3cf3c5b784847963621b5a7f3166, type: 3}
 --- !u!114 &2120764636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41876,7 +41876,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   possibilityRate: 0.0078125
-  creatureLibrary: {fileID: 2120764635}
   terrain: {fileID: 2120764633}
   parent: {fileID: 2120764631}
   player: {fileID: 403460084}

@@ -324,7 +324,7 @@ public class Terrain : MonoBehaviour {
             SetRoof(Vct.I(x, y), mapData.roofs[x, y], true);
         foreach (Feature.Data featureData in mapData.features)
             BuildFeature(featureData.tile, FeatureLibrary.P.ByTypeName(featureData.type))
-                .Deserialize(featureData.customFields);
+                .DeserializeUponStart(featureData.customFields);
     }
 
     public static void GenerateNewWorld() {

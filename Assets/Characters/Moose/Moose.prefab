@@ -104,6 +104,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4227571806329763833, guid: 7e7239e308b1f4af398d71e6f2b81b7a, type: 3}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureName
+      value: Moose
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.timidity
       value: 0.1
       objectReference: {fileID: 0}
