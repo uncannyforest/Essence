@@ -29,7 +29,7 @@ public class ArcherBrain : Brain {
     }
 
     override public bool CanTame(Transform player) {
-        return State == CreatureState.Faint // changed in CommandFollow not ExtractTamingCost
+        return State == CommandType.Faint // changed in CommandFollow not ExtractTamingCost
             && HasBunnyNearby(player);
     }
 
@@ -57,9 +57,9 @@ public class ArcherBrain : Brain {
             yield return new WaitForSeconds(general.scanningRate);
             if (Focused && IsThreat(Focus)) continue;
             
-            if (State == CreatureState.Roam || State == CreatureState.Station)
+            if (State == CommandType.Roam || State == CommandType.Station)
                 Focus = NearestThreat((threat) => threat.GetComponent<Archer>() == null);
-            else if (State == CreatureState.FollowOffensive) UpdateFollowOffensive();
+            else if (State == CommandType.FollowOffensive) UpdateFollowOffensive();
             else Focus = null;
         }
     }
@@ -94,7 +94,7 @@ public class ArcherBrain : Brain {
         if (Vector2.Distance(expectedFuturePosition, transform.position) < expectedArrowReach) {
             movement.IdleFacing(expectedFuturePosition);
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition);
-        } else if (State != CreatureState.Station) {
+        } else if (State != CommandType.Station) {
             pathfinding.MoveToward(target.position);
         }
         return new WaitForSeconds(general.reconsiderRateTarget * .9f);
@@ -108,7 +108,7 @@ public class ArcherBrain : Brain {
     }
 
     override protected void OnHealthReachedZero() {
-        State = CreatureState.Faint;
+        State = CommandType.Faint;
         movement.SetBool("Fainted", true);
     }
 

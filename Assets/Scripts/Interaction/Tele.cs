@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public class Target : OneOf<Terrain.Position, SpriteSorter> {
+    private Target() : base() {}
+    public Target(Terrain.Position t) : base(t) {}
+    public Target(SpriteSorter u) : base(u) {}
+    new public static Target Neither { get => new Target(); }
+}
+
 public class TeleFilter {
     public enum Terrain {
         NONE,
@@ -32,24 +39,23 @@ public class Tele {
         this.terrain = terrain;
     }
 
-    public OneOf<Terrain.Position, SpriteSorter> SelectDynamic(Vector2 point) {
+    public Target SelectDynamic(Vector2 point) {
         if (dynamicFilter == null) throw new InvalidOperationException("No dynamic filter set");
         if (dynamicFilter.characterFilter != null) {
             SpriteSorter character = SelectCharacterWithFilter(point, dynamicFilter.characterFilter);
-            if (character != null) return new OneOf<Terrain.Position, SpriteSorter>(character);
+            if (character != null) return new Target(character);
         }
         switch (dynamicFilter.terrainSelection) {
             case (TeleFilter.Terrain.TILES):
                 Vector2Int tile = SelectSquareOnly(point);
-                return new OneOf<Terrain.Position, SpriteSorter>(
-                    new Terrain.Position(Terrain.Grid.Roof, tile));
+                return new Target(new Terrain.Position(Terrain.Grid.Roof, tile));
             case (TeleFilter.Terrain.WOODBUILDING):
                 Terrain.Position? maybePosition = SelectBuildLoc(point);
                 if (maybePosition is Terrain.Position position)
-                    return new OneOf<Terrain.Position, SpriteSorter>(position);
+                    return new Target(position);
                 break;
         }
-        return OneOf<Terrain.Position, SpriteSorter>.Neither;
+        return Target.Neither;
     }
 
     public Vector2Int SelectSquareOnly(Vector2 point) {

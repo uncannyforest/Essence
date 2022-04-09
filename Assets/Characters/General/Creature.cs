@@ -48,7 +48,7 @@ public struct CreatureAction {
             (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
             new TeleFilter(TeleFilter.Terrain.TILES, null), feature, true, false, false);
     public static CreatureAction Roam =
-        new CreatureAction(null, (c) => c.State = CreatureState.Roam, null, null, null, false, true, false);
+        new CreatureAction(null, (c) => c.State = CommandType.Roam, null, null, null, false, true, false);
     public static CreatureAction Station =
         new CreatureAction(null, null,
             (creature, location) => creature.Station(((Terrain.Position)location).Coord),
@@ -73,10 +73,10 @@ public class Creature : MonoBehaviour {
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
-    public CreatureState stateForEditorDebugging;
+    public CommandType stateForEditorDebugging;
 
     public Brain brain;
-    public CreatureState State {
+    public CommandType State {
         get => brain.State;
         set => brain.State = value;
     }
@@ -239,7 +239,7 @@ public class Creature : MonoBehaviour {
         return new Data(Terrain.I.CellAt(transform.position),
             creatureName,
             GetComponent<Team>().TeamId,
-            brain.State == CreatureState.Station,
+            brain.State == CommandType.Station,
             gameObject.name);
     }
     public void DeserializeUponStart(Data data) {

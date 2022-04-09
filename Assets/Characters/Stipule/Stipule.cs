@@ -52,9 +52,9 @@ public class StipuleBrain : Brain {
             yield return new WaitForSeconds(general.scanningRate);
             if (Focused && IsThreat(Focus)) continue;
             
-            if (State == CreatureState.Roam || State == CreatureState.Station)
+            if (State == CommandType.Roam || State == CommandType.Station)
                 Focus = NearestThreat();
-            else if (State == CreatureState.FollowOffensive) UpdateFollowOffensive();
+            else if (State == CommandType.FollowOffensive) UpdateFollowOffensive();
             else Focus = null;
         }
     }

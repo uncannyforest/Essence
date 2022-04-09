@@ -28,11 +28,11 @@ public class Concealment {
         GameObject.FindObjectOfType<PointOfView>().CrossedTile += HandleCrossedTile;
     }
 
-    public bool CanSee(Transform seer, SpriteSorter seen) {
+    public bool CanSee(Vector3 seerPosition, SpriteSorter seen) {
         Construction? expectedConstruction = terrain.Roof.Get(terrain.CellAt(seen.transform.position));
         if (expectedConstruction != null && expectedConstruction != Construction.None) {
             Vector2Int cellDistance =
-                terrain.CellAt(seer.position) - terrain.CellAt(seen.transform.position);
+                terrain.CellAt(seerPosition) - terrain.CellAt(seen.transform.position);
             for (int i = 0; i < 4; i++) {
                 Terrain.Position wall = Terrain.Position.Edge(currentCenter, i);
                 Vector2Int roof = currentCenter + Vct.Cardinals[i];
@@ -62,7 +62,7 @@ public class Concealment {
         }
         Land? land = terrain.GetLand(terrain.CellAt(seen.transform.position));
         if (land?.PlantLevel() >= seen.Height) {
-            if ((seer.position - seen.transform.position).sqrMagnitude < 2.5f * 2.5f)
+            if ((seerPosition - seen.transform.position).sqrMagnitude < 2.5f * 2.5f)
                 return true;
             foreach (Land? adjLand in terrain.GetFourLandTilesAround(seen.transform.position))
                 if (adjLand == null || adjLand?.PlantLevel() < seen.Height)

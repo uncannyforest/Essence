@@ -37,5 +37,8 @@ public class Team : MonoBehaviour {
     public bool SameTeam(GameObject other) => teamId == other.GetComponentStrict<Team>().teamId;
     public bool SameTeam(Collider2D other) => teamId == other.GetComponentStrict<Team>().teamId;
     public bool SameTeam(Transform other) => teamId == other.GetComponentStrict<Team>().teamId;
+    public static bool SameTeam(int me, GameObject other) => me == other.GetComponentStrict<Team>().teamId;
+    public static bool SameTeam(int me, Collider2D other) => me == other.GetComponentStrict<Team>().teamId;
+    public static bool SameTeam(int me, Transform other) => me == other.GetComponentStrict<Team>().teamId;
 
 }

@@ -34,6 +34,22 @@ public class CoroutineWrapper {
     public bool IsRunning {
         get => isRunning;
     }
+
+    public static CoroutineWrapper<T> WithParam<T>(Func<T, IEnumerator> enumeratorGenerator) {
+        return new CoroutineWrapper<T>(enumeratorGenerator);
+    }
+}
+
+public class CoroutineWrapper<T> {
+    protected Func<T, IEnumerator> enumeratorGenerator;
+
+    public CoroutineWrapper(Func<T, IEnumerator> enumeratorGenerator) {
+        this.enumeratorGenerator = enumeratorGenerator;
+    }
+
+    public CoroutineWrapper Of(T t, MonoBehaviour attachedScript) {
+        return new CoroutineWrapper(() => enumeratorGenerator(t), attachedScript);
+    }
 }
 
 public class RunOnce : CoroutineWrapper {

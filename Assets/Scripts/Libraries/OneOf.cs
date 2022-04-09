@@ -23,12 +23,20 @@ public class OneOf<T, U> {
         which = Which.Second;
     }
 
-    private OneOf() {
+    protected OneOf() {
         which = Which.Neither;
     }
 
     public static OneOf<T, U> Neither {
         get => new OneOf<T, U>();
+    }
+
+    public static implicit operator OneOf<T, U>(T t) {
+        return new OneOf<T, U>(t);
+    }
+
+    public static implicit operator OneOf<T, U>(U u) {
+        return new OneOf<T, U>(u);
     }
 
     public static explicit operator T(OneOf<T, U> oneOf) {
