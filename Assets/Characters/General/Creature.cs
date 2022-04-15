@@ -9,14 +9,14 @@ using Random = UnityEngine.Random;
 public struct CreatureAction {
     public readonly Sprite icon;
     public readonly Action<Creature> instantDirective;
-    public readonly Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective;
+    public readonly Action<Creature, Target> pendingDirective;
     public readonly TeleFilter dynamicFilter;
     public readonly bool canQueue;
     public readonly bool isRoam;
     public readonly bool isStation;
     public readonly Feature feature;
     private CreatureAction(Sprite icon, Action<Creature> instantDirective, 
-            Action<Creature, OneOf<Terrain.Position, SpriteSorter>> pendingDirective,
+            Action<Creature, Target> pendingDirective,
             TeleFilter filter, Feature feature, bool canQueue, bool isRoam, bool isStation) {
         this.icon = icon;
         this.instantDirective = instantDirective;
@@ -48,7 +48,7 @@ public struct CreatureAction {
             (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
             new TeleFilter(TeleFilter.Terrain.TILES, null), feature, true, false, false);
     public static CreatureAction Roam =
-        new CreatureAction(null, (c) => c.State = CommandType.Roam, null, null, null, false, true, false);
+        new CreatureAction(null, (creature) => creature.CommandRoam(), null, null, null, false, true, false);
     public static CreatureAction Station =
         new CreatureAction(null, null,
             (creature, location) => creature.Station(((Terrain.Position)location).Coord),
@@ -73,12 +73,10 @@ public class Creature : MonoBehaviour {
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
-    public CommandType stateForEditorDebugging;
 
     public Brain brain;
-    public CommandType State {
-        get => brain.State;
-        set => brain.State = value;
+    public CreatureState State {
+        get => brain.state;
     }
     public List<CreatureAction> action = new List<CreatureAction>();
 
@@ -112,11 +110,19 @@ public class Creature : MonoBehaviour {
             GetComponent<Team>().Color;
     }
 
-    public CharacterController OverrideControl(MonoBehaviour source) => brain.OverrideControl(source);
-    public void ReleaseControl() => brain.ReleaseControl();
-
+    public CharacterController OverrideControl(MonoBehaviour source) {
+        new Senses() { controlOverride = Delta<MonoBehaviour>.Add(source) }
+            .TryUpdateCreature(this, 2);
+        return brain.movement;
+    }
+    public void ReleaseControl() => new Senses() {
+        controlOverride = Delta<MonoBehaviour>.Remove()
+    }.TryUpdateCreature(this, 2);
+    
     public void Follow(Transform player) {
-        brain.CommandFollow(player);
+        new Senses() { command = Command.Follow(player) }
+            .ForCreature(this).TryUpdateState(brain, 2);
+        brain.movement.SetBool("Fainted", false); // TODO remove
     }
     // Can call without calling CanTame() first; result will indicate whether it succeeded
     // If false, get TamingInfo for error
@@ -148,15 +154,21 @@ public class Creature : MonoBehaviour {
             tamingInfoLong.Replace("<creature/>", "<color=creature>" + creatureName + "</color>"));
     }
 
-    public bool CanPair() => brain.TrekkingFree;
+    public bool CanPair() => State.type.CanTransitionTo(CreatureStateType.Pair);
     
-    public bool TryPair(Transform initiator) => brain.TryCommandPair(initiator);
+    public bool TryPair(Transform initiator) => new Senses() {
+        message = CreatureMessage.PairToSubject(initiator)
+    }.TryUpdateCreature(this);
+    
+    // call this method on recipient
+    public bool EndPairCommand(Transform initiator) => new Senses() {
+        message = CreatureMessage.EndPairToSubject(initiator)
+    }.TryUpdateCreature(this);
 
-    public void EndPairCommand(Transform initiator) => brain.EndPairCommand(initiator); // call this method on recipient
-
-    public void EndPairRequest() => brain.EndPairRequest(); // call this method on initiator
-
-    public bool CanSee(Transform seen) => brain.CanSee(seen);
+    // call this method on initiator
+    public void EndPairRequest() => new Senses() {
+        message = CreatureMessage.EndPairToMaster()
+    }.TryUpdateCreature(this, 1);
 
     public static Transform FindOffensiveTarget(int team, Vector2 playerPosition, Vector2 playerDirection,
             float castRadius, float castStart, float castDistance) {
@@ -172,23 +184,35 @@ public class Creature : MonoBehaviour {
 
     public void FollowOffensive(Transform target) {
         if (!brain.general.hasAttack) return;
-        Debug.Log(gameObject + " received message to attack " + target);
-        // Generally offensive, when no target specified
-        if (target == null) brain.EnableFollowOffensiveNoTarget();
-        // Specific offense, temporary once target is gone.
-        else brain.EnableFollowOffensiveWithTarget(target);
+        new Senses() {
+            hint = (target != null)
+                ? new Hint() { target = Optional.Of(target) }
+                : new Hint() { generallyOffensive = true }
+        }.TryUpdateCreature(this);
     }
 
     // Defensive
-    public void WitnessAttack(Transform assailant) => brain.TryIndicateAttack(assailant, false);
+    public void WitnessAttack(Transform assailant) => new Senses() {
+        desireMessage = new DesireMessage() {
+            target = new Target(assailant.GetComponentStrict<SpriteSorter>())
+        }
+    }.TryUpdateCreature(this);
 
-    public void Station(Vector2Int location) => brain.CommandStation(location);
+    public void CommandRoam() => new Senses() {
+        command = Command.Roam()
+    }.TryUpdateCreature(this);
 
-    public void Execute(CoroutineWrapper executingBehavior,
-            OneOf<Terrain.Position, SpriteSorter> target) => brain.CommandExecute(executingBehavior, target);
+    public void Station(Vector2Int location) => new Senses() {
+        command = Command.Station(Terrain.I.CellCenter(location))
+    }.TryUpdateCreature(this);
 
-    public void ExecuteEnqueue(CoroutineWrapper executingBehavior,
-            OneOf<Terrain.Position, SpriteSorter> target) => brain.EnqueueExecuteCommand(executingBehavior, target);
+    public void Execute(CoroutineWrapper executingBehavior, Target target) => new Senses() {
+        command = Command.Execute(new LegacyBehaviorNode(executingBehavior, target))
+    }.TryUpdateCreature(this);
+
+    public void ExecuteEnqueue(CoroutineWrapper executingBehavior, Target target) => new Senses() {
+        command = Command.Execute(QueueOperator.Of(new LegacyBehaviorNode(executingBehavior, target)))
+    }.TryUpdateCreature(this);
 
     private Coroutine cMaybeDespawn;
     private IEnumerator MaybeDespawn() {
@@ -212,7 +236,7 @@ public class Creature : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collider) {
         Boat boat = collider.transform.parent.GetComponent<Boat>();
-        if (boat != null && boat.player == brain.FollowDirective?.GetComponent<PlayerCharacter>())
+        if (boat != null && boat.player == brain.followDirective?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
     }
 
@@ -239,7 +263,7 @@ public class Creature : MonoBehaviour {
         return new Data(Terrain.I.CellAt(transform.position),
             creatureName,
             GetComponent<Team>().TeamId,
-            brain.State == CommandType.Station,
+            brain.state.command?.type == CommandType.Station,
             gameObject.name);
     }
     public void DeserializeUponStart(Data data) {

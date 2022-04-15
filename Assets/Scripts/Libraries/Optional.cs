@@ -39,6 +39,11 @@ public struct Optional<T> {
         return new Optional<T>();
     }
 
+    public T Or(T defaultValue) {
+        if (HasValue) return value;
+        else return defaultValue;
+    }
+
     public static explicit operator T(Optional<T> optional) {
         return optional.Value;
     }

@@ -5,11 +5,8 @@ using UnityEngine;
 public enum CommandType {
     Roam,
     Follow,
-    FollowOffensive, // TODO deprecated
     Station,
     Execute,
-    Pair, // TODO deprecated
-    Faint, // TODO deprecated
 }
 
 public struct Command {
@@ -49,6 +46,14 @@ public struct Command {
         command.executeDirective = this.executeDirective.UpdateWithNewBehavior(executeCommand.executeDirective);
         return command;
     }
+
+    public override string ToString() {
+        string result = type.ToString();
+        if (followDirective.HasValue) result += " | follow: " + followDirective.Value.gameObject.name;
+        if (stationDirective is Vector3 directive) result += " station: " + directive;
+        if (executeDirective != null) result += " execute: " + executeDirective;
+        return result;
+    }
 }
 
 public struct CreatureMessage {
@@ -60,22 +65,50 @@ public struct CreatureMessage {
 
     public Type type;
     public Transform master; // required except for EndPairToMaster
+
+    public static CreatureMessage PairToSubject(Transform master) {
+        CreatureMessage message = new CreatureMessage();
+        message.type = Type.PairToSubject;
+        message.master = master;
+        return message;
+    }
+    public static CreatureMessage EndPairToSubject(Transform master) {
+        CreatureMessage message = new CreatureMessage();
+        message.type = Type.EndPairToSubject;
+        message.master = master;
+        return message;
+    }
+    public static CreatureMessage EndPairToMaster() {
+        CreatureMessage message = new CreatureMessage();
+        message.type = Type.EndPairToMaster;
+        return message;
+    }
 }
 
 public struct Hint {
-    public bool offensive;
+    public bool generallyOffensive;
     public Optional<Transform> target;
 }
 
 public struct Senses {
-    public static Senses ForCreature(Brain brain) {
-        Senses senses = new Senses();
-        senses.knowledge = new PersistentProperties(
-            brain.general,
-            brain.transform.position,
-            brain.team
-        );
+    public static Senses CreateForCreature(Creature creature) {
+        Senses senses = new Senses()
+            { knowledge = PersistentProperties.ForCreature(creature) };
         return senses;
+    }
+
+    public Senses ForCreature(Creature creature) {
+        knowledge = PersistentProperties.ForCreature(creature);
+        return this;
+    }
+
+    public bool TryUpdateState(Brain brain, int logLevel = 0) {
+        return brain.TryUpdateState(this, logLevel);
+    }
+
+    public bool TryUpdateCreature(Creature creature, int logLevel = 0) {
+        if (creature.brain == null) throw new InvalidOperationException(creature + " has no brain");
+        return ForCreature(creature).TryUpdateState(creature.brain, logLevel);
     }
 
     public Delta<MonoBehaviour> controlOverride;
@@ -107,6 +140,12 @@ public struct Senses {
             this.config = config;
             this.position = position;
             this.team = team;
+        }
+        public static PersistentProperties ForCreature(Creature creature) {
+            return new PersistentProperties(
+                creature.brainConfig,
+                creature.transform.position,
+                creature.GetComponentStrict<Team>().TeamId);
         }
     }
 }

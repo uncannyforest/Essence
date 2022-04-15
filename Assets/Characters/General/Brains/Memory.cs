@@ -55,23 +55,15 @@ public struct CreatureState {
         return oldState.ToPassiveCommand();
     }
 
-    public Hint hint;
+    public bool followOffensive;
     public CreatureState DisableFollowOffensive() {
         if (command?.type != CommandType.Follow) throw new InvalidOperationException("Called DisableFollowOffensive on command " + command?.type);
-        hint = new Hint();
+        followOffensive = false;
         return this;
     }
-    public CreatureState FollowOffensiveNoTarget() {
+    public CreatureState FollowOffensive() {
         if (command?.type != CommandType.Follow) throw new InvalidOperationException("Called FollowOffensive on command " + command?.type);
-        hint = new Hint();
-        hint.offensive = true;
-        return this;
-    }
-    public CreatureState FollowOffensiveWithTarget(Transform target) {
-        if (command?.type != CommandType.Follow) throw new InvalidOperationException("Called FollowOffensive on command " + command?.type);
-        hint = new Hint();
-        hint.offensive = true;
-        hint.target = Optional.Of(target);
+        followOffensive = true;
         return this;
     }
 
@@ -127,5 +119,19 @@ public struct CreatureState {
         CreatureState state = this;
         state.command = command;
         return state;
+    }
+
+    public override string ToString() {
+        string result = type.ToString();
+        if (type == CreatureStateType.Override) result +=
+            " | control override: " + controlOverride.Value.gameObject.name
+            + " | previous state: " + controlOverridePrevState;
+        if (command is Command actualCommand) result += " | command: " + command;
+        if (pairDirective.HasValue) result += " | pair directive: " + pairDirective.Value.gameObject.name;
+        if (followOffensive) result += " | follow offensive";
+        if (focusIsPair.HasValue) result += " | pair focus: " + focusIsPair.Value.gameObject.name;
+        if (characterFocus.HasValue) result += " | character focus: " + characterFocus.Value.gameObject.name;
+        if (investigation is Vector3 actualInvestigation) result += " | investigation: " + actualInvestigation;
+        return result;
     }
 }

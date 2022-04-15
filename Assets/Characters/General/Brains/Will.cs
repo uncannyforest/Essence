@@ -57,14 +57,13 @@ public class Will {
             if (state.command?.type != CommandType.Follow)
                 return "No use for player hints under command " + state.command?.type;
 
-            if (!hint.offensive)
+            if (!hint.generallyOffensive && !hint.target.HasValue)
                 return state.DisableFollowOffensive();
-            else if (!hint.target.HasValue)
-                return state.FollowOffensiveNoTarget(); // TODO identify immediately
+            else if (hint.generallyOffensive)
+                return state.FollowOffensive();
             else {
-                if (state.hint.target.HasValue)
-                    return "already attacking" + state.hint.target.Value;
-                return state.FollowOffensiveWithTarget(hint.target.Value); // TODO identify immediately
+                relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
+                return DesireAttack(input.knowledge.config, input.knowledge.position, state, hint.target.Value);
             }
         } else if (input.message is CreatureMessage message) {
             switch (message.type) {

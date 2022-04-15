@@ -10,6 +10,8 @@ public class Healing : MonoBehaviour {
 
     private Team team;
 
+    private List<Creature> healAutoCreatures = new List<Creature>();
+
     void Start() {
         team = GetComponent<Team>();
         if (team == null) team = null;
@@ -56,12 +58,21 @@ public class Healing : MonoBehaviour {
         while (true) {
             Collider2D[] charactersNearby =
                 Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
+            for (int i = healAutoCreatures.Count - 1; i >= 0; i--) {
+                Creature creature = healAutoCreatures[i];
+                if (creature.GetComponentStrict<Health>().IsFull() ||
+                        Vector2.Distance(transform.position, creature.transform.position) > Creature.neighborhood) {
+                    if (creature.EndPairCommand(transform))
+                        healAutoCreatures.RemoveAt(i);
+                }
+            }
             foreach (Collider2D character in charactersNearby) if (SameTeam(character.transform)) {
                 if (CanHeal(character.transform, healDistance)) ForceHeal(character.transform, healQuantity);
                 Creature creature = character.GetComponent<Creature>();
-                if (creature != null) {
-                    if (character.GetComponentStrict<Health>().IsFull()) creature.EndPairCommand(transform);    
-                    else if (HealPriority(character) < 1 && creature.CanPair()) creature.TryPair(transform);
+                if (creature != null && !healAutoCreatures.Contains(creature) &&
+                        HealPriority(character) < 1 && creature.CanPair()) {
+                    creature.TryPair(transform);
+                    healAutoCreatures.Add(creature);
                 }
             }
             yield return new WaitForSeconds(healTime);

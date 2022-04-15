@@ -41,9 +41,7 @@ public class ArrowwiggleBrain : Brain {
             yield return new WaitForSeconds(general.scanningRate);
             if (Focused && ShouldRestockPlayer()) continue;
             
-            if ((State == CommandType.Roam || State == CommandType.Station || State == CommandType.Follow)
-                && ShouldRestockPlayer()) Focus = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-            else Focus = null;
+            Focus = GameObject.FindObjectOfType<PlayerCharacter>().transform;
         }
     }
 

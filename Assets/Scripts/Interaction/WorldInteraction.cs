@@ -386,7 +386,7 @@ public class WorldInteraction : MonoBehaviour {
                 }
             break;
             case Mode.Directing:
-                OneOf<Terrain.Position, SpriteSorter> target = teleSelect.SelectDynamic(worldPoint);
+                Target target = teleSelect.SelectDynamic(worldPoint);
                 if (target.IsNeither) return;
                 ClearCharacter();
                 ClearTile();

@@ -13,9 +13,24 @@ public enum CreatureStateType {
     PassiveCommand = 100,
 }
 
+public static class CreatureStateTypeExtensions {
+    public static bool IsScanning(this CreatureStateType type) {
+        return (int)type < 400;
+    }
+    public static bool IsTrekking(this CreatureStateType type) {
+        return (int)type <= 300;
+    }
+    public static bool CanTransition(this CreatureStateType from, int priority) {
+        return priority >= (int)from;
+    }
+    public static bool CanTransitionTo(this CreatureStateType from, CreatureStateType type) {
+        return from.CanTransition((int)type - 50);
+    }
+}
+
 public class Habits {
-    public static bool CanTransitionTo(CreatureStateType from, CreatureStateType type) => CanTransition(from, (int)type - 50);
-    public static bool CanTransition(CreatureStateType from, int priority) => priority >= (int)from;
+    public static bool CanTransitionTo(CreatureStateType from, CreatureStateType type) => from.CanTransitionTo(type);
+    public static bool CanTransition(CreatureStateType from, int priority) => from.CanTransition(priority);
 
     public static bool ForcedTransitionAllowed(CreatureState oldState, CreatureState newState, int? priority = null) {
         if (priority is int actualPriority) return oldState.CanTransition(actualPriority);

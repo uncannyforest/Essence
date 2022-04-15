@@ -52,9 +52,8 @@ public class StipuleBrain : Brain {
             yield return new WaitForSeconds(general.scanningRate);
             if (Focused && IsThreat(Focus)) continue;
             
-            if (State == CommandType.Roam || State == CommandType.Station)
+            if (state.command?.type == CommandType.Roam || state.command?.type == CommandType.Station)
                 Focus = NearestThreat();
-            else if (State == CommandType.FollowOffensive) UpdateFollowOffensive();
             else Focus = null;
         }
     }

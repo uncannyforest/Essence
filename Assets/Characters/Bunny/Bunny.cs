@@ -43,7 +43,7 @@ public class BunnyBrain : Brain {
             
             Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
             if (healing.CanHeal(player, Creature.neighborhood)) Focus = player;
-            else Focus = RequestPair(healing.FindOneCreatureToHeal()); 
+            else RequestPair(healing.FindOneCreatureToHeal()); 
         }
     }
 

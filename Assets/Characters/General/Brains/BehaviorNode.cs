@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BehaviorNode {
-    public CoroutineWrapper coroutine { get; protected set; }
+    virtual public CoroutineWrapper coroutine { get; protected set; }
 
     public BehaviorNode(CoroutineWrapper coroutine) {
         this.coroutine = coroutine;
@@ -27,8 +27,21 @@ public class BehaviorNodeShell<T> {
     }
 }
 
+public class LegacyBehaviorNode : BehaviorNode {
+    public Target target { get; protected set; }
+
+    public LegacyBehaviorNode(CoroutineWrapper coroutine, Target target) : base(coroutine) {
+        this.target = target;
+    }
+}
+
 public class QueueOperator : BehaviorNode {
     private Queue<BehaviorNode> queue = new Queue<BehaviorNode>();
+
+    override public CoroutineWrapper coroutine {
+        get => (queue.Peek()).coroutine;
+        protected set => throw new NotSupportedException();
+    }
 
     public QueueOperator() : base(null) {}
     public static QueueOperator Of(BehaviorNode node) {
@@ -45,12 +58,20 @@ public class QueueOperator : BehaviorNode {
         else return newNode;
     }
 
+    public bool Pop() {
+        if (queue.Count == 0) return false;
+        queue.Dequeue();
+        return true;
+    }
+
     public class Shell<T> : BehaviorNodeShell<T> {
         public Shell(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
 
         override public BehaviorNode ToNode(T target, MonoBehaviour attachedScript) =>
             QueueOperator.Of(base.ToNode(target, attachedScript));
     }
+
+    public Target DeprecatedTargetAccessor { get => ((LegacyBehaviorNode)queue.Peek()).target; }
 }
 
 public class BehaviorNodeTest {
