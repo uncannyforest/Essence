@@ -39,7 +39,7 @@ public class StipuleBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithObject(stipule.attackAction,
-                new CoroutineWrapper(AttackBehaviorE, species),
+                AttackBehaviorE,
                 new TeleFilter(TeleFilter.Terrain.NONE, (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != team ;}

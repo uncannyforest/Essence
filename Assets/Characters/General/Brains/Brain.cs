@@ -75,14 +75,82 @@ public class Brain {
     public CharacterController movement { get => creature.controller; }
     public Pathfinding pathfinding;
     private GoodTaste taste;
-
     public Transform transform { get => species.transform; }
 
     ///////////////////
     // STATE PROPERTIES
 
-    private CreatureState oldState;
     public CreatureState state { get; private set; } = CreatureState.Command(Command.Roam());
+    private CreatureState oldState = CreatureState.WithControlOverride(CreatureState.Command(Command.Roam()), null);
+    private bool stateIsDirty = true;
+
+    public Transform Focus {
+        get => state.characterFocus.Or(null);
+        set {
+            if (Focus == null && value != null) SetFocus(value);
+            if (Focus != null && value == null) RemoveFocus();
+        }
+    }
+    public bool Focused {
+        get => state.characterFocus.HasValue;
+    }
+    public Vector3? Investigation { // trying to focus but cannot see
+        get => state.investigation;
+    }
+    public RunOnce investigationCancel = null;
+    public Transform followDirective { get => state.command?.followDirective.Or(null); }
+    public OneOf<Terrain.Position, SpriteSorter> executeDirective { 
+        get {
+            if (state.command?.executeDirective is LegacyBehaviorNode executeDirective) {
+                return executeDirective.target;
+            } else if (state.command?.executeDirective is QueueOperator executeCommandQueue) {
+                return executeCommandQueue.DeprecatedTargetAccessor;
+            } else if (state.command?.executeDirective == null) {
+                return null;
+            } else {
+                throw new NotImplementedException();
+            }
+        }
+    }
+    protected QueueOperator executeCommandQueue { get => state.command?.executeDirective as QueueOperator; }
+
+    /////////////////////////////////////////////
+    // INITIALIZATION, VIRTUAL, & UTILITY METHODS
+
+    public Brain(Species species, BrainConfig general) {
+        this.species = species;
+        this.general = general;
+    }
+    public Brain InitializeAll() {
+        pathfinding = new Pathfinding(this);
+        creature = GetComponentStrict<Creature>();
+        terrain = GameObject.FindObjectOfType<Terrain>();
+        taste = GetComponent<GoodTaste>();
+        Health health = GetComponent<Health>();
+        if (health != null) health.ReachedZero += OnHealthReachedZero;
+        ScanningBehavior = new CoroutineWrapper(ScanningBehaviorE, species);
+        OnStateChange();
+        Initialize();
+        return this;
+    }
+    virtual protected void Initialize() {}
+    virtual public List<CreatureAction> Actions() { return new List<CreatureAction>(); }
+    virtual public bool CanTame(Transform player) { return false; }
+    virtual public bool ExtractTamingCost(Transform player) { return false; }
+
+    protected CoroutineWrapper ScanningBehavior;
+    virtual protected IEnumerator ScanningBehaviorE() { yield break; }
+    public Func<IEnumerator> FocusedBehavior { get => FocusedBehaviorE; }
+    virtual protected IEnumerator FocusedBehaviorE() { yield break; }
+    protected CoroutineWrapper RunningBehavior;
+
+    protected T GetComponent<T>() => species.GetComponent<T>();
+    protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
+    virtual protected void OnHealthReachedZero() => GameObject.Destroy(creature.gameObject);
+
+    /////////////////////////
+    // STATE UPDATE FUNCTIONS
+
     public bool TryUpdateState(Senses input, int logLevel = 0) {
         OneOf<CreatureState, string> result = Will.Decide(state, input);
         if (result.Is(out CreatureState newState)) {
@@ -99,144 +167,53 @@ public class Brain {
         return false;
     }
 
-    public Transform Focus {
-        get => state.characterFocus.Or(null);
-        set {
-            if (Focus == null && value != null) SetFocus(value);
-            if (Focus != null && value == null) RemoveFocus();
-        }
-    }
-    public bool Focused {
-        get => state.characterFocus.HasValue;
-    }
-    public Vector3? Investigation { // trying to focus but cannot see
-        get => state.investigation;
-    }
-    public bool Investigating { // trying to focus but cannot see
-        get => Investigation != null;
-    }
-    public bool Busy { // not available to focus
-        get => state.type == CreatureStateType.Execute || state.type == CreatureStateType.Pair || state.type == CreatureStateType.Faint;
-    }
-    public bool TrekkingFree { // available for pairing
-        get => !Focused && !Busy;
-    }
-    protected bool Scanning {
-        get => state.type.IsScanning();
-    }
-    private bool stateIsDirty = false;
-    private MonoBehaviour controlOverride { get => state.ControlOverride; } // character controller fully controlled by another script
-    private RunOnce investigationCancel = null;
-    public Transform followDirective { get => state.command?.followDirective.Or(null); }
-    protected Vector3 stationDirective { get => state.command?.stationDirective ?? Vector3.zero; }
-    public OneOf<Terrain.Position, SpriteSorter> executeDirective { 
-        get {
-            if (state.command?.executeDirective is LegacyBehaviorNode executeDirective) {
-                return executeDirective.target;
-            } else if (state.command?.executeDirective is QueueOperator executeCommandQueue) {
-                return executeCommandQueue.DeprecatedTargetAccessor;
-            } else if (state.command?.executeDirective == null) {
-                return null;
-            } else {
-                throw new NotImplementedException();
-            }
-        }
-    }
-    protected QueueOperator executeCommandQueue {
-        get {
-            if (state.command?.executeDirective is QueueOperator executeCommandQueue)
-                return executeCommandQueue;
-            else return null;
-        }
-    }
-    protected Transform pairDirective { get => state.pairDirective.Or(null); }
-    protected Creature focusOrExecuteDirectiveIsPair { get => state.focusIsPair.Or(null); }
-
-    /////////////////////////////////////////////
-    // INITIALIZATION, VIRTUAL, & UTILITY METHODS
-
-    public Brain(Species species, BrainConfig general) {
-        this.species = species;
-        this.general = general;
-    }
-    public Brain InitializeAll() {
-        pathfinding = new Pathfinding(this);
-        creature = GetComponentStrict<Creature>();
-        terrain = GameObject.FindObjectOfType<Terrain>();
-        taste = GetComponent<GoodTaste>();
-        Health health = GetComponent<Health>();
-        if (health != null) health.ReachedZero += OnHealthReachedZero;
-        TrekkingBehavior = new CoroutineWrapper(TrekkingBehaviorE, species);
-        ScanningBehavior = new CoroutineWrapper(ScanningBehaviorE, species);
-        FocusedBehavior = new CoroutineWrapper(FocusedBehaviorE, species);
-        OnStateChange();
-        Initialize();
-        return this;
-    }
-    virtual protected void Initialize() {}
-    virtual public List<CreatureAction> Actions() { return new List<CreatureAction>(); }
-    virtual protected void Attack() {}
-    virtual public bool CanTame(Transform player) { return false; }
-    virtual public bool ExtractTamingCost(Transform player) { return false; }
-
-    protected CoroutineWrapper ScanningBehavior;
-    virtual protected IEnumerator ScanningBehaviorE() { yield break; }
-    protected CoroutineWrapper FocusedBehavior;
-    virtual protected IEnumerator FocusedBehaviorE() { yield break; }
-    protected CoroutineWrapper ExecutingBehavior { get => state.command?.executeDirective?.coroutine; }
-
-    protected T GetComponent<T>() => species.GetComponent<T>();
-    protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
-    virtual protected void OnHealthReachedZero() => GameObject.Destroy(creature.gameObject);
-
-    /////////////////////////
-    // STATE UPDATE FUNCTIONS
-
     public void DebugLogStateChange(bool triggerOnly) {
         string stateChangeText = triggerOnly ? ") changed state to " : ") processed state change to ";
         string result = species + " (team " + GetComponentStrict<Team>().TeamId + stateChangeText + state;
         Debug.Log(result);
     }
+
     public void TriggerStateChange(CreatureState oldState) {
         DebugLogStateChange(true);
         if (!stateIsDirty) this.oldState = oldState;
         stateIsDirty = true;
     }
+
     protected void OnStateChange() {
+        CreatureState originalState = oldState;
+
+        Habit newHabit = new Habit();
+        while (stateIsDirty) {
+            stateIsDirty = false;
+            Habit oldHabit = Habit.Get(oldState, this);
+            newHabit = Habit.Get(state, this);
+            if (oldState.type != state.type) {
+                oldHabit.OnExit();
+                newHabit.OnEnter();
+            } else {
+                newHabit.OnUpdate();
+            }
+        }
+        if (originalState.type == state.type && !newHabit.OnUpdate()) {
+            Debug.LogError("Should not transition from state " + state.type + " to same state: " + state);
+        }
+        RunningBehavior?.Stop();
+        if (newHabit.HasRunBehavior) {
+            RunningBehavior = new CoroutineWrapper(() => newHabit.RunBehavior(this, state.type == CreatureStateType.Execute ? (Action)CompleteExecution : (Action)EndState), species);
+            RunningBehavior.Start();
+        }
+
         DebugLogStateChange(false);
-        if (state.type == CreatureStateType.Override) {
-            ScanningBehavior.Stop();
-            FocusedBehavior.Stop();
-            TrekkingBehavior.Stop();
-            ExecutingBehavior?.Stop();
-            
-            return;
-        }
 
-        // resolve unstable states
-        if (state.type == CreatureStateType.PassiveCommand && state.followOffensive) {
-            UpdateFollowOffensive();
-            return;
-        }
-
-        // changes resulting from transitions
-        if (state.type == CreatureStateType.Faint) movement.Idle();
-        if (oldState.investigation != state.investigation) ChangedInvestigation(state.investigation != null);
-        if (oldState.type == CreatureStateType.Pair && state.type != CreatureStateType.Pair) {
-            Creature master = oldState.pairDirective.Value.GetComponent<Creature>();
-            if (master != null) master.EndPairRequest();
-        }
-        if (oldState.focusIsPair.HasValue && !state.focusIsPair.HasValue) {
-            Creature subject = oldState.focusIsPair.Value;
-            if (subject != null) subject.EndPairCommand(transform);
-        }
-
-        // run coroutines
-        FocusedBehavior.RunIf(Focused);
-        ScanningBehavior.RunIf(Scanning);
-        TrekkingBehavior.RunIf(TrekkingFree || state.type == CreatureStateType.Pair);
-        ExecutingBehavior?.RunIf(state.type == CreatureStateType.Execute);
+        ScanningBehavior.RunIf(state.type.IsScanning());
     }
+
+    private void EndState() => new Senses() {
+        endState = true
+    }.TryUpdateCreature(creature);
+
+    /////////////////////////
+    // AI SELF STATE CHANGES
 
     public void RequestFollow() {
         new Senses() { command = Command.RequestFollow() }.TryUpdateCreature(creature);
@@ -261,10 +238,16 @@ public class Brain {
     }
 
     public void CompleteExecution() {
-        ExecutingBehavior.Stop();
         bool complete = !executeCommandQueue.Pop();
         if (complete) RequestFollow();
-        else ExecutingBehavior.Start();
+        else {
+            RunningBehavior?.Stop();
+            Habit newHabit = Habit.Get(state, this);
+            if (newHabit.HasRunBehavior) {
+                RunningBehavior = new CoroutineWrapper(() => newHabit.RunBehavior(this, EndState), species);
+                RunningBehavior.Start();
+            }
+        }
     }
 
     private void SetFocus(Transform focus) => new Senses() {
@@ -283,12 +266,6 @@ public class Brain {
         environment = new Senses.Environment() { removeInvestigation = true }
     }.TryUpdateCreature(creature);
 
-    public void ChangedInvestigation(bool investigating) {
-        investigationCancel?.Stop();
-        if (investigating) investigationCancel =
-            RunOnce.Run(species, Creature.neighborhood * movement.Speed, RemoveInvestigation);
-    }
-
     public void DisableFollowOffensive() => new Senses() {
         hint = new Hint() { generallyOffensive = false }
     }.TryUpdateCreature(creature);
@@ -296,41 +273,11 @@ public class Brain {
     public void UpdateFollowOffensive() {
         Transform threat = NearestThreat();
         if (threat == null) DisableFollowOffensive();
-        Focus = threat;
+        else SetFocus(threat);
     }
 
     ///////////
     // BEHAVIOR
-
-    protected CoroutineWrapper TrekkingBehavior;
-    public IEnumerator TrekkingBehaviorE() {
-        for (int i = 0; i < 10_000; i++) {
-            if (Investigating) {
-                pathfinding.MoveToward((Vector3)Investigation);
-                yield return new WaitForSeconds(general.reconsiderRateTarget);
-                if (Investigation is Vector3 investigation && (investigation - transform.position).magnitude <
-                        general.reconsiderRateTarget * movement.Speed) { // arrived at point, found nothing
-                    RemoveInvestigation();
-                }
-            } else if (state.type == CreatureStateType.Pair) {
-                yield return pathfinding.ApproachThenIdle(pairDirective.transform.position, movement.personalBubble);
-            } else switch (state.command?.type) {
-                case CommandType.Roam:
-                    yield return pathfinding.Roam();
-                break;
-                case CommandType.Follow:
-                    yield return pathfinding.Follow(followDirective);
-                break;
-                case CommandType.Station:
-                    yield return pathfinding.ApproachThenIdle(stationDirective, 1f / CharacterController.subGridUnit);
-                break;
-                default:
-                    Debug.LogError("Weird state: " + state);
-                    yield break;
-            }
-        }
-        Debug.LogError("Forgot to add a yield return on some branch :P");
-    }
 
     protected bool IsThreat(Transform threat) => Will.IsThreat(team, transform.position, threat);
     public Transform NearestThreat() => Will.NearestThreat(team, transform.position);
@@ -341,82 +288,28 @@ public class Brain {
 
     public void Update() {
         CleanUpState();
-        if (stateIsDirty) {
-            stateIsDirty = false;
-            OnStateChange();
-        }
-        if (state.type != CreatureStateType.Override) StateAssumptions(); // put off sanity checks if overriden
+        if (stateIsDirty) OnStateChange();
+        StateAssumptions();
     }
 
     public void CleanUpState() {
-        if (Focus == null && !ReferenceEquals(Focus, null)) {
-            Debug.Log("Cleanup pre-check: focus died");
-            Focus = null;
-        }
         if (executeDirective != null && executeDirective.WhichType == typeof(SpriteSorter)
                 && (SpriteSorter)executeDirective == null) {
             Debug.Log("Cleanup pre-check: executeDirective died");
-            RequestFollow();
-        }
-        if (pairDirective == null && !ReferenceEquals(pairDirective, null)) {
-            Debug.Log("Cleanup pre-check: pairDirective died");
-            RequestFollow();
-        }
-        if (state.type == CreatureStateType.Override && controlOverride == null) {
-            Debug.LogError("controlOverride died for some reason");
-            creature.ReleaseControl();
-        }
-        if (state.followOffensive && Focus == null) {
-            Debug.Log("Cleanup post-check: follow offensive lost target");
-            UpdateFollowOffensive();
+            CompleteExecution();
         }
     }
 
     // Check for things that should never happen
     public void StateAssumptions() {
-        // Coroutines
-        if (Focus == null && FocusedBehavior.IsRunning) {
-            Debug.LogError("Focus null but FocusedBehavior running");
-            FocusedBehavior.Stop();
-        }
-        if (Focus != null && TrekkingBehavior.IsRunning) {
-            Debug.LogError("Focus nonnull but TrekkingBehavior running");
-            TrekkingBehavior.Stop();
-        }
-        if (Scanning == false && ScanningBehavior.IsRunning) {
-            Debug.LogError("Scanning false but ScanningBehavior running");
-            ScanningBehavior.Stop();
-        }
-        if (state.type != CreatureStateType.Execute && (ExecutingBehavior != null)) {
-            Debug.LogWarning("Should not have ExecutingBehavior while state is " + state.type);
-            ExecutingBehavior.Stop();
-        }
-        if (Busy && (FocusedBehavior.IsRunning || ScanningBehavior.IsRunning ||
-                (TrekkingBehavior.IsRunning && state.type != CreatureStateType.Pair))) {
-            Debug.LogError("Busy but " + (FocusedBehavior.IsRunning ? "FocusedBehavior " : null)
-                + (TrekkingBehavior.IsRunning ? "TrekkingBehavior " : null)
-                + (ScanningBehavior.IsRunning ? "ScanningBehavior " : null) + "is running");
-            FocusedBehavior.Stop();
-            TrekkingBehavior.Stop();
-            ScanningBehavior.Stop();
-        }
-        int runningBehaviors = (FocusedBehavior.IsRunning ? 1 : 0) + (TrekkingBehavior.IsRunning ? 1 : 0)
-                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? 1 : 0)
-                + (state.type == CreatureStateType.Faint ? 1 : 0);
-        if (runningBehaviors != 1) {
-            Debug.LogError("Exactly one of these must be running, but FocusedBehavior is"
-                + (FocusedBehavior.IsRunning ? null : " not") + ", TrekkingBehavior is"
-                + (TrekkingBehavior.IsRunning ? null : " not") + ", ExecutingBehavior is"
-                + (ExecutingBehavior != null && ExecutingBehavior.IsRunning ? null : " not")
-                + ", and State == Faint is " + (state.type == CreatureStateType.Faint));
-            RequestFollow(); // reset to most helpful default
-        }
+        if (state.type == CreatureStateType.Override) return; // put off sanity checks if overriden
+
         // Directives
         if (state.command?.type == CommandType.Follow && followDirective == null) {
             Debug.LogError("Following without followDirective");
             creature.CommandRoam();
         }
-        if (state.command?.type == CommandType.Station && stationDirective == Vector3.zero) {
+        if (state.command?.type == CommandType.Station && state.command?.stationDirective == null) {
             Debug.LogError("Stationed without stationDirective");
             creature.CommandRoam();
         }
@@ -424,16 +317,8 @@ public class Brain {
             Debug.LogError("Executing without executeDirective");
             creature.CommandRoam();
         }
-        if (state.command?.type == CommandType.Execute && (ExecutingBehavior == null || !ExecutingBehavior.IsRunning)) {
-            Debug.LogError("Executing without ExecutingBehavior");
-            creature.CommandRoam();
-        }
         if (state.command?.type == CommandType.Execute && followDirective == null) {
             Debug.LogError("Executing without subsequent followDirective");
-        }
-        if (state.type == CreatureStateType.Pair && pairDirective == null) {
-            Debug.LogError("Paired without pairDirective");
-            creature.CommandRoam();
         }
         // Invalid focus combinations
         if (Focus != null && Investigation != null) {

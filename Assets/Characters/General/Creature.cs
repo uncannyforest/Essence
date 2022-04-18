@@ -31,19 +31,19 @@ public struct CreatureAction {
     public static CreatureAction Instant(Sprite icon, Action<Creature> instantDirective) =>
         new CreatureAction(icon, instantDirective, null, null, null, false, false, false);
     public static CreatureAction WithObject(Sprite icon,
-            CoroutineWrapper executingBehavior,
+            Func<IEnumerator> executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.Execute(executingBehavior, target),
             filter, null, false, false, false);
     public static CreatureAction QueueableWithObject(Sprite icon,
-            CoroutineWrapper executingBehavior,
+            Func<IEnumerator> executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
             filter, null, true, false, false);
     public static CreatureAction QueueableFeature(Feature feature,
-            CoroutineWrapper executingBehavior) =>
+            Func<IEnumerator> executingBehavior) =>
         new CreatureAction(null, null,
             (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
             new TeleFilter(TeleFilter.Terrain.TILES, null), feature, true, false, false);
@@ -119,11 +119,10 @@ public class Creature : MonoBehaviour {
         controlOverride = Delta<MonoBehaviour>.Remove()
     }.TryUpdateCreature(this, 2);
     
-    public void Follow(Transform player) {
-        new Senses() { command = Command.Follow(player) }
-            .ForCreature(this).TryUpdateState(brain, 2);
-        brain.movement.SetBool("Fainted", false); // TODO remove
-    }
+    public void Follow(Transform player) => new Senses() {
+        command = Command.Follow(player)
+    }.ForCreature(this).TryUpdateState(brain, 2);
+    
     // Can call without calling CanTame() first; result will indicate whether it succeeded
     // If false, get TamingInfo for error
     public bool TryTame(Transform player) {
@@ -194,7 +193,7 @@ public class Creature : MonoBehaviour {
     // Defensive
     public void WitnessAttack(Transform assailant) => new Senses() {
         desireMessage = new DesireMessage() {
-            target = new Target(assailant.GetComponentStrict<SpriteSorter>())
+            target = new Target(assailant.GetComponentInChildren<SpriteSorter>())
         }
     }.TryUpdateCreature(this);
 
@@ -206,11 +205,11 @@ public class Creature : MonoBehaviour {
         command = Command.Station(Terrain.I.CellCenter(location))
     }.TryUpdateCreature(this);
 
-    public void Execute(CoroutineWrapper executingBehavior, Target target) => new Senses() {
+    public void Execute(Func<IEnumerator> executingBehavior, Target target) => new Senses() {
         command = Command.Execute(new LegacyBehaviorNode(executingBehavior, target))
     }.TryUpdateCreature(this);
 
-    public void ExecuteEnqueue(CoroutineWrapper executingBehavior, Target target) => new Senses() {
+    public void ExecuteEnqueue(Func<IEnumerator> executingBehavior, Target target) => new Senses() {
         command = Command.Execute(QueueOperator.Of(new LegacyBehaviorNode(executingBehavior, target)))
     }.TryUpdateCreature(this);
 

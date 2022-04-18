@@ -44,7 +44,7 @@ public class ArcherBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithObject(archer.attackAction,
-                new CoroutineWrapper(AttackBehaviorE, species),
+                AttackBehaviorE,
                 new TeleFilter(TeleFilter.Terrain.NONE, (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != team ;}
@@ -110,7 +110,6 @@ public class ArcherBrain : Brain {
         new Senses() {
             faint = true
         }.TryUpdateCreature(creature);
-        movement.SetBool("Fainted", true);
     }
 
     private bool HasBunnyNearby(Transform player) {

@@ -29,12 +29,12 @@ public class RedDwarfBrain : Brain {
             CreatureAction.QueueableWithObject(redDwarf.woodBuildAction,
                 new PathfindingEnumerator.ApproachThenBuild(this,
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain[loc] = Construction.Wood).C,
+                    (loc) => terrain[loc] = Construction.Wood).E,
                 new TeleFilter(TeleFilter.Terrain.WOODBUILDING, null)),
             CreatureAction.QueueableFeature(FeatureLibrary.P.boat,
                 new PathfindingEnumerator.ApproachThenBuild(this,
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).C)
+                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).E)
         };
     }
 

@@ -9,8 +9,8 @@ public struct CreatureState {
         return result;
     }
     
-    public bool CanTransitionTo(CreatureStateType type) => Habits.CanTransitionTo(this.type, type);
-    public bool CanTransition(int priority) => Habits.CanTransition(this.type, priority);
+    public bool CanTransitionTo(CreatureStateType type) => Habit.CanTransitionTo(this.type, type);
+    public bool CanTransition(int priority) => Habit.CanTransition(this.type, priority);
 
     public CreatureStateType type { get; private set; }
 

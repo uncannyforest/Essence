@@ -8,7 +8,7 @@ public class Will {
         int? transitionPriority = null;
         OneOf<CreatureState, string> maybeResult = Decide(old, input, ref transitionPriority);
         if (maybeResult.Is(out CreatureState result)) {
-            if (Habits.ForcedTransitionAllowed(old, result, transitionPriority)) return result;
+            if (Habit.ForcedTransitionAllowed(old, result, transitionPriority)) return result;
             else return "Lower priority (" + transitionPriority + ") " + result.type + " not allowed to replace " + old.type;
         }
         else return maybeResult;
@@ -22,7 +22,25 @@ public class Will {
     // a direct request to end that higher-priority state specifically.
     // All other requests are considered requests to escalate priority (or keep it the same level).
     public static OneOf<CreatureState, string> Decide(CreatureState state, Senses input, ref int? relinquishedPriority) {
-        if (input.controlOverride.IsAdd) {
+        if (input.endState) {
+            relinquishedPriority = (int)CreatureStateType.Override; // end anything
+            switch (state.type) {
+                case CreatureStateType.Override:
+                    return CreatureState.WithoutControlOverride(state);
+                case CreatureStateType.Execute:
+                    if (state.command?.followDirective.HasValue == true)
+                        return CreatureState.Command(Command.Follow(((Command)state.command).followDirective.Value));
+                    else return CreatureState.Command(Command.Roam()); // follow request failed
+                case CreatureStateType.Pair:
+                    return CreatureState.Unpair(state);
+                case CreatureStateType.CharacterFocus:
+                case CreatureStateType.Investigate:
+                    return state.ClearFocus();
+                case CreatureStateType.PassiveCommand:
+                    return CreatureState.Command(Command.Roam());
+                default: throw new ArgumentException("End state on wrong state");
+            }
+        } else if (input.controlOverride.IsAdd) {
             return CreatureState.WithControlOverride(state, input.controlOverride.Value);
         } else if (input.controlOverride.IsRemove) {
             relinquishedPriority = (int)CreatureStateType.Override; // end override
@@ -33,7 +51,9 @@ public class Will {
             if (state.command?.type == CommandType.Execute || command.type == CommandType.Execute) {
                 relinquishedPriority = (int)CreatureStateType.Execute; // may transition out of Execute
                 if (state.command?.type == CommandType.Execute && command.type == CommandType.Execute)
-                    command = ((Command)state.command).UpdateExecute(command);
+                    command = ((Command)state.command).UpdateExecute(command);                
+                // If Follow/Execute -> Execute, copy over followDirective
+                // If Execute -> non-Execute, request follow
                 if (!command.followDirective.HasValue) {
                     if (state.command?.followDirective.HasValue == true)
                         command.followDirective = ((Command)state.command).followDirective;
@@ -87,7 +107,7 @@ public class Will {
         } else if (input.desireMessage is DesireMessage desireMessage) {
             if (desireMessage.target.Is(out SpriteSorter target)){
                 relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
-                return DesireAttack(input.knowledge.config, input.knowledge.position, state, target.transform);
+                return DesireAttack(input.knowledge.config, input.knowledge.position, state, target.Character);
             } else throw new NotImplementedException("Desire is Position");
         } else if (input.environment is Senses.Environment environment) {
             if (environment.characterFocus.IsAdd) {

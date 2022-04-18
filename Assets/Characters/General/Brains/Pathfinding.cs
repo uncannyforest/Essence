@@ -146,9 +146,6 @@ public class PathfindingOperation<T> {
 public abstract class PathfindingEnumerator {
     private readonly Brain brain;
     PathfindingEnumerator(Brain brain) { this.brain = brain; }
-    public CoroutineWrapper C {
-        get => new CoroutineWrapper(E, brain.species);
-    }
     abstract public IEnumerator E();
 
     public class ApproachThenBuild : PathfindingEnumerator {
@@ -174,7 +171,6 @@ public abstract class PathfindingEnumerator {
                 if (reached) {
                     buildAction(buildLocation);
                     yield return new WaitForSeconds(buildTime);
-                    brain.CompleteExecution(); 
                     yield break;
                 } else yield return approachWait;
             }

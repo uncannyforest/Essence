@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BehaviorNode {
-    virtual public CoroutineWrapper coroutine { get; protected set; }
+    virtual public Func<IEnumerator> enumerator { get; protected set; }
 
-    public BehaviorNode(CoroutineWrapper coroutine) {
-        this.coroutine = coroutine;
+    protected BehaviorNode() {}
+    public BehaviorNode(Func<IEnumerator> enumerator) {
+        this.enumerator = enumerator;
     }
     
     virtual public BehaviorNode UpdateWithNewBehavior(BehaviorNode newNode) {
@@ -16,21 +17,21 @@ public class BehaviorNode {
 }
 
 public class BehaviorNodeShell<T> {
-    private CoroutineWrapper<T> coroutineWithParam;
+    private Func<T, IEnumerator> enumeratorWithParam;
 
     public BehaviorNodeShell(Func<T, IEnumerator> enumeratorWithParam) {
-        this.coroutineWithParam = CoroutineWrapper.WithParam(enumeratorWithParam);
+        this.enumeratorWithParam = enumeratorWithParam;
     }
 
-    virtual public BehaviorNode ToNode(T target, MonoBehaviour attachedScript) {
-        return new BehaviorNode(coroutineWithParam.Of(target, attachedScript));
+    virtual public BehaviorNode ToNode(T target) {
+        return new BehaviorNode(() => enumeratorWithParam(target));
     }
 }
 
 public class LegacyBehaviorNode : BehaviorNode {
     public Target target { get; protected set; }
 
-    public LegacyBehaviorNode(CoroutineWrapper coroutine, Target target) : base(coroutine) {
+    public LegacyBehaviorNode(Func<IEnumerator> enumerator, Target target) : base(enumerator) {
         this.target = target;
     }
 }
@@ -38,12 +39,12 @@ public class LegacyBehaviorNode : BehaviorNode {
 public class QueueOperator : BehaviorNode {
     private Queue<BehaviorNode> queue = new Queue<BehaviorNode>();
 
-    override public CoroutineWrapper coroutine {
-        get => (queue.Peek()).coroutine;
+    override public Func<IEnumerator> enumerator {
+        get => (queue.Peek()).enumerator;
         protected set => throw new NotSupportedException();
     }
 
-    public QueueOperator() : base(null) {}
+    public QueueOperator() : base() {}
     public static QueueOperator Of(BehaviorNode node) {
         QueueOperator queueNode = new QueueOperator();
         queueNode.queue.Enqueue(node);
@@ -59,16 +60,15 @@ public class QueueOperator : BehaviorNode {
     }
 
     public bool Pop() {
-        if (queue.Count == 0) return false;
         queue.Dequeue();
-        return true;
+        return (queue.Count > 0);
     }
 
     public class Shell<T> : BehaviorNodeShell<T> {
         public Shell(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
 
-        override public BehaviorNode ToNode(T target, MonoBehaviour attachedScript) =>
-            QueueOperator.Of(base.ToNode(target, attachedScript));
+        override public BehaviorNode ToNode(T target) =>
+            QueueOperator.Of(base.ToNode(target));
     }
 
     public Target DeprecatedTargetAccessor { get => ((LegacyBehaviorNode)queue.Peek()).target; }
@@ -77,7 +77,7 @@ public class QueueOperator : BehaviorNode {
 public class BehaviorNodeTest {
     public static void Test() {
         BehaviorNodeShell<int> testFactory = new BehaviorNodeShell<int>(TestE);
-        BehaviorNode actualNode = testFactory.ToNode(6, null);
+        BehaviorNode actualNode = testFactory.ToNode(6);
     }
 
     private static IEnumerator TestE(int i) {

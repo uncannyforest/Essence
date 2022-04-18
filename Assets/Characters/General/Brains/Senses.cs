@@ -111,6 +111,8 @@ public struct Senses {
         return ForCreature(creature).TryUpdateState(creature.brain, logLevel);
     }
 
+    public bool endState;
+
     public Delta<MonoBehaviour> controlOverride;
 
     public bool faint;
