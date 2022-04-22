@@ -8,6 +8,16 @@ public class Target : OneOf<Terrain.Position, SpriteSorter> {
     public Target(Terrain.Position t) : base(t) {}
     public Target(SpriteSorter u) : base(u) {}
     new public static Target Neither { get => new Target(); }
+
+    public Vector3 Position {
+        get {
+            if (this.Is(out Terrain.Position position))
+                return Terrain.I.CellCenter(position);
+            else if (this.Is(out SpriteSorter character))
+                return character.Character.position;
+            else throw new InvalidOperationException("Neither");
+        }
+    }
 }
 
 public class TeleFilter {

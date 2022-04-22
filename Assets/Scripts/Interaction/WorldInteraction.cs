@@ -176,7 +176,7 @@ public class WorldInteraction : MonoBehaviour {
             [Terrain.Grid.YWalls] = uiMapEdgeY,
             [Terrain.Grid.Roof] = uiMap
         };
-        ConfirmOngoing = new CoroutineWrapper(ConfirmOngoingE, this);
+        ConfirmOngoing = new TaskRunner(ConfirmOngoingE, this);
         inventory = player.GetComponentStrict<Inventory>();
         Orientor.I.onRotation += ClearTile;
     }
@@ -313,7 +313,7 @@ public class WorldInteraction : MonoBehaviour {
         switch (PlayerAction) {
             case Mode.Sword:
             case Mode.Arrow:
-                if (!ConfirmOngoing.IsRunning) ConfirmOngoing.Start();
+                if (!ConfirmOngoing.isRunning) ConfirmOngoing.Start();
             break;
             case Mode.Praxel:
                 coord = (Vector2Int)activeTile;
@@ -403,7 +403,7 @@ public class WorldInteraction : MonoBehaviour {
         }
     }
 
-    private CoroutineWrapper ConfirmOngoing;
+    private TaskRunner ConfirmOngoing;
     private IEnumerator ConfirmOngoingE() {
         bool toolChanged = false;
         int i = 0;

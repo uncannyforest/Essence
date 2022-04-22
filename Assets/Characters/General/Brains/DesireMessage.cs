@@ -7,4 +7,8 @@ public struct DesireMessage {
     }
 
     public Target target;
+
+    override public string ToString() {
+        return "DesireMessage target: " + target;
+    }
 }

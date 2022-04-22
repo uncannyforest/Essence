@@ -16,35 +16,73 @@ public class BehaviorNode {
     }
 }
 
-public class BehaviorNodeShell<T> {
-    private Func<T, IEnumerator> enumeratorWithParam;
+public class RestrictNearbyBehavior : BehaviorNode {
+    private BehaviorNode subBehavior;
+    private Transform ai;
+    private Target target;
+    private float distance;
 
-    public BehaviorNodeShell(Func<T, IEnumerator> enumeratorWithParam) {
-        this.enumeratorWithParam = enumeratorWithParam;
+    public RestrictNearbyBehavior(BehaviorNode subBehavior, Transform ai, Target target, float distance) {
+        this.subBehavior = subBehavior;
+        this.ai = ai;
+        this.target = target;
+        this.distance = distance;
+        this.enumerator = E;
     }
-
-    virtual public BehaviorNode ToNode(T target) {
-        return new BehaviorNode(() => enumeratorWithParam(target));
+    
+    public IEnumerator E() {
+        IEnumerator task = subBehavior.enumerator(); // saved here, not reset unless RunBehavior() is called again
+        while (Vector3.Distance(ai.position, target.Position) < distance && task.MoveNext()) {
+            yield return task.Current;
+        }
     }
 }
 
-public class LegacyBehaviorNode : BehaviorNode {
-    public Target target { get; protected set; }
+public class TargetedBehavior<T> {
+    public Func<T, IEnumerator> enumeratorWithParam;
 
-    public LegacyBehaviorNode(Func<IEnumerator> enumerator, Target target) : base(enumerator) {
-        this.target = target;
+    protected TargetedBehavior() {}
+    public TargetedBehavior(Func<T, IEnumerator> enumeratorWithParam) {
+        this.enumeratorWithParam = enumeratorWithParam;
     }
+    public TargetedBehavior(Func<T, YieldInstruction> singleLine) {
+        this.enumeratorWithParam = (target) => FromSingleLine(singleLine, target);
+    }
+
+    virtual public BehaviorNode WithTarget(T target) {
+        return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
+    }
+
+    private IEnumerator FromSingleLine(Func<T, YieldInstruction> line, T target) {
+        while (true) yield return line(target);
+    }
+
+    private IEnumerator CheckNonNullTargetEnumerator(T target) {
+        IEnumerator task = enumeratorWithParam(target);
+        while (target != null && task.MoveNext()) {
+            yield return task.Current;
+        }
+    }
+
+    public TargetedBehavior<U> For<U>(Func<U, T> func) => new TargetedBehavior<U>(
+        (target) =>enumeratorWithParam(func(target))
+    );
+}
+
+public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
+    public CharacterTargetedBehavior(Func<Transform, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
+    public CharacterTargetedBehavior(Func<Transform, YieldInstruction> singleLine) : base(singleLine) {}
+
+    public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((SpriteSorter)t).Character);
 }
 
 public class QueueOperator : BehaviorNode {
     private Queue<BehaviorNode> queue = new Queue<BehaviorNode>();
 
-    override public Func<IEnumerator> enumerator {
-        get => (queue.Peek()).enumerator;
-        protected set => throw new NotSupportedException();
+    public QueueOperator() : base() {
+        this.enumerator = QueueEnumerator;
     }
 
-    public QueueOperator() : base() {}
     public static QueueOperator Of(BehaviorNode node) {
         QueueOperator queueNode = new QueueOperator();
         queueNode.queue.Enqueue(node);
@@ -64,23 +102,20 @@ public class QueueOperator : BehaviorNode {
         return (queue.Count > 0);
     }
 
-    public class Shell<T> : BehaviorNodeShell<T> {
-        public Shell(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
+    public class Targeted<T> : TargetedBehavior<T> {
+        public Targeted(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
 
-        override public BehaviorNode ToNode(T target) =>
-            QueueOperator.Of(base.ToNode(target));
+        override public BehaviorNode WithTarget(T target) =>
+            QueueOperator.Of(base.WithTarget(target));
     }
 
-    public Target DeprecatedTargetAccessor { get => ((LegacyBehaviorNode)queue.Peek()).target; }
-}
-
-public class BehaviorNodeTest {
-    public static void Test() {
-        BehaviorNodeShell<int> testFactory = new BehaviorNodeShell<int>(TestE);
-        BehaviorNode actualNode = testFactory.ToNode(6);
-    }
-
-    private static IEnumerator TestE(int i) {
-        yield return null;
+    private IEnumerator QueueEnumerator() {
+        while (queue.Count > 0) {
+            IEnumerator subBehavior = queue.Peek().enumerator(); // saved here, not reset unless RunBehavior() is called again
+            while (subBehavior.MoveNext()) {
+                yield return subBehavior.Current;
+            }
+            Pop();
+        }
     }
 }

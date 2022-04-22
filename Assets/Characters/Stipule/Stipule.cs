@@ -39,37 +39,24 @@ public class StipuleBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithObject(stipule.attackAction,
-                AttackBehaviorE,
-                new TeleFilter(TeleFilter.Terrain.NONE, (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
+                AttackBehavior.ForTarget(),
+                new TeleFilter(TeleFilter.Terrain.NONE, (c) => 
                     c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != team ;}
+                    c.GetComponentStrict<Team>().TeamId != team
                 ))
         };
     }
 
-    override protected IEnumerator ScanningBehaviorE() {
-        while (true) {
-            yield return new WaitForSeconds(general.scanningRate);
-            if (Focused && IsThreat(Focus)) continue;
-            
-            if (state.command?.type == CommandType.Roam || state.command?.type == CommandType.Station)
-                Focus = NearestThreat();
-            else Focus = null;
-        }
-    }
+    override public Optional<Transform> FindFocus() => Will.NearestThreat(this);
 
-    override protected IEnumerator FocusedBehaviorE() {
-        while (Focused) {
-            yield return pathfinding.Approach(Focus, stipule.meleeReach).Then("Attack", Attack);
-        }
-        Debug.Log("Focus just ended, exiting FocusedBehavior");
-    }
+    override public IEnumerator FocusedBehavior(Transform focus) => AttackBehavior.enumeratorWithParam(focus);
     
-    private IEnumerator AttackBehaviorE() {
-        while (((SpriteSorter)executeDirective) != null) {
-            yield return pathfinding.Approach(((SpriteSorter)executeDirective).Character, stipule.meleeReach).Then("Attack", Attack);
-        }
-        Debug.Log("Attack just ended, exiting AttackBehavior");
+    private CharacterTargetedBehavior AttackBehavior {
+        get => new CharacterTargetedBehavior((Transform focus) =>
+            pathfinding.Approach(focus.position, stipule.meleeReach).Else(
+                pathfinding.FaceAnd("Attack", focus.position, () => Attack(focus))
+            )
+        );
     }
 
     private void Attack(Transform target) {

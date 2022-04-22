@@ -44,6 +44,11 @@ public struct Optional<T> {
         else return defaultValue;
     }
 
+    public T Else(Func<T> fallback) {
+        if (HasValue) return value;
+        else return fallback();
+    }
+
     public static explicit operator T(Optional<T> optional) {
         return optional.Value;
     }

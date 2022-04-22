@@ -37,7 +37,7 @@ public class Boat : MonoBehaviour {
     private Vector2 currentVelocity = Vector2.zero;
     private Vector2Int currentTile;
     private Vector2 currentShoreCorrection;
-    private CoroutineWrapper CreatureExits;
+    private TaskRunner CreatureExits;
     private Vector2 exitLocation;
 
     void Start() {
@@ -46,7 +46,7 @@ public class Boat : MonoBehaviour {
         movement.CrossingTile += HandleCrossingTile;
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
-        CreatureExits = new CoroutineWrapper(CreatureExitE, this);
+        CreatureExits = new TaskRunner(CreatureExitE, this);
         for (int i = 0; i < 4; i++) 
             seatSorters[i] = seats.GetChild(i).GetComponentStrict<SortingGroup>();
 

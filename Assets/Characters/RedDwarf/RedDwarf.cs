@@ -26,15 +26,15 @@ public class RedDwarfBrain : Brain {
 
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
-            CreatureAction.QueueableWithObject(redDwarf.woodBuildAction,
-                new PathfindingEnumerator.ApproachThenBuild(this,
+            CreatureAction.WithObject(redDwarf.woodBuildAction,
+                pathfinding.ApproachThenBuild(
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain[loc] = Construction.Wood).E,
+                    (loc) => terrain[loc] = Construction.Wood).ForTarget(),
                 new TeleFilter(TeleFilter.Terrain.WOODBUILDING, null)),
-            CreatureAction.QueueableFeature(FeatureLibrary.P.boat,
-                new PathfindingEnumerator.ApproachThenBuild(this,
+            CreatureAction.WithFeature(FeatureLibrary.P.boat,
+                pathfinding.ApproachThenBuild(
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).E)
+                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).ForVector2Int())
         };
     }
 
@@ -44,14 +44,4 @@ public class RedDwarfBrain : Brain {
     public override bool ExtractTamingCost(Transform player) =>
         player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Gemstone, redDwarf.tamingCost);
 
-
-    override protected IEnumerator ScanningBehaviorE() {
-        while (true) {
-            yield return new WaitForSeconds(general.scanningRate);
-        }
-    }
-
-    override protected IEnumerator FocusedBehaviorE() {
-        yield break; // not implemented
-    }
 }

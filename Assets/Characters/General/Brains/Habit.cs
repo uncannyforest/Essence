@@ -12,13 +12,9 @@ public enum CreatureStateType {
     Investigate = 260,
     PassiveCommand = 100,
 }
-
 public static class CreatureStateTypeExtensions {
     public static bool IsScanning(this CreatureStateType type) {
-        return (int)type < 400;
-    }
-    public static bool IsTrekking(this CreatureStateType type) {
-        return (int)type <= 300;
+        return (int)type < 300;
     }
     public static bool CanTransition(this CreatureStateType from, int priority) {
         return priority >= (int)from;
@@ -29,6 +25,9 @@ public static class CreatureStateTypeExtensions {
 }
 
 public struct Habit {
+
+    // class properties and methods
+
     private Node node;
     private CreatureState creatureState;
     private Brain brain;
@@ -38,11 +37,13 @@ public struct Habit {
         this.brain = brain;
     }
     public bool HasRunBehavior { get => node.onRun != null || node.onRunStep != null; }
-    public IEnumerator RunBehavior(Brain brain, Action doneRunning) =>
-        node.RunBehavior(brain, doneRunning);
+    public IEnumerator RunBehavior(CreatureState state, Brain brain, Action doneRunning) =>
+        node.RunBehavior(state, brain, doneRunning);
     public void OnEnter() => node.onEnter(creatureState, brain);
     public void OnExit() => node.onExit(creatureState, brain);
     public bool OnUpdate() => node.onUpdate(creatureState, brain);
+
+    // static methods
 
     public static bool CanTransitionTo(CreatureStateType from, CreatureStateType type) => from.CanTransitionTo(type);
     public static bool CanTransition(CreatureStateType from, int priority) => from.CanTransition(priority);
@@ -53,14 +54,16 @@ public struct Habit {
 
     public static Habit Get(CreatureState state, Brain brain) => new Habit(Nodes[state.type], state, brain);
 
+    // Node class
+
     public class Node {
         public CreatureStateType type;
-        public Action<CreatureState, Brain> onEnter = (s, b) => {};
-        public Action<CreatureState, Brain> onExit = (s, b) => {};
-        public Func<CreatureState, Brain, bool> onUpdate = (s, b) => false;
-        public Func<CreatureState, bool> onRunCheck = (s) => true;
-        public Func<Brain, Func<IEnumerator>> onRun; // retrieved on the second frame of RunBehavior()
-        public Func<CreatureState, Brain, WaitForSeconds> onRunStep;
+        public Action<CreatureState, Brain> onEnter = (s, b) => {}; // run on transition from another CreatureStateType
+        public Action<CreatureState, Brain> onExit = (s, b) => {}; // run on transition to another CreatureStateType
+        public Func<CreatureState, Brain, bool> onUpdate = (s, b) => false; // run on transition to same type, return false if illegal
+        public Func<CreatureState, Brain, bool> onRunCheck = (s, b) => true; // while condition for run behavior
+        public Func<CreatureState, Brain, BehaviorNode> onRun; // retrieved on the second frame of RunBehavior()
+        public Func<CreatureState, Brain, YieldInstruction> onRunStep; // single step alternative to onRun
 
         public Node (CreatureStateType type) => this.type = type;
 
@@ -73,7 +76,7 @@ public struct Habit {
             return this;
         }
 
-        public Func<Brain, Action, IEnumerator> RunBehavior {
+        public Func<CreatureState, Brain, Action, IEnumerator> RunBehavior {
             get {
                 if (onRun != null) return RunBehaviorEnumerator;
                 else if (onRunStep != null) return RunBehaviorStep;
@@ -81,28 +84,30 @@ public struct Habit {
             }
         }
 
-        private IEnumerator RunBehaviorEnumerator(Brain brain, Action doneRunning) {
+        private IEnumerator RunBehaviorEnumerator(CreatureState state, Brain brain, Action doneRunning) {
             yield return null;
-            IEnumerator subBehavior = onRun(brain)(); // saved here, not reset unless RunBehavior() is called again
-            while (onRunCheck(brain.state) && subBehavior.MoveNext()) {
+            IEnumerator subBehavior = onRun(state, brain).enumerator(); // saved here, not reset unless RunBehavior() is called again
+            while (onRunCheck(state, brain) && subBehavior.MoveNext()) {
                 yield return subBehavior.Current;
             }
             doneRunning();
         }
 
-        private IEnumerator RunBehaviorStep(Brain brain, Action doneRunning) {
+        private IEnumerator RunBehaviorStep(CreatureState state, Brain brain, Action doneRunning) {
             yield return null;
-            while (onRunCheck(brain.state)) {
-                yield return onRunStep(brain.state, brain);
+            while (onRunCheck(state, brain)) {
+                yield return onRunStep(state, brain);
             }
             doneRunning();
         }
 
     }
 
+    // all state specs
+
     private static Dictionary<CreatureStateType, Node> Nodes = new Dictionary<CreatureStateType, Node>() {
         [CreatureStateType.Override] = new Node(CreatureStateType.Override) {
-            onRunCheck = (state) => state.ControlOverride != null,
+            onRunCheck = (state, _) => state.ControlOverride != null,
         },
 
         [CreatureStateType.Faint] = new Node(CreatureStateType.Faint) {
@@ -115,7 +120,7 @@ public struct Habit {
 
         [CreatureStateType.Execute] = new Node(CreatureStateType.Execute) {
             onUpdate = (_, __) => true,
-            onRun = (brain) => brain.state.command?.executeDirective?.enumerator
+            onRun = (state, _) => state.command?.executeDirective
         },
 
         [CreatureStateType.CharacterFocus] = new Node(CreatureStateType.CharacterFocus) {
@@ -124,8 +129,9 @@ public struct Habit {
                     state.focusIsPair.Value?.EndPairCommand(brain.transform);
                 }
             },
-            onRunCheck = (state) => !state.characterFocus.IsDestroyed,
-            onRun = (brain) => brain.FocusedBehavior,
+            onRunCheck = (state, brain) => !state.characterFocus.IsDestroyed &&
+                    brain.IsValidFocus(state.characterFocus.Value),
+            onRun = (state, brain) => new TargetedBehavior<Transform>(brain.FocusedBehavior).WithTarget(state.characterFocus.Value),
         },
 
         [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {
@@ -133,7 +139,7 @@ public struct Habit {
                 Creature master = state.pairDirective.Value.GetComponent<Creature>();
                 if (master != null) master.EndPairRequest();
             },
-            onRunCheck = (state) => !state.pairDirective.IsDestroyed,
+            onRunCheck = (state, _) => !state.pairDirective.IsDestroyed,
             onRunStep = (state, brain) => brain.pathfinding.ApproachThenIdle(state.pairDirective.Value.transform.position, brain.movement.personalBubble)
         },
 
@@ -141,10 +147,10 @@ public struct Habit {
             onEnter = (_, brain) => brain.investigationCancel =
                 RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
             onExit = (_, brain) => brain.investigationCancel.Stop(),
-            onRunStep = (_, brain) => {
-                if (((Vector3)brain.Investigation - brain.transform.position).magnitude <
+            onRunStep = (state, brain) => {
+                if (((Vector3)state.investigation - brain.transform.position).magnitude <
                         brain.general.reconsiderRateTarget * brain.movement.Speed) brain.RemoveInvestigation();
-                brain.pathfinding.MoveToward((Vector3)brain.Investigation);
+                brain.pathfinding.MoveToward((Vector3)state.investigation);
                 return new WaitForSeconds(brain.general.reconsiderRateTarget);  
             },
         }.ExitAndEnterOnUpdate(),

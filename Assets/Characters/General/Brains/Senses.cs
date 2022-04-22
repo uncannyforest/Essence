@@ -50,8 +50,8 @@ public struct Command {
     public override string ToString() {
         string result = type.ToString();
         if (followDirective.HasValue) result += " | follow: " + followDirective.Value.gameObject.name;
-        if (stationDirective is Vector3 directive) result += " station: " + directive;
-        if (executeDirective != null) result += " execute: " + executeDirective;
+        if (stationDirective is Vector3 directive) result += " | station: " + directive;
+        if (executeDirective != null) result += " | execute: " + executeDirective;
         return result;
     }
 }
@@ -83,11 +83,24 @@ public struct CreatureMessage {
         message.type = Type.EndPairToMaster;
         return message;
     }
+
+    override public string ToString() {
+        string result = type.ToString();
+        if (master != null) result += " master: " + master.gameObject.name;
+        return result;
+    }
 }
 
 public struct Hint {
     public bool generallyOffensive;
     public Optional<Transform> target;
+
+    override public string ToString() {
+        string result = "";
+        if (generallyOffensive) result += " generally offensive";
+        if (target.HasValue) result += " target: " + target.Value.gameObject.name;
+        return result.Substring(1);
+    }
 }
 
 public struct Senses {
@@ -130,6 +143,14 @@ public struct Senses {
         public Delta<Transform> characterFocus;
         public Optional<Creature> focusIsPair;
         public bool removeInvestigation;
+
+        override  public string ToString(){
+            string result = "";
+            if (characterFocus.IsAdd) result += " add character focus: " + characterFocus.Value.gameObject.name;
+            if (characterFocus.IsRemove) result += " remove character focus";
+            if (removeInvestigation) result += " remove investigation";
+            return result.Substring(1);
+        }
     }
 
     public PersistentProperties knowledge;
@@ -149,5 +170,19 @@ public struct Senses {
                 creature.transform.position,
                 creature.GetComponentStrict<Team>().TeamId);
         }
+    }
+
+    override public string ToString() {
+        string result = "";
+        if (endState) result += " end state";
+        if (controlOverride.IsAdd) result += " add control override: " + controlOverride.Value;
+        if (controlOverride.IsRemove) result += " remove control override";
+        if (faint) result += " faint";
+        if (command is Command actualCommand) result += " command: " + actualCommand;
+        if (hint is Hint actualHint) result += " hint: " + hint;
+        if (message is CreatureMessage actualMessage) result += " creature message: " + actualMessage;
+        if (desireMessage is DesireMessage actualDesireMessage) result += " desire message: " + actualDesireMessage;
+        if (environment is Environment actualEnvironment) result += " environment: " + actualEnvironment;
+        return result.Substring(1);
     }
 }

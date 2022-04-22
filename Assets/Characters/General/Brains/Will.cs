@@ -67,6 +67,12 @@ public class Will {
             } else if (command.type == CommandType.Roam) {
                 relinquishedPriority = (int)CreatureStateType.PassiveCommand; // to another command
                 return state.UpdatePassiveCommand(command);
+            } else if (command.type == CommandType.Follow) {
+                relinquishedPriority = (int)CreatureStateType.CharacterFocus; // clear focus
+                if (Team.SameTeam(input.knowledge.team, command.followDirective.Value))
+                    return CreatureState.Command(command);
+                else return "Creature on team " + input.knowledge.team +
+                    " not willing to follow " + command.followDirective.Value.gameObject.name;
             } else {
                 relinquishedPriority = (int)CreatureStateType.CharacterFocus; // clear focus
                 return CreatureState.Command(command);
@@ -164,8 +170,10 @@ public class Will {
     public static bool IsThreat(int team, Vector3 creaturePosition, Transform threat) =>
         !Team.SameTeam(team, threat) && CanSee(creaturePosition, threat);
 
-    public static Transform NearestThreat(int team, Vector3 creaturePosition) => NearestThreat(team, creaturePosition, null);
-    public static Transform NearestThreat(int team, Vector3 creaturePosition, Func<Collider2D, bool> filter) {
+    public static Optional<Transform> NearestThreat(Brain brain) => NearestThreat(brain, null);
+    public static Optional<Transform> NearestThreat(Brain brain, Func<Collider2D, bool> filter) {
+        int team = brain.team;
+        Vector3 creaturePosition = brain.transform.position;
         Collider2D[] charactersNearby =
             Physics2D.OverlapCircleAll(creaturePosition, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
         List<Transform> threats = new List<Transform>();
@@ -175,7 +183,7 @@ public class Will {
                         character.GetComponent<PlayerCharacter>() != null)
                     threats.Add(character.transform);
         }
-        if (threats.Count == 0) return null;
-        return threats.MinBy(threat => (threat.position - creaturePosition).sqrMagnitude);
+        if (threats.Count == 0) return Optional<Transform>.Empty();
+        return Optional.Of(threats.MinBy(threat => (threat.position - creaturePosition).sqrMagnitude));
     }
 }

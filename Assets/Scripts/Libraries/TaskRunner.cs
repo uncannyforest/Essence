@@ -2,16 +2,16 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class CoroutineWrapper {
-    protected Func<IEnumerator> enumeratorGenerator;
+public class TaskRunner {
+    protected Func<IEnumerator> task;
     protected Coroutine coroutine;
     protected MonoBehaviour attachedScript;
-    protected bool isRunning;
+    public bool isRunning { get; protected set; }
 
-    protected CoroutineWrapper() {}
+    protected TaskRunner() {}
 
-    public CoroutineWrapper(Func<IEnumerator> enumeratorGenerator, MonoBehaviour attachedScript) {
-        this.enumeratorGenerator = enumeratorGenerator;
+    public TaskRunner(Func<IEnumerator> task, MonoBehaviour attachedScript) {
+        this.task = task;
         this.attachedScript = attachedScript;
     }
 
@@ -23,7 +23,7 @@ public class CoroutineWrapper {
     public void Start() {
         Stop();
         isRunning = true;
-        coroutine = attachedScript.StartCoroutine(enumeratorGenerator.Invoke());
+        coroutine = attachedScript.StartCoroutine(task.Invoke());
     }
 
     public void Stop() {
@@ -31,8 +31,10 @@ public class CoroutineWrapper {
         if (coroutine != null) attachedScript.StopCoroutine(coroutine);
     }
 
-    public bool IsRunning {
-        get => isRunning;
+    public void SwapOut(Func<IEnumerator> task) {
+        Stop();
+        this.task = task;
+        Start();
     }
 
     public static CoroutineWrapper<T> WithParam<T>(Func<T, IEnumerator> enumeratorGenerator) {
@@ -47,12 +49,12 @@ public class CoroutineWrapper<T> {
         this.enumeratorGenerator = enumeratorGenerator;
     }
 
-    public CoroutineWrapper Of(T t, MonoBehaviour attachedScript) {
-        return new CoroutineWrapper(() => enumeratorGenerator(t), attachedScript);
+    public TaskRunner Of(T t, MonoBehaviour attachedScript) {
+        return new TaskRunner(() => enumeratorGenerator(t), attachedScript);
     }
 }
 
-public class RunOnce : CoroutineWrapper {
+public class RunOnce : TaskRunner {
     private Action action;
     private float seconds;
 
@@ -60,7 +62,7 @@ public class RunOnce : CoroutineWrapper {
         this.action = action;
         this.seconds = seconds;
         this.attachedScript = attachedScript;
-        this.enumeratorGenerator = RunOnceE;
+        this.task = RunOnceE;
     }
 
     public static RunOnce Run(MonoBehaviour attachedScript, float seconds, Action action) {

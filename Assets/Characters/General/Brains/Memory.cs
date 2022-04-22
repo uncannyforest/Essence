@@ -124,7 +124,7 @@ public struct CreatureState {
     public override string ToString() {
         string result = type.ToString();
         if (type == CreatureStateType.Override) result +=
-            " | control override: " + controlOverride.Value.gameObject.name
+            " | control override: " + controlOverride.Value
             + " | previous state: " + controlOverridePrevState;
         if (command is Command actualCommand) result += " | command: " + command;
         if (pairDirective.HasValue) result += " | pair directive: " + pairDirective.Value.gameObject.name;

@@ -21,7 +21,7 @@ public class CharacterController : MonoBehaviour {
     [NonSerialized] new public Collider2D collider;
     [NonSerialized] public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
     private Animator animator; // may be null
-    private CoroutineWrapper MoveCoroutine;
+    private TaskRunner MoveCoroutine;
     
     private Vector2 velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
@@ -37,7 +37,7 @@ public class CharacterController : MonoBehaviour {
     }
     
     void Start() {
-        MoveCoroutine = new CoroutineWrapper(MoveCoroutineE, this);
+        MoveCoroutine = new TaskRunner(MoveCoroutineE, this);
         MoveCoroutine.Start();
         Speed = defaultSpeed;
     }

@@ -31,22 +31,16 @@ public struct CreatureAction {
     public static CreatureAction Instant(Sprite icon, Action<Creature> instantDirective) =>
         new CreatureAction(icon, instantDirective, null, null, null, false, false, false);
     public static CreatureAction WithObject(Sprite icon,
-            Func<IEnumerator> executingBehavior,
+            TargetedBehavior<Target> executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
-            (creature, target) => creature.Execute(executingBehavior, target),
-            filter, null, false, false, false);
-    public static CreatureAction QueueableWithObject(Sprite icon,
-            Func<IEnumerator> executingBehavior,
-            TeleFilter filter) =>
-        new CreatureAction(icon, null,
-            (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
-            filter, null, true, false, false);
-    public static CreatureAction QueueableFeature(Feature feature,
-            Func<IEnumerator> executingBehavior) =>
+            (creature, target) => creature.Execute(executingBehavior.WithTarget(target)),
+            filter, null, executingBehavior is QueueOperator.Targeted<Target>, false, false);
+    public static CreatureAction WithFeature(Feature feature,
+            TargetedBehavior<Vector2Int> executingBehavior) =>
         new CreatureAction(null, null,
-            (creature, target) => creature.ExecuteEnqueue(executingBehavior, target),
-            new TeleFilter(TeleFilter.Terrain.TILES, null), feature, true, false, false);
+            (creature, target) => creature.Execute(executingBehavior.WithTarget(((Terrain.Position)target).Coord)),
+            new TeleFilter(TeleFilter.Terrain.TILES, null), feature, executingBehavior is QueueOperator.Targeted<Vector2Int>, false, false);
     public static CreatureAction Roam =
         new CreatureAction(null, (creature) => creature.CommandRoam(), null, null, null, false, true, false);
     public static CreatureAction Station =
@@ -121,7 +115,7 @@ public class Creature : MonoBehaviour {
     
     public void Follow(Transform player) => new Senses() {
         command = Command.Follow(player)
-    }.ForCreature(this).TryUpdateState(brain, 2);
+    }.TryUpdateCreature(this, 1);
     
     // Can call without calling CanTame() first; result will indicate whether it succeeded
     // If false, get TamingInfo for error
@@ -138,8 +132,6 @@ public class Creature : MonoBehaviour {
         if (cMaybeDespawn != null) StopCoroutine(cMaybeDespawn);
         GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
         Follow(player);
-    }
-    public void ForceTame(int team) {
     }
     public ExpandableInfo TamingInfo {
         get => GenerateTamingInfo(creatureName, tamingInfoShort, tamingInfoLong);
@@ -205,12 +197,8 @@ public class Creature : MonoBehaviour {
         command = Command.Station(Terrain.I.CellCenter(location))
     }.TryUpdateCreature(this);
 
-    public void Execute(Func<IEnumerator> executingBehavior, Target target) => new Senses() {
-        command = Command.Execute(new LegacyBehaviorNode(executingBehavior, target))
-    }.TryUpdateCreature(this);
-
-    public void ExecuteEnqueue(Func<IEnumerator> executingBehavior, Target target) => new Senses() {
-        command = Command.Execute(QueueOperator.Of(new LegacyBehaviorNode(executingBehavior, target)))
+    public void Execute(BehaviorNode executingBehavior) => new Senses() {
+        command = Command.Execute(executingBehavior)
     }.TryUpdateCreature(this);
 
     private Coroutine cMaybeDespawn;
@@ -235,7 +223,7 @@ public class Creature : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collider) {
         Boat boat = collider.transform.parent.GetComponent<Boat>();
-        if (boat != null && boat.player == brain.followDirective?.GetComponent<PlayerCharacter>())
+        if (boat != null && boat.player == brain.state.command?.followDirective.Or(null)?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
     }
 

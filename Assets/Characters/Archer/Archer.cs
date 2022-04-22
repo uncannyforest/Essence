@@ -44,7 +44,7 @@ public class ArcherBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithObject(archer.attackAction,
-                AttackBehaviorE,
+                new CharacterTargetedBehavior(FocusedBehavior).ForTarget(),
                 new TeleFilter(TeleFilter.Terrain.NONE, (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != team ;}
@@ -52,31 +52,14 @@ public class ArcherBrain : Brain {
         };
     }
 
-    override protected IEnumerator ScanningBehaviorE() {
-        while (true) {
-            yield return new WaitForSeconds(general.scanningRate);
-            if (Focused && IsThreat(Focus)) continue;
-            
-            if (state.command?.type == CommandType.Roam || state.command?.type == CommandType.Station)
-                Focus = NearestThreat((threat) => threat.GetComponent<Archer>() == null);
-            else Focus = null;
-        }
-    }
+    override public Optional<Transform> FindFocus() => Will.NearestThreat(this,
+        (threat) => threat.GetComponent<Archer>() == null);
 
-    override protected IEnumerator FocusedBehaviorE() {
-        while (Focused) {
-            yield return WatchForMovement(Focus, out Vector2 pos0, out float time0);
-            yield return Attack(Focus, pos0, time0);
+    override public IEnumerator FocusedBehavior(Transform focus) {
+        while (true) {
+            yield return WatchForMovement(focus, out Vector2 pos0, out float time0);
+            yield return Attack(focus, pos0, time0);
         }
-        Debug.Log("Focus just ended, exiting FocusedBehavior");
-    }
-    
-    private IEnumerator AttackBehaviorE() {
-        while (((SpriteSorter)executeDirective) != null) {
-            yield return WatchForMovement(((SpriteSorter)executeDirective).Character, out Vector2 pos0, out float time0);
-            yield return Attack(((SpriteSorter)executeDirective).Character, pos0, time0);
-        }
-        Debug.Log("Attack just ended, exiting AttackBehavior");
     }
 
     private WaitForSeconds WatchForMovement(Transform target, out Vector2 pos0, out float time0) {

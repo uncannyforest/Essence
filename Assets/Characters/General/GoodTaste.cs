@@ -15,8 +15,9 @@ public class GoodTaste : StatusQuantity {
     public Transform Tamer {
         get => tamer;
         set {
+            Transform oldTamer = tamer;
             tamer = value;
-            HandleTamerChanged();
+            HandleTamerChanged(oldTamer);
         }
     }
 
@@ -47,12 +48,13 @@ public class GoodTaste : StatusQuantity {
         }
     }
 
-    public void HandleTamerChanged() {
+    public void HandleTamerChanged(Transform oldTamer) {
         if (Tamer != null) {
             CharacterController movement = GetComponent<Creature>().OverrideControl(this);
             movement.IdleFacing(Tamer.position);
         } else {
             GetComponent<Creature>().ReleaseControl();
+            GetComponent<Creature>().Follow(oldTamer);
         }
     }
 

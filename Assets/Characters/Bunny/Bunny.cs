@@ -32,19 +32,13 @@ public class BunnyBrain : Brain {
     override public bool CanTame(Transform player) => true;
     override public bool ExtractTamingCost(Transform player) => true;
 
-    override protected IEnumerator ScanningBehaviorE() {
-        while (true) {
-            yield return new WaitForSeconds(general.scanningRate);
+    override public bool IsValidFocus(Transform characterFocus) =>
+        healing.CanHeal(characterFocus, Creature.neighborhood);
 
-            if (Focused) {
-                if (healing.CanHeal(Focus, Creature.neighborhood)) continue;
-                else Focus = null;
-            }
-            
-            Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
-            if (healing.CanHeal(player, Creature.neighborhood)) Focus = player;
-            else RequestPair(healing.FindOneCreatureToHeal()); 
-        }
+    override public Optional<Transform> FindFocus() {
+        Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
+        if (healing.CanHeal(player, Creature.neighborhood)) return Optional.Of(player);
+        else return RequestPair(healing.FindOneCreatureToHeal()); 
     }
 
     private bool ShouldHealPlayer() {
@@ -54,11 +48,13 @@ public class BunnyBrain : Brain {
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }
 
-    override protected IEnumerator FocusedBehaviorE() {
-        while (Focused) {
-            yield return pathfinding.Approach(Focus, healing.healDistance).Then(null, healing.healTime, (target) => {
-                target.GetComponentStrict<Health>().Increase(healing.healQuantity);
+    override public IEnumerator FocusedBehavior(Transform focus) {
+        while (true) {
+            yield return pathfinding.Approach(focus.position, healing.healDistance).Else(() => {
+                focus.GetComponentStrict<Health>().Increase(healing.healQuantity);
+                return new WaitForSeconds(healing.healTime);
             });
         }
     }
+    
 }
