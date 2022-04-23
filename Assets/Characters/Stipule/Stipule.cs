@@ -38,12 +38,12 @@ public class StipuleBrain : Brain {
 
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
-            CreatureAction.WithObject(stipule.attackAction,
-                AttackBehavior.ForTarget(),
-                new TeleFilter(TeleFilter.Terrain.NONE, (c) => 
+            CreatureAction.WithCharacter(stipule.attackAction,
+                AttackBehavior,
+                (c) => 
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != team
-                ))
+                )
         };
     }
 

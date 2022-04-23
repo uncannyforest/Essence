@@ -36,11 +36,26 @@ public struct CreatureAction {
         new CreatureAction(icon, null,
             (creature, target) => creature.Execute(executingBehavior.WithTarget(target)),
             filter, null, executingBehavior is QueueOperator.Targeted<Target>, false, false);
+    public static CreatureAction WithCharacter(Sprite icon,
+            TargetedBehavior<Transform> executingBehavior,
+            Func<Transform, bool> characterFilter) =>
+        new CreatureAction(icon, null,
+            (creature, target) => creature.Execute(executingBehavior.WithTarget(((SpriteSorter)target).Character)),
+            new TeleFilter(TeleFilter.Terrain.NONE, characterFilter),
+            null, executingBehavior is QueueOperator.Targeted<Transform>, false, false);
+    public static CreatureAction WithTerrain(Sprite icon,
+            TargetedBehavior<Terrain.Position> executingBehavior,
+            TeleFilter.Terrain terrainFilter) =>
+        new CreatureAction(icon, null,
+            (creature, target) => creature.Execute(executingBehavior.WithTarget((Terrain.Position)target)),
+            new TeleFilter(terrainFilter, null),
+            null, executingBehavior is QueueOperator.Targeted<Terrain.Position>, false, false);
     public static CreatureAction WithFeature(Feature feature,
             TargetedBehavior<Vector2Int> executingBehavior) =>
         new CreatureAction(null, null,
             (creature, target) => creature.Execute(executingBehavior.WithTarget(((Terrain.Position)target).Coord)),
-            new TeleFilter(TeleFilter.Terrain.TILES, null), feature, executingBehavior is QueueOperator.Targeted<Vector2Int>, false, false);
+            new TeleFilter(TeleFilter.Terrain.TILES, null),
+            feature, executingBehavior is QueueOperator.Targeted<Vector2Int>, false, false);
     public static CreatureAction Roam =
         new CreatureAction(null, (creature) => creature.CommandRoam(), null, null, null, false, true, false);
     public static CreatureAction Station =

@@ -67,6 +67,9 @@ public class TargetedBehavior<T> {
     public TargetedBehavior<U> For<U>(Func<U, T> func) => new TargetedBehavior<U>(
         (target) =>enumeratorWithParam(func(target))
     );
+
+    public QueueOperator.Targeted<T> Queued() =>
+        new QueueOperator.Targeted<T>(enumeratorWithParam);
 }
 
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
