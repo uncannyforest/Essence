@@ -22,12 +22,12 @@ public class Randoms {
         return new Vector2Int(x / 2 + dx, y / 2 + dy);
     }
 
-    public static Vector2 RightAngleRotation(Vector2 input) {
+    public static Displacement RightAngleRotation(Displacement input) {
         int rotation = Random.Range(0, 4);
         switch(rotation) {
-            case 1: return new Vector2(-input.y, input.x);
-            case 2: return new Vector2(-input.x, -input.y);
-            case 3: return new Vector2(input.y, -input.x);
+            case 1: return new Displacement(-input.y, input.x);
+            case 2: return new Displacement(-input.x, -input.y);
+            case 3: return new Displacement(input.y, -input.x);
             default: return input;
         }
     }

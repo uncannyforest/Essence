@@ -23,9 +23,9 @@ public class CharacterController : MonoBehaviour {
     private Animator animator; // may be null
     private TaskRunner MoveCoroutine;
     
-    private Vector2 velocityChebyshevSubgridUnit; // just the direction
+    private Displacement velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
-    private Vector2 animatorDirection;
+    private Displacement animatorDirection;
 
     void Awake() {
         terrain = GameObject.FindObjectOfType<Terrain>();
@@ -42,8 +42,8 @@ public class CharacterController : MonoBehaviour {
         Speed = defaultSpeed;
     }
 
-    public CharacterController SetRelativeVelocity(Vector2 velocity) {
-        if (velocity == Vector2.zero) return Idle();
+    public CharacterController SetRelativeVelocity(Displacement velocity) {
+        if (velocity == Displacement.zero) return Idle();
         else return InDirection(velocity);
     }
 
@@ -61,9 +61,9 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
-    public CharacterController InDirection(Vector2 inputVelocity) {
-        velocityChebyshevSubgridUnit = inputVelocity / inputVelocity.ChebyshevMagnitude() / subGridUnit;
-        timeToChebyshevSubgridUnit = 1f / inputVelocity.ChebyshevMagnitude() / subGridUnit;
+    public CharacterController InDirection(Displacement inputVelocity) {
+        velocityChebyshevSubgridUnit = inputVelocity / inputVelocity.chebyshevMagnitude / subGridUnit;
+        timeToChebyshevSubgridUnit = 1f / inputVelocity.chebyshevMagnitude / subGridUnit;
         SetAnimatorDirection(inputVelocity);
         animator?.SetBool("Moving", true);
         return this;
@@ -71,20 +71,20 @@ public class CharacterController : MonoBehaviour {
 
     // Chain after Toward() to indicate direction faced to the animator.
     public CharacterController Idle() {
-        velocityChebyshevSubgridUnit = Vector2.zero;
+        velocityChebyshevSubgridUnit = Displacement.zero;
         animator?.SetBool("Moving", false);
         return this;
     }
 
     public CharacterController IdleFacing(Vector3 target) {
-        Vector3 direction = target - transform.position;
+        Displacement direction = Disp.FT(transform.position, target);
         SetAnimatorDirection(direction);
         return Idle();
     }
 
-    private void SetAnimatorDirection(Vector2 direction) {
+    private void SetAnimatorDirection(Displacement direction) {
         animatorDirection = direction;
-        Vector2 orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
+        Displacement orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
         if (setAnimatorDirectionDirectly) {
             animator?.SetFloat("X", orientedDirection.x);
             animator?.SetFloat("Y", orientedDirection.y);
@@ -117,7 +117,7 @@ public class CharacterController : MonoBehaviour {
     private IEnumerator MoveCoroutineE() {
         yield return new WaitForFixedUpdate();
         while (true) {
-            if (velocityChebyshevSubgridUnit != Vector2Int.zero) {
+            if (velocityChebyshevSubgridUnit != Displacement.zero) {
                 Vector2? maybeMove = Move();
                 if (maybeMove is Vector2 move) {
                     rigidbody.MovePosition(move);

@@ -11,18 +11,18 @@ public class Pathfinding {
         Eight,
         Twelve
     }
-    public static Dictionary<AIDirections, Vector2[]> AIDirectionVectors = new Dictionary<AIDirections, Vector2[]>() {
-        [AIDirections.Four] = new Vector2[] {
-            Vct.F(0.7071067812f, 0.7071067812f),
+    public static Dictionary<AIDirections, Displacement[]> AIDirectionVectors = new Dictionary<AIDirections, Displacement[]>() {
+        [AIDirections.Four] = new Displacement[] {
+            new Displacement(0.7071067812f, 0.7071067812f),
         },
-        [AIDirections.Eight] = new Vector2[] {
-            Vct.F(1f, 0f),
-            Vct.F(0.7071067812f, 0.7071067812f),
+        [AIDirections.Eight] = new Displacement[] {
+            new Displacement(1f, 0f),
+            new Displacement(0.7071067812f, 0.7071067812f),
         },
-        [AIDirections.Twelve] = new Vector2[] {
-            Vct.F(1f, 0.2679491924f), // tan(15)
-            Vct.F(0.7071067812f, 0.7071067812f),
-            Vct.F(0.2679491924f, 1f)
+        [AIDirections.Twelve] = new Displacement[] {
+            new Displacement(1f, 0.2679491924f), // tan(15)
+            new Displacement(0.7071067812f, 0.7071067812f),
+            new Displacement(0.2679491924f, 1f)
         }
     };
 
@@ -34,23 +34,23 @@ public class Pathfinding {
     private CharacterController movement { get => brain.movement; }
     private Transform transform { get => brain.transform; }
 
-    private Vector2[] aiDirections { get => AIDirectionVectors[general.numMovementDirections]; }
+    private Displacement[] aiDirections { get => AIDirectionVectors[general.numMovementDirections]; }
 
-    private Vector2 RandomVelocity() {
-        Vector2 randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
+    private Displacement RandomVelocity() {
+        Displacement randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
         return Randoms.RightAngleRotation(randomFromList);
     }
     
-    private Vector2 IndexedVelocity(Vector2 targetDirection) {
+    private Displacement IndexedVelocity(Displacement targetDirection) {
         // round instead of floor if aiDirections.Length were even.
-        int index = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, targetDirection) + 360) % 360 / (90 / aiDirections.Length));
+        int index = Mathf.FloorToInt((targetDirection.angle + 360) % 360 / (90 / aiDirections.Length));
         int rotation = index / aiDirections.Length;
         int subIndex = index % aiDirections.Length;
         return aiDirections[subIndex].RotateRightAngles(rotation);
     }
 
     public void MoveToward(Vector3 target) =>
-        movement.InDirection(IndexedVelocity(target - transform.position));
+        movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
 
     public YieldInstruction Roam() {
         if (Random.value < general.roamRestingFraction) movement.Idle();
@@ -58,17 +58,17 @@ public class Pathfinding {
         return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
     }
 
-    private Vector3 FollowTargetDirection(Vector3 targetPosition) {
-        Vector3 toTarget = targetPosition - transform.position;
+    private Displacement FollowTargetDirection(Vector3 targetPosition) {
+        Displacement toTarget = Disp.FT(transform.position, targetPosition);
 
         Optional<Transform> nearestThreat = Will.NearestThreat(brain);
         if (!nearestThreat.HasValue) return toTarget;
-        Vector3 toThreat = nearestThreat.Value.position - transform.position;
-        Vector3 toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
+        Displacement toThreat = Disp.FT(transform.position, nearestThreat.Value.position);
+        Displacement toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
         return toTarget - toThreatCorrected;
     }
     public YieldInstruction Follow(Transform followDirective) {
-        Vector3 targetDirection = FollowTargetDirection(followDirective.position);
+        Displacement targetDirection = FollowTargetDirection(followDirective.position);
         movement.InDirection(IndexedVelocity(targetDirection));
         return new WaitForSeconds(Random.value * general.reconsiderRateFollow);
     }
@@ -85,7 +85,7 @@ public class Pathfinding {
             return Optional<YieldInstruction>.Empty();
         } else {
             if (distance < movement.Speed * general.reconsiderRateTarget) return Optional<YieldInstruction>.Of(null); // adjust faster when we're close
-            movement.InDirection(IndexedVelocity(target - (Vector2)transform.position));
+            movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
             return Optional.Of(TypicalWait);
         }
     }

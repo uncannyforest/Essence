@@ -151,14 +151,4 @@ public static class VectorExtensions {
             func(vec.ToLeft()) ||
             func(vec.Behind());
     }
-
-    // Rotate index * 90 degrees, but there's no reason to multiply by 90 here
-    public static Vector2 RotateRightAngles(this Vector2 input, int numRightAngles) {
-        switch(numRightAngles) {
-            case 1: return new Vector2(-input.y, input.x);
-            case 2: return new Vector2(-input.x, -input.y);
-            case 3: return new Vector2(input.y, -input.x);
-            default: return input;
-        }
-    }
 }

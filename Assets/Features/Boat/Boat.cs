@@ -68,8 +68,8 @@ public class Boat : MonoBehaviour {
         movement.rigidbody.bodyType = RigidbodyType2D.Static;
         exitLocation = location * 2 - terrain.CellCenterAt(transform.position);
         terrain.Feature[currentTile] = feature;
-        movement.InDirection(currentShoreCorrection).Idle();
-        FaceDirection(currentShoreCorrection);
+        movement.InDirection((Displacement)currentShoreCorrection).Idle();
+        FaceDirection((Displacement)currentShoreCorrection);
         Debug.DrawLine(location, exitLocation, Color.magenta, 5);
         CharacterExit(0);
         player.ExitedVehicle();
@@ -142,8 +142,8 @@ public class Boat : MonoBehaviour {
             if (currentVelocity.magnitude < minSpeed) {
                 currentVelocity = Vector2.MoveTowards(currentVelocity, expectedVelocity, minSpeed);
             }
-            movement.SetRelativeVelocity(currentVelocity);
-            if (currentVelocity != Vector2.zero) FaceDirection(currentVelocity);
+            movement.SetRelativeVelocity((Displacement)currentVelocity);
+            if (currentVelocity != Vector2.zero) FaceDirection((Displacement)currentVelocity);
         }
 
         currentShoreCorrection = shoreCorrection;
@@ -161,13 +161,13 @@ public class Boat : MonoBehaviour {
         }
     }
 
-    private void FaceDirection(Vector2 direction) {
+    private void FaceDirection(Displacement direction) {
         // Update passenger controllers
         for (int i = 0; i < 4; i++) if (passengers[i] != null)
             passengers[i].InDirection(direction).Idle();
 
         // Sort seat sprites: these properties are not available to the Animator
-        int eightDirectionIndex = Mathf.FloorToInt((Vector2.SignedAngle(Vector3.right, direction) + 360) % 360 / 45);
+        int eightDirectionIndex = Mathf.FloorToInt((direction.angle + 360) % 360 / 45);
         for (int i = 0; i < 4; i++)
             seatSorters[i].sortingOrder = seatSortings[eightDirectionIndex][i];
     }
