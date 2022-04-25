@@ -146,7 +146,7 @@ public class Will {
         if (canSee) return state.ClearFocus().WithCharacterFocus(target);
         else if (state.type != CreatureStateType.Investigate ||
                 Disp.FT(creaturePosition, target.position).sqrMagnitude <
-                Disp.FT(creaturePosition, (Vector2)state.investigation)?.sqrMagnitude)
+                Disp.FT(creaturePosition, (Vector2)state.investigation).sqrMagnitude)
             return state.ClearFocus().WithInvestigation(target.position);
         else return "Investigating something more important";
     }

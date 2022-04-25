@@ -42,7 +42,7 @@ public class PlayerCharacter : MonoBehaviour {
                 return;
             }
             if (value == Vector2Int.zero) movement.Idle();
-            else movement.InDirection(((Vector2)value).normalized);
+            else movement.InDirection(Disp.FT(Vector2.zero, ((Vector2)value).normalized));
         }
     }
 
