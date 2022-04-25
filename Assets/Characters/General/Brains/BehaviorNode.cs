@@ -10,29 +10,36 @@ public class BehaviorNode {
     public BehaviorNode(Func<IEnumerator> enumerator) {
         this.enumerator = enumerator;
     }
+    public BehaviorNode(Func<YieldInstruction> singleLine) {
+        this.enumerator = () => FromSingleLine(singleLine);
+    }
     
     virtual public BehaviorNode UpdateWithNewBehavior(BehaviorNode newNode) {
         return newNode;
+    }
+
+    private IEnumerator FromSingleLine(Func<YieldInstruction> line) {
+        while (true) yield return line();
     }
 }
 
 public class RestrictNearbyBehavior : BehaviorNode {
     private BehaviorNode subBehavior;
     private Transform ai;
-    private Target target;
+    private Func<Vector2> targetLocation;
     private float distance;
 
-    public RestrictNearbyBehavior(BehaviorNode subBehavior, Transform ai, Target target, float distance) {
+    public RestrictNearbyBehavior(BehaviorNode subBehavior, Transform ai, Func<Vector2> targetLocation, float distance) {
         this.subBehavior = subBehavior;
         this.ai = ai;
-        this.target = target;
+        this.targetLocation = targetLocation;
         this.distance = distance;
         this.enumerator = E;
     }
     
     public IEnumerator E() {
         IEnumerator task = subBehavior.enumerator(); // saved here, not reset unless RunBehavior() is called again
-        while (Vector3.Distance(ai.position, target.Position) < distance && task.MoveNext()) {
+        while (Vector3.Distance(ai.position, targetLocation()) < distance && task.MoveNext()) {
             yield return task.Current;
         }
     }

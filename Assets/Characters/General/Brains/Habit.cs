@@ -103,6 +103,21 @@ public struct Habit {
 
     }
 
+    public class PassiveCommandNode {
+        public CommandType type;
+        public Func<CreatureState, Brain, YieldInstruction> passiveCommandRunStep;
+        public Optional<Func<CreatureState, Vector2>> nearbyTracking;
+
+        public PassiveCommandNode(CommandType type) => this.type = type;
+
+        public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, BehaviorNode subBehavior) {
+            if (nearbyTracking.HasValue)
+                return new RestrictNearbyBehavior(subBehavior, brain.transform, () => nearbyTracking.Value(state), Creature.neighborhood);
+            else return subBehavior;
+        }
+
+    }
+
     // all state specs
 
     private static Dictionary<CreatureStateType, Node> Nodes = new Dictionary<CreatureStateType, Node>() {
@@ -131,7 +146,8 @@ public struct Habit {
             },
             onRunCheck = (state, brain) => !state.characterFocus.IsDestroyed &&
                     brain.IsValidFocus(state.characterFocus.Value),
-            onRun = (state, brain) => new TargetedBehavior<Transform>(brain.FocusedBehavior).WithTarget(state.characterFocus.Value),
+            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
+                    new TargetedBehavior<Transform>(brain.FocusedBehavior).WithTarget(state.characterFocus.Value)),
         },
 
         [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {
@@ -147,12 +163,13 @@ public struct Habit {
             onEnter = (_, brain) => brain.investigationCancel =
                 RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
             onExit = (_, brain) => brain.investigationCancel.Stop(),
-            onRunStep = (state, brain) => {
-                if (((Vector3)state.investigation - brain.transform.position).magnitude <
-                        brain.general.reconsiderRateTarget * brain.movement.Speed) brain.RemoveInvestigation();
-                brain.pathfinding.MoveToward((Vector3)state.investigation);
-                return new WaitForSeconds(brain.general.reconsiderRateTarget);  
-            },
+            onRunCheck = (state, brain) => ((Vector3)state.investigation - brain.transform.position).magnitude >
+                                            brain.general.reconsiderRateTarget * brain.movement.Speed,
+            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
+                new BehaviorNode(() => {
+                    brain.pathfinding.MoveToward((Vector3)state.investigation);
+                    return new WaitForSeconds(brain.general.reconsiderRateTarget);  
+                })),
         }.ExitAndEnterOnUpdate(),
 
         [CreatureStateType.PassiveCommand] = new Node(CreatureStateType.PassiveCommand) {
@@ -160,14 +177,23 @@ public struct Habit {
                 if (state.followOffensive) brain.UpdateFollowOffensive();
             },
             onUpdate = (_, __) => true,
-            onRunStep = (state, brain) => {
-                if (state.command?.type == CommandType.Roam) return brain.pathfinding.Roam();
-                if (state.command?.type == CommandType.Follow) return brain.pathfinding.Follow(state.command?.followDirective.Value);
-                if (state.command?.type == CommandType.Station) return brain.pathfinding
-                    .ApproachThenIdle((Vector3)state.command?.stationDirective, 1f / CharacterController.subGridUnit);
-                Debug.LogError("Weird state: " + state);
-                return null;
-            }
+            onRunStep = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].passiveCommandRunStep(state, brain)
+        },
+    };
+
+    private static Dictionary<CommandType, PassiveCommandNode> PassiveCommandNodes = new Dictionary<CommandType, PassiveCommandNode>() {
+        [CommandType.Roam] = new PassiveCommandNode(CommandType.Roam) {
+            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Empty(),
+            passiveCommandRunStep = (state, brain) => brain.pathfinding.Roam()
+        },
+        [CommandType.Follow] = new PassiveCommandNode(CommandType.Follow) {
+            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.followDirective.Value.position),
+            passiveCommandRunStep = (state, brain) => brain.pathfinding.Follow(state.command?.followDirective.Value)
+        },
+        [CommandType.Station] = new PassiveCommandNode(CommandType.Station) {
+            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.stationDirective),
+            passiveCommandRunStep = (state, brain) => brain.pathfinding
+                .ApproachThenIdle((Vector3)state.command?.stationDirective, 1f / CharacterController.subGridUnit)
         },
     };
 }
