@@ -78,6 +78,7 @@ public class WorldInteraction : MonoBehaviour {
     public TileBase hoverTile;
     public TileBase edgeHoverTileX;
     public TileBase edgeHoverTileY;
+    public LineRenderer lineSelect;
 
     public Collectible wood;
     public Collectible soil;
@@ -95,6 +96,7 @@ public class WorldInteraction : MonoBehaviour {
     private Tele teleSelect;
     private Vector3Int activeTile = Vector3Int.zero;
     private Tilemap activeGrid;
+    private bool lineStarterUpdate;
     private SpriteSorter activeCharacter;
     private SortingGroup activeCharacterHighlight;
     private DeStack<SpriteSorter> followingCharacters = new DeStack<SpriteSorter>();
@@ -123,6 +125,8 @@ public class WorldInteraction : MonoBehaviour {
     public Interaction CurrentAction {
         get => currentAction;
         set {
+            ClearTile();
+            ClearLine();
             if (currentAction.mode == Mode.Arrow && value.mode != Mode.Arrow) rangedSelect.Reset();
             currentAction = value;
             activeGrid?.SetTile(activeTile, null);
@@ -179,12 +183,17 @@ public class WorldInteraction : MonoBehaviour {
         ConfirmOngoing = new TaskRunner(ConfirmOngoingE, this);
         inventory = player.GetComponentStrict<Inventory>();
         Orientor.I.onRotation += ClearTile;
+        Orientor.I.onRotation += ClearLine;
     }
 
     public void ClearTile() => activeGrid?.SetTile(activeTile, null);
     public void ClearCharacter() {
         if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight.gameObject);
         activeCharacter = null;
+    }
+    public void ClearLine() {
+        lineSelect.positionCount = 0;
+        lineStarterUpdate = false;
     }
     public void ActiveCharacterToFollowing() {
         followingCharacters.Push(activeCharacter);
@@ -287,11 +296,21 @@ public class WorldInteraction : MonoBehaviour {
                 if (duringPress) break;
                 ClearTile();
                 ClearCharacter();
+                ClearLine();
                 OneOf<Terrain.Position, SpriteSorter> target = teleSelect.SelectDynamic(pointer);
                 if (target.Is(out Terrain.Position tile)) {
                     activeTile = (Vector3Int)tile.Coord;
                     activeGrid = uiMaps[tile.grid];
-                    activeGrid.SetTile(activeTile, hoverTiles[tile.grid]);
+                    if (teleSelect.Line == null) activeGrid.SetTile(activeTile, hoverTiles[tile.grid]);
+                    else {
+                        List<Vector3> line = teleSelect.Line();
+                        lineStarterUpdate = line == null;
+                        if (!lineStarterUpdate) {
+                            line.Add(terrain.CellCenter(tile));
+                            lineSelect.positionCount = line.Count;
+                            lineSelect.SetPositions(line.ToArray());
+                        }
+                    }
                 } else if (target.Is(out SpriteSorter character)) {
                     activeCharacter = character;
                     activeCharacterHighlight = NewCharacterHighlight(activeCharacter, true);
@@ -390,6 +409,7 @@ public class WorldInteraction : MonoBehaviour {
                 if (target.IsNeither) return;
                 ClearCharacter();
                 ClearTile();
+                ClearLine();
                 creature = PeekFollowing();
                 if (creature != null) {
                     CreatureAction creatureAction = CurrentAction.CreatureAction;
@@ -494,6 +514,13 @@ public class WorldInteraction : MonoBehaviour {
     void Update() {
         if (PlayerAction == Mode.Arrow) {
             rangedSelect.Update();
+        }
+        if (lineStarterUpdate == true) {
+            lineSelect.positionCount = 2;
+            lineSelect.SetPositions(new Vector3[] {
+                PeekFollowing().transform.position,
+                terrain.CellCenter((Vector2Int)activeTile)
+            });
         }
         ThroroughCleanUpTopFollowingCharacter();
     }

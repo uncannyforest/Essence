@@ -118,7 +118,17 @@ public class PathTracingBehavior : BehaviorNode {
         }
     }
 
-    public class Targeted : TargetedBehavior<Terrain.Position> {
+    public List<Vector3> DestinationsForDisplay {
+        get {
+            if (destinations.Count == 0 || previousDestination == null) return null;
+            List<Vector3> result = new List<Vector3>();
+            result.Add(previousDestination);
+            foreach (Vector2 destination in destinations) result.Add(destination);
+            return result;
+        }
+    }
+
+    public class Targeted : TargetedBehavior<Target> {
         private Transform ai;
         private Func<Terrain.Position, bool> positionFilter;
         private Func<Terrain.Position, YieldInstruction> positionAction;
@@ -130,7 +140,7 @@ public class PathTracingBehavior : BehaviorNode {
             this.canQueue = true;
         }
 
-        override public BehaviorNode WithTarget(Terrain.Position target) =>
-            PathTracingBehavior.Of(Terrain.I.CellCenter(target), ai, positionFilter, positionAction);
+        override public BehaviorNode WithTarget(Target target) =>
+            PathTracingBehavior.Of(Terrain.I.CellCenter((Terrain.Position)target), ai, positionFilter, positionAction);
     }
 }

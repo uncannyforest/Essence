@@ -29,11 +29,17 @@ public class TeleFilter {
 
     public Terrain terrainSelection;
     public Func<Transform, bool> characterFilter;
+    public Func<List<Vector3>> line { get; private set; } = null;
 
     public TeleFilter(Terrain terrainSelection,
             Func<Transform, bool> characterFilter) {
         this.terrainSelection = terrainSelection;
         this.characterFilter = characterFilter;
+    }
+
+    public TeleFilter WithLine(Func<List<Vector3>> line) {
+        this.line = line;
+        return this;
     }
 }
 
@@ -48,6 +54,8 @@ public class Tele {
     public Tele(Terrain terrain) {
         this.terrain = terrain;
     }
+
+    public Func<List<Vector3>> Line { get => dynamicFilter.line; }
 
     public Target SelectDynamic(Vector2 point) {
         if (dynamicFilter == null) throw new InvalidOperationException("No dynamic filter set");

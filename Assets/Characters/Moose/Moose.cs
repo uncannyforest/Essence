@@ -31,11 +31,15 @@ public class MooseBrain : Brain {
 
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
-            CreatureAction.WithTerrain(moose.attackAction,
+            CreatureAction.WithObject(moose.attackAction,
                 new PathTracingBehavior.Targeted(transform, IsDestroyable, ApproachAndAttack),
-                TeleFilter.Terrain.TILES)
+                new TeleFilter(TeleFilter.Terrain.TILES, null)
+                    .WithLine(GetDestinationsForDisplay))
         };
     }
+
+    private List<Vector3> GetDestinationsForDisplay() => 
+        (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;
 
     private bool IsDestroyable(Terrain.Position location) {
         if (location.grid != Terrain.Grid.Roof) {
