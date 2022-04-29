@@ -52,7 +52,7 @@ public class Fauna : MonoBehaviour {
 
     private Creature IdentifyCreature() {
         if (Randoms.CoinFlip) return CreatureLibrary.P.stipule;
-        int justARandomNumberForNow = Random.Range(0, 4);
+        int justARandomNumberForNow = Random.Range(0, 5);
         switch (justARandomNumberForNow) {
             case 0: return CreatureLibrary.P.bunny;
             case 1: return CreatureLibrary.P.arrowwiggle;
