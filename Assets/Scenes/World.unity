@@ -1085,9 +1085,9 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: 16, y: 50, z: 0}
-  - {x: 15, y: 50, z: 0}
-  - {x: 14, y: 49, z: 0}
+  - {x: 16.5, y: 50, z: 0}
+  - {x: 15.5, y: 50, z: 0}
+  - {x: 14.5, y: 49, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -1095,8 +1095,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.0033112583
-        value: 0.62595356
+        time: 0
+        value: 0.6335906
         inSlope: 0
         outSlope: 0
         tangentMode: 0

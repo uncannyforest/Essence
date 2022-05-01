@@ -36,7 +36,24 @@ public class MooseMath {
                 yi += yDirection;
                 yt = (yi - start.y) / direction.y;
             } else {
-                Debug.LogError("MooseMath corner case");
+                foreach (Terrain.Position wall in Randoms.Order<Terrain.Position>(
+                    new Terrain.Position(Terrain.Grid.YWalls, currentCell + xTransition),
+                    new Terrain.Position(Terrain.Grid.XWalls, currentCell + yTransition)
+                )) yield return wall;
+                foreach (Terrain.Position corner in Randoms.Order<Terrain.Position>(
+                    new Terrain.Position(Terrain.Grid.Roof, currentCell + Vct.I(xDirection, 0)),
+                    new Terrain.Position(Terrain.Grid.Roof, currentCell + Vct.I(0, yDirection))
+                )) yield return corner;
+                foreach (Terrain.Position wall in Randoms.Order<Terrain.Position>(
+                    new Terrain.Position(Terrain.Grid.XWalls, currentCell + Vct.I(xDirection, 0) + yTransition),
+                    new Terrain.Position(Terrain.Grid.YWalls, currentCell + Vct.I(0, yDirection) + xTransition)
+                )) yield return wall;
+                currentCell += Vct.I(xDirection, yDirection);
+                yield return new Terrain.Position(Terrain.Grid.Roof, currentCell);
+                xi += xDirection;
+                xt = (xi - start.x) / direction.x;
+                yi += yDirection;
+                yt = (yi - start.y) / direction.y;
             }
         }
 

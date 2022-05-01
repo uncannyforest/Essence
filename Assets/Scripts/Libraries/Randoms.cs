@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Randoms {
     public static bool CoinFlip { get => Random.Range(0, 2) == 0; }
@@ -39,6 +41,16 @@ public class Randoms {
             return new Vector2(mean, extreme);
         } else {
             return new Vector2(extreme, mean);
+        }
+    }
+
+    public static IEnumerable<T> Order<T>(T first, T second) {
+        if (CoinFlip) {
+            yield return first;
+            yield return second;
+        } else {
+            yield return second;
+            yield return first;
         }
     }
 }
