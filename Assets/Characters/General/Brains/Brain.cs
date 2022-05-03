@@ -23,31 +23,10 @@ public class BrainConfig {
 
 }
 
-// READY States : Roam | Follow | FollowOffsensive | Station
-
-//                 | Scanning | Investigating | Focused | Busy | Trekking | followDir. | attackDir. | executeDir.
-// ----------------+----------+---------------+---------+------+----------+------------+------------+------------
-// READY: not I/F  | USUALLY* |               |         |      | ALWAYS   | if F/FO    | FO if dir. |            
-// READY: investg. | ALWAYS   | ALWAYS        |         |      | ALWAYS   | if F/FO    | FO if dir. |            
-// READY: focused  |          |               | ALWAYS  |      |          | if F/FO    | FO if dir. |            
-// Execute         |          |               |         | ALWS |          | ALWAYS     |            | ALWAYS     
-// Pair            |          |               |         | ALWS | ALWAYS   | sometimes  |            |            
-// Faint           |          |               |         | ALWS |          |            |            |            
-// controlOverride | states and directives: any row above, but ignored - no coroutines running
-
-// * always except iff State is Following and scanForFocusWhileFollowing is off
-
-// Note: always exactly one in each row is true:
-// * Focused | Busy | TrekkingFree
-// * Focused | Trekking | Execute | Faint
-// (note Busy == Execute || Pair || Faint, and TrekkingFree == Trekking && !Pair)
-// These rules are encoded in StateAssumptions() at the bottom, which runs every Update().
-
 // Notes from the last refactor.
-// The decision tree of the AI can be modeled by https://app.diagrams.net/#G12U12TJ4aRo3wOl9gePm-mq7hj-KayC94 .
 //
 // Separate different functionality:
-// 1. Inputs: five types
+// 1. Inputs (Senses class): five types
 //    - Player commands
 //    - Player hints
 //    - Same-team creature requests and messages
@@ -56,15 +35,15 @@ public class BrainConfig {
 //    Most calls to Brain will update an Input.
 //    State change computation can be accomplished without committing a state modification.
 //    So can immediately compute the state change even without its consequences running until the next frame.
-// 2. State change
+// 2. State change (Will class):
 //    The decision tree of the AI can be modeled by https://app.diagrams.net/#G12U12TJ4aRo3wOl9gePm-mq7hj-KayC94 .
 //    Note that there are only nine different kinds of output behaviors, even though the decision tree is complex.
 //    We want legal transitions to be relatively stateless, i.e., most states can transition to most states with few special cases.
 // 3. Consequences of state change
-//    Macro logic:
+//    Macro logic (Habit class):
 //      Although most states can transition to most states, we still want to borrow a good State Machine principle:
 //      Every state has OnEnter and OnExit logic that runs when entering and exiting the state.
-//    Micro logic:
+//    Micro logic (BehaviorNode class):
 //      We will introduce a concept of BehaviorNodes which are units of behavior,
 //      and some BehaviorNodes can modify other BehaviorNodes for more complex behavior.
 
