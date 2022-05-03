@@ -80,8 +80,6 @@ public class Pathfinding {
     public YieldInstruction TypicalWait { get => new WaitForSeconds(general.reconsiderRateTarget); }
 
     public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop) {
-        if (CheckTargetForObstacles(target).IsValue(out YieldInstruction unblockSelf))
-            return unblockSelf;
         return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
     }
 

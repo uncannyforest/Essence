@@ -123,7 +123,8 @@ public class Brain {
     virtual public bool IsValidFocus(Transform characterFocus) =>
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) : true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
-    virtual public YieldInstruction UnblockSelf(Terrain.Position location) { return null; }
+    virtual public YieldInstruction UnblockSelf(Terrain.Position location) =>
+        throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS
