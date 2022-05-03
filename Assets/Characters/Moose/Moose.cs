@@ -50,6 +50,8 @@ public class MooseBrain : Brain {
         }
     }
 
+    override public YieldInstruction UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
+
     private YieldInstruction ApproachAndAttack(Terrain.Position location)
         => pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
             .Else(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));

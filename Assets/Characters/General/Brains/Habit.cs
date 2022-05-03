@@ -176,7 +176,7 @@ public struct Habit {
                                             brain.general.reconsiderRateTarget * brain.movement.Speed,
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
                 new BehaviorNode(() => {
-                    brain.pathfinding.MoveToward((Vector3)state.investigation);
+                    brain.pathfinding.MoveTowardWithoutClearingObstacles((Vector3)state.investigation);
                     return new WaitForSeconds(brain.general.reconsiderRateTarget);  
                 })),
         }.ExitAndEnterOnUpdate(),

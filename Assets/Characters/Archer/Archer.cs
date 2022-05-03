@@ -80,7 +80,7 @@ public class ArcherBrain : Brain {
             movement.IdleFacing(expectedFuturePosition);
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition);
         } else if (state.command?.type != CommandType.Station) {
-            pathfinding.MoveToward(target.position);
+            pathfinding.MoveTowardWithoutClearingObstacles(target.position);
         }
         return new WaitForSeconds(general.reconsiderRateTarget * .9f);
     }

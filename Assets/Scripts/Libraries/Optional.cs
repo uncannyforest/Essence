@@ -56,6 +56,15 @@ public struct Optional<T> {
         return new Optional<T>(value);
     }
 
+    public bool IsValue(out T value) {
+        if (HasValue) {
+            value = this.value;
+            return true;
+        }
+        value = default(T);
+        return false;
+    }
+
     public override bool Equals(object obj) {
         if (obj is Optional<T>)
             return this.Equals((Optional<T>)obj);
