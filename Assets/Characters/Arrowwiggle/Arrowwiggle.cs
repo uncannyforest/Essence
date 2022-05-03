@@ -50,10 +50,10 @@ public class ArrowwiggleBrain : Brain {
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }
 
-    override public IEnumerator FocusedBehavior(Transform focus) {
+    override public IEnumerator FocusedBehavior() {
         while (true) {
-            yield return pathfinding.Approach(focus.position, arrowwiggle.restockDistance).Else(() => {
-                focus.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity);
+            yield return pathfinding.Approach(state.characterFocus.Value.position, arrowwiggle.restockDistance).Else(() => {
+                state.characterFocus.Value.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity);
                 return new WaitForSeconds(arrowwiggle.restockTime);
             });
         }

@@ -197,11 +197,8 @@ public class Creature : MonoBehaviour {
         }.TryUpdateCreature(this);
     }
 
-    // Defensive
-    public void WitnessAttack(Transform assailant) => new Senses() {
-        desireMessage = new DesireMessage() {
-            target = new Target(assailant.GetComponentInChildren<SpriteSorter>())
-        }
+    public bool ReceiveDesireMessage(DesireMessage desireMessage) => new Senses() {
+        desireMessage = desireMessage
     }.TryUpdateCreature(this);
 
     public void CommandRoam() => new Senses() {

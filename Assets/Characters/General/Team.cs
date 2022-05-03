@@ -22,12 +22,18 @@ public class Team : MonoBehaviour {
 
     public void OnAttack(Transform assailant) {
         if (assailant == null) Debug.Log("Attacked by the terrain itself");
-        else
-            foreach (Creature creature in BroadcastAudience(assailant))
-                creature.WitnessAttack(assailant);
+        else Broadcast(new DesireMessage() { assailant = Optional.Of(assailant) });
     }
 
-    public IEnumerable<Creature> BroadcastAudience(Transform subject) {
+    public int Broadcast(DesireMessage desireMessage) {
+        int count = 0;
+        foreach (Creature creature in BroadcastAudience())
+            if (creature.ReceiveDesireMessage(desireMessage))
+                count++;   
+        return count;
+    }
+
+    private IEnumerable<Creature> BroadcastAudience() {
         Collider2D[] nearbyCreatures = Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Creature", "HealthCreature"));
         return (from creature in nearbyCreatures
             where SameTeam(creature)

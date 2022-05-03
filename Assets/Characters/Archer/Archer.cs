@@ -44,7 +44,7 @@ public class ArcherBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithCharacter(archer.attackAction,
-                new CharacterTargetedBehavior(FocusedBehavior),
+                new CharacterTargetedBehavior(ExecuteBehavior),
                 (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != teamId;}
@@ -55,13 +55,16 @@ public class ArcherBrain : Brain {
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this,
         (threat) => threat.GetComponent<Archer>() == null);
 
-    override public IEnumerator FocusedBehavior(Transform focus) {
+    override public IEnumerator FocusedBehavior() {
+        return ExecuteBehavior(state.characterFocus.Value);
+    }
+
+    public IEnumerator ExecuteBehavior(Transform focus) {
         while (true) {
             yield return WatchForMovement(focus, out Vector2 pos0, out float time0);
             yield return Attack(focus, pos0, time0);
         }
     }
-
     private WaitForSeconds WatchForMovement(Transform target, out Vector2 pos0, out float time0) {
         pos0 = target.position;
         time0 = Time.time;

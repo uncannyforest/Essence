@@ -34,7 +34,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
-    destroyDistance: 0.7071068
+    destroyDistance: 1
     destroyTime: 0.5
     attack: 1
 --- !u!1001 &6362756172984435830
@@ -117,6 +117,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.canClearFeatures
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.reconsiderRateTarget
       value: 0.5
       objectReference: {fileID: 0}
@@ -127,6 +131,22 @@ PrefabInstance:
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.scanForFocusWhenFollowing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.canClearObstacles.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.canClearConstruction.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.canClearObstacles.Array.data[0]
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: brainConfig.canClearConstruction.Array.data[0]
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2935051636441069319, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer

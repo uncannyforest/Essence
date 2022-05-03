@@ -7,6 +7,9 @@ static class HandyExtensionsFromJavascript {
     public static bool includes(this Land[] array, Land value) {
         return System.Array.IndexOf(array, value) >= 0;
     }
+    public static bool includes(this Construction[] array, Construction value) {
+        return System.Array.IndexOf(array, value) >= 0;
+    }
 }
 
 // Minimally edited copy from javascript

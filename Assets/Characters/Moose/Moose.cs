@@ -41,15 +41,13 @@ public class MooseBrain : Brain {
     private List<Vector3> GetDestinationsForDisplay() => 
         (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;
 
-    private bool IsDestroyable(Terrain.Position location) {
-        if (location.grid != Terrain.Grid.Roof) {
-            Construction? wall = terrain.GetConstruction(location);
-            return wall != null && wall != Construction.None;
+    private bool IsDestroyable(Terrain.Position location) =>
+        Will.CanClearObstacleAt(general, location);
+
+    override public IEnumerator FocusedBehavior() {
+        while (true) {
+            yield return ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
         }
-        else if (terrain.GetLand(location.Coord) == Land.Dirtpile) return true;
-        else if (terrain.Feature[location.Coord] != null)
-            return terrain.Feature[location.Coord].GetComponent<Fountain>() == null;
-        else return false;
     }
 
     private YieldInstruction ApproachAndAttack(Terrain.Position location)

@@ -33,20 +33,24 @@ public class Will {
                     else return CreatureState.Command(Command.Roam()); // follow request failed
                 case CreatureStateType.Pair:
                     return CreatureState.Unpair(state);
-                case CreatureStateType.CharacterFocus:
+                case CreatureStateType.Focus:
                 case CreatureStateType.Investigate:
                     return state.ClearFocus();
                 case CreatureStateType.PassiveCommand:
                     return CreatureState.Command(Command.Roam());
                 default: throw new ArgumentException("End state on wrong state");
             }
+
         } else if (input.controlOverride.IsAdd) {
             return CreatureState.WithControlOverride(state, input.controlOverride.Value);
+
         } else if (input.controlOverride.IsRemove) {
             relinquishedPriority = (int)CreatureStateType.Override; // end override
             return CreatureState.WithoutControlOverride(state);
+
         } else if (input.faint) {
             return CreatureState.Fainted();
+
         } else if (input.command is Command command) {
             if (state.command?.type == CommandType.Execute || command.type == CommandType.Execute) {
                 relinquishedPriority = (int)CreatureStateType.Execute; // may transition out of Execute
@@ -68,15 +72,16 @@ public class Will {
                 relinquishedPriority = (int)CreatureStateType.PassiveCommand; // to another command
                 return state.UpdatePassiveCommand(command);
             } else if (command.type == CommandType.Follow) {
-                relinquishedPriority = (int)CreatureStateType.CharacterFocus; // clear focus
+                relinquishedPriority = (int)CreatureStateType.Focus; // clear focus
                 if (Team.SameTeam(input.knowledge.team, command.followDirective.Value))
                     return CreatureState.Command(command);
                 else return "Creature on team " + input.knowledge.team +
                     " not willing to follow " + command.followDirective.Value.gameObject.name;
             } else {
-                relinquishedPriority = (int)CreatureStateType.CharacterFocus; // clear focus
+                relinquishedPriority = (int)CreatureStateType.Focus; // clear focus
                 return CreatureState.Command(command);
             }
+
         } else if (input.hint is Hint hint) {
             if (!input.knowledge.config.hasAttack)
                 return "hasAttack false";
@@ -91,6 +96,7 @@ public class Will {
                 relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
                 return DesireAttack(input.knowledge.config, input.knowledge.position, state, hint.target.Value);
             }
+
         } else if (input.message is CreatureMessage message) {
             switch (message.type) {
                 case CreatureMessage.Type.PairToSubject:
@@ -102,7 +108,7 @@ public class Will {
                     relinquishedPriority = (int)CreatureStateType.Pair; // end pair
                     return CreatureState.Unpair(state);
                 case CreatureMessage.Type.EndPairToMaster:
-                    if (state.type != CreatureStateType.CharacterFocus) {
+                    if (state.type != CreatureStateType.Focus) {
                         Debug.LogError("Why was there a pair when state " + state);
                         return "Can't remove pair focus when no focus";
                     } 
@@ -110,11 +116,15 @@ public class Will {
                 default:
                     return "No such CreatureMessage type";
             }
+
         } else if (input.desireMessage is DesireMessage desireMessage) {
-            if (desireMessage.target.Is(out SpriteSorter target)){
-                relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
-                return DesireAttack(input.knowledge.config, input.knowledge.position, state, target.Character);
-            } else throw new NotImplementedException("Desire is Position");
+            relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
+            if (desireMessage.assailant.HasValue)
+                return DesireAttack(input.knowledge.config, input.knowledge.position, state, desireMessage.assailant.Value);
+            else if (desireMessage.obstacle is DesireMessage.Obstacle obstacle) {
+                return DesireClearObstacle(input.knowledge.config, state, obstacle);
+            } else throw new ArgumentException("DesireMessage must have contents");
+
         } else if (input.environment is Senses.Environment environment) {
             if (environment.characterFocus.IsAdd) {
                 if (state.characterFocus.HasValue)
@@ -125,7 +135,7 @@ public class Will {
                 return result;
             } else if (environment.characterFocus.IsRemove) {
                 if (state.characterFocus.HasValue) {
-                    relinquishedPriority = (int)CreatureStateType.CharacterFocus; // end focus
+                    relinquishedPriority = (int)CreatureStateType.Focus; // end focus
                     return state.ClearFocus();
                 } else return "Trying to remove characterFocus when none present";
             } else if (environment.removeInvestigation) {
@@ -139,9 +149,33 @@ public class Will {
         } else return "No change";
     }
 
+    public static OneOf<CreatureState, string> DesireClearObstacle(BrainConfig config, CreatureState state, DesireMessage.Obstacle obstacle) {
+        if (obstacle.wallObstacle is Construction wall) {
+            if (config.canClearConstruction.includes(wall)) return state.ClearFocus().WithTerrainFocus(obstacle);
+            else return "Cannot clear wall of " + wall;
+        } else if (obstacle.featureObstacle != null) {
+            if (!config.canClearFeatures) return "Cannot clear obstacles";
+            else if (obstacle.featureObstacle.GetComponent<Fountain>() != null) return "Cannot clear fountains";
+            else return state.ClearFocus().WithTerrainFocus(obstacle);
+        } else if (obstacle.landObstacle is Land land) {
+            if (config.canClearObstacles.includes(land)) return state.ClearFocus().WithTerrainFocus(obstacle);
+            else return "Cannot clear land " + land;
+        } else throw new ArgumentException("Obstacle message must include expected obstacle");
+    }
+
+    public static bool CanClearObstacleAt(BrainConfig config, Terrain.Position location) {
+        if (!Terrain.I.InBounds(location)) return false;
+        if (location.grid != Terrain.Grid.Roof)
+            return config.canClearConstruction.includes(Terrain.I[location]);
+        else if (Terrain.I.Land[location.Coord] == Land.Dirtpile
+            && config.canClearObstacles.includes(Land.Dirtpile)) return true;
+        else if (Terrain.I.Feature[location.Coord] != null)
+            return config.canClearFeatures && Terrain.I.Feature[location.Coord].GetComponent<Fountain>() == null;
+        else return config.canClearObstacles.includes(Terrain.I.Land[location.Coord]);
+    }
+
     public static OneOf<CreatureState, string> DesireAttack(BrainConfig config, Vector3 creaturePosition, CreatureState state, Transform target) {
         if (!config.hasAttack) return "No attack for desire";
-        if (state.type >= CreatureStateType.Pair) return "Busy with " + state.type;
         bool canSee = CanSee(creaturePosition, target);
         if (canSee) return state.ClearFocus().WithCharacterFocus(target);
         else if (state.type != CreatureStateType.Investigate ||

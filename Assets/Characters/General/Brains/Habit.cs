@@ -7,7 +7,7 @@ public enum CreatureStateType {
     Override = 800,
     Faint = 700,
     Execute = 500,
-    CharacterFocus = 340,
+    Focus = 340,
     Pair = 300,
     Investigate = 260,
     PassiveCommand = 100,
@@ -138,16 +138,25 @@ public struct Habit {
             onRun = (state, _) => state.command?.executeDirective
         },
 
-        [CreatureStateType.CharacterFocus] = new Node(CreatureStateType.CharacterFocus) {
+        [CreatureStateType.Focus] = new Node(CreatureStateType.Focus) {
             onExit = (state, brain) => {
                 if (state.focusIsPair.HasValue) {
                     state.focusIsPair.Value?.EndPairCommand(brain.transform);
                 }
             },
-            onRunCheck = (state, brain) => !state.characterFocus.IsDestroyed &&
-                    brain.IsValidFocus(state.characterFocus.Value),
+            onRunCheck = (state, brain) => {
+                if (state.characterFocus.HasValue)
+                    return !state.characterFocus.IsDestroyed &&
+                        brain.IsValidFocus(state.characterFocus.Value);
+                else if (state.terrainFocus.HasValue)
+                    return state.terrainFocus.Value.IsStillPresent;
+                else {
+                    Debug.LogError("Neither characterFocus nor terrainFocus: " + state);
+                    return false;
+                }
+            },
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                    new TargetedBehavior<Transform>(brain.FocusedBehavior).WithTarget(state.characterFocus.Value)),
+                    new BehaviorNode(brain.FocusedBehavior)),
         },
 
         [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {

@@ -49,8 +49,10 @@ public class Pathfinding {
         return aiDirections[subIndex].RotateRightAngles(rotation);
     }
 
-    public void MoveToward(Vector3 target) =>
+    public void MoveToward(Vector3 target) {
+        CheckTargetForObstacles(target);
         movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
+    }
 
     public YieldInstruction Roam() {
         if (Random.value < general.roamRestingFraction) movement.Idle();
@@ -68,6 +70,7 @@ public class Pathfinding {
         return toTarget - toThreatCorrected;
     }
     public YieldInstruction Follow(Transform followDirective) {
+        CheckTargetForObstacles(followDirective.position);
         Displacement targetDirection = FollowTargetDirection(followDirective.position);
         movement.InDirection(IndexedVelocity(targetDirection));
         return new WaitForSeconds(Random.value * general.reconsiderRateFollow);
@@ -76,10 +79,12 @@ public class Pathfinding {
     public YieldInstruction TypicalWait { get => new WaitForSeconds(general.reconsiderRateTarget); }
 
     public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop) {
+        CheckTargetForObstacles(target);
         return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
     }
 
     public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop) {
+        CheckTargetForObstacles(target);
         float distance = Vector2.Distance(target, transform.position);
         if (distance <= proximityToStop) {
             return Optional<YieldInstruction>.Empty();
@@ -109,6 +114,45 @@ public class Pathfinding {
         finalAction();
         return TypicalWait;
     };
+
+    public void CheckTargetForObstacles(Vector2 target) {
+        if (IdentifyObstacles(target) is DesireMessage.Obstacle obstacle) {
+            BroadcastObstacle(obstacle);
+        }
+    }
+
+    private DesireMessage.Obstacle? IdentifyObstacles(Vector2 target) {
+        if (!Terrain.I.InBounds(Terrain.I.CellAt(target)))
+            throw new InvalidOperationException("Target out of bounds");
+        foreach (Terrain.Position position in
+                MooseMath.GetPathPositions(brain.transform.position, target)) {
+            if (position.grid == Terrain.Grid.XWalls || position.grid == Terrain.Grid.YWalls) {
+                if (Terrain.I[position] != Construction.None) {
+                    return new DesireMessage.Obstacle() {
+                        requestor = brain.creature,
+                        location = position,
+                        wallObstacle = Terrain.I[position]
+                    };
+                }
+            } else {
+                Land? land = Terrain.I.GetLand(position.Coord);
+                if (land?.IsPassable() == false || (movement.waterSpeed == 0 && land?.IsWatery() == true)) {
+                    return new DesireMessage.Obstacle() {
+                        requestor = brain.creature,
+                        location = position,
+                        landObstacle = land
+                    };
+                }
+            }
+        }
+        return null;
+    }
+
+    private void BroadcastObstacle(DesireMessage.Obstacle obstacle) {
+        int count = brain.team.Broadcast(new DesireMessage() { obstacle = obstacle });
+        if (count == 0 && brain.teamId == 0)
+            HiveMind.I.RegisterObstacle(brain.creature, obstacle);
+    }
 }
 
 public class ApproachThenBuild : TargetedBehavior<Terrain.Position> {
@@ -131,6 +175,7 @@ public class ApproachThenBuild : TargetedBehavior<Terrain.Position> {
 
     public IEnumerator E(Terrain.Position buildLocation) {
         for (int i = 0; i < 100_000; i++) {
+            brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(buildLocation));
             Optional<YieldInstruction> approaching = brain.pathfinding.Approach(Terrain.I.CellCenter(buildLocation), buildDistance);
             if (approaching.HasValue) yield return approaching.Value;
             else {

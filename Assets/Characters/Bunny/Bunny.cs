@@ -48,10 +48,10 @@ public class BunnyBrain : Brain {
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
     }
 
-    override public IEnumerator FocusedBehavior(Transform focus) {
+    override public IEnumerator FocusedBehavior() {
         while (true) {
-            yield return pathfinding.Approach(focus.position, healing.healDistance).Else(() => {
-                focus.GetComponentStrict<Health>().Increase(healing.healQuantity);
+            yield return pathfinding.Approach(state.characterFocus.Value.position, healing.healDistance).Else(() => {
+                state.characterFocus.Value.GetComponentStrict<Health>().Increase(healing.healQuantity);
                 return new WaitForSeconds(healing.healTime);
             });
         }

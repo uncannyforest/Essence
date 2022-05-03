@@ -69,24 +69,24 @@ public struct CreatureState {
 
     public Optional<Creature> focusIsPair;
     public Optional<Transform> characterFocus;
+    public DesireMessage.Obstacle? terrainFocus;
     public Vector3? investigation;
     public CreatureState WithCharacterFocus(Transform characterFocus) {
         CreatureState state = this;
-        state.type = CreatureStateType.CharacterFocus;
+        state.type = CreatureStateType.Focus;
         state.characterFocus = Optional.Of(characterFocus);
-        return state;
-    }
-    public CreatureState WithoutCharacterFocus() {
-        CreatureState state = this;
-        if (state.focusIsPair.HasValue) throw new InvalidOperationException("Must remove pair");
-        state.type = CreatureStateType.PassiveCommand;
-        state.characterFocus = Optional<Transform>.Empty();
         return state;
     }
     public CreatureState WhereFocusIsPair(Creature focusIsPair) {
         CreatureState state = this;
-        if (state.type != CreatureStateType.CharacterFocus) throw new InvalidOperationException("Not a focus");
+        if (state.type != CreatureStateType.Focus) throw new InvalidOperationException("Not a focus");
         state.focusIsPair = Optional.Of(focusIsPair);
+        return state;
+    }
+    public CreatureState WithTerrainFocus(DesireMessage.Obstacle terrainFocus) {
+        CreatureState state = this;
+        state.type = CreatureStateType.Focus;
+        state.terrainFocus = terrainFocus;
         return state;
     }
     public CreatureState WithInvestigation(Vector3 investigation) {
@@ -95,17 +95,12 @@ public struct CreatureState {
         state.investigation = investigation;
         return state;
     }
-    public CreatureState WithoutInvestigation() {
-        CreatureState state = this;
-        state.type = CreatureStateType.PassiveCommand;
-        state.investigation = null;
-        return state;
-    }
     public CreatureState ClearFocus() {
         CreatureState state = this;
         state.focusIsPair = Optional<Creature>.Empty();
         state.type = CreatureStateType.PassiveCommand;
         state.characterFocus = Optional<Transform>.Empty();
+        state.terrainFocus = null;
         state.investigation = null;
         return state;
     }

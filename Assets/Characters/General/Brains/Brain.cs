@@ -16,6 +16,9 @@ public class BrainConfig {
     public float scanningRate = 1f;
     public bool scanForFocusWhenFollowing = true;
     public bool hasAttack = false;
+    public Land[] canClearObstacles = new Land[0];
+    public Construction[] canClearConstruction = new Construction[0];
+    public bool canClearFeatures = false;
     public float timidity = .75f;   
 
 }
@@ -68,11 +71,11 @@ public class BrainConfig {
 public class Brain {
     public BrainConfig general;
     public Species species;
-    protected Creature creature;
+    public Creature creature;
     public Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     public int teamId { get => GetComponentStrict<Team>().TeamId; }
-    protected Team team { get => GetComponentStrict<Team>(); }
+    public Team team { get => GetComponentStrict<Team>(); }
     public CharacterController movement { get => creature.controller; }
     public Pathfinding pathfinding;
     private GoodTaste taste;
@@ -116,7 +119,7 @@ public class Brain {
     virtual public bool CanTame(Transform player) => false;
     virtual public bool ExtractTamingCost(Transform player) => false;
 
-    virtual public IEnumerator FocusedBehavior(Transform characterFocus) { yield break; }
+    virtual public IEnumerator FocusedBehavior() { yield break; }
     virtual public bool IsValidFocus(Transform characterFocus) =>
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) : true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();

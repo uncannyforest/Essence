@@ -49,7 +49,7 @@ public class StipuleBrain : Brain {
 
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this);
 
-    override public IEnumerator FocusedBehavior(Transform focus) => AttackBehavior.enumeratorWithParam(focus);
+    override public IEnumerator FocusedBehavior() => AttackBehavior.enumeratorWithParam(state.characterFocus.Value);
     
     private CharacterTargetedBehavior AttackBehavior {
         get => new CharacterTargetedBehavior((Transform focus) =>
