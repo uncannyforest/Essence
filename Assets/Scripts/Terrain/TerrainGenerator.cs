@@ -48,14 +48,12 @@ public class TerrainGenerator {
                     for (var j = 0; j < 2; j++) { // j is sub y in new image
                         var useAdjX = Mathf.FloorToInt(Random.value * (1+modPos));
                         var useAdjY = Mathf.FloorToInt(Random.value * (1+modPos));
-                        if (newImage.width >= 16 && 2*x+i >= newImage.width / 8 - 2 && 2*x+i < newImage.width / 8 + 2
-                            && 2*y+j >= newImage.width / 8 - 2 && 2*y+j < newImage.width / 8 + 2) {
-                            // Tutorial Island
-                            setPixel(newImage, 2*x+i, 2*y+j, Land.Hill);
-                        } else if (newImage.width >= 16 && 2*x+i < newImage.width / 4 && 2*y+j < newImage.height / 4 &&
-                            (nearEdge(2*x+i, newImage.width / 4, newImage.width / 4) || nearEdge(2*y+j, newImage.width / 4, newImage.height / 4))) {
-                            // Tutorial Island shore
-                            setPixel(newImage, 2*x+i, 2*y+j, Land.Water);
+                        Land? tiPixel = null;
+                        if (newImage.width >= 16 && 2*x+i <= newImage.width / 4f && 2*y+j <= newImage.width / 4f) {
+                            tiPixel = tutorialIsland(2*x+i, 2*y+j, newImage.width / 4f);
+                        }
+                        if (tiPixel is Land actualTiPixel) {
+                            setPixel(newImage, 2*x+i, 2*y+j, actualTiPixel);
                         } else if (mutateX == i && mutateY == j) {
                             if ((nearEdge(2*x+i, 16, newImage.width) || nearEdge(2*y+j, 16, newImage.height))
                                 && Random.value < .33f) {
@@ -73,8 +71,22 @@ public class TerrainGenerator {
             }
         }
     }
-    bool nearEdge(int n, int factor, int dim) => dim >= factor && (n < dim / factor || n >= dim - dim / factor);
-    bool nearCorners(int x, int y, int dim) => Mathf.Min(x, dim-x-1) + Mathf.Min(y, dim-y-1) < dim/4 - 1;
+    Land? tutorialIsland (float x, float y, float dim) {
+        if (x >= dim / 4 - 2 && x < dim / 4 + 2 && y >= dim / 4 - 2 && y < dim / 4 + 2) {
+            return Land.Grass;
+        } else if (x >= dim * 7 / 16 && x < dim * 9 / 16 && y >= dim * 7 / 16 && y < dim * 9 / 16) {
+            return Land.Grass;
+        } else if (x >= dim / 8 && x < dim * 7 / 8 && y >= dim / 8 && y < dim * 7 / 8
+            && (nearEdge(x - dim / 8, dim * 3 / 4, dim * 3 / 4) || nearEdge(y - dim / 8, dim * 3 / 4, dim * 3 / 4))) {
+            return Land.Hill;
+        } else if (nearEdge(x, dim, dim) || nearEdge(y, dim, dim)) {
+            return Land.Water;
+        } else {
+            return null;
+        }
+    }
+    bool nearEdge(float n, float factor, float dim) => dim >= factor && (n < dim / factor || n >= dim - dim / factor);
+    bool nearCorners(float x, float y, float dim) => Mathf.Min(x, dim-x-1) + Mathf.Min(y, dim-y-1) < dim/4 - 1;
 
     // IMAGE PROCESSING
     void setPixel(ImageData image, int x, int y, Land land) {
@@ -144,6 +156,7 @@ public class TerrainGenerator {
         for (var i = 0; i < maxTries; i++) {
             var x = Random.Range(0, DIM);
             var y = Random.Range(0, DIM);
+            if (y + x <= image.height / 3f) continue; // Tutorial Island
             if (neighborCount(image, x, y, check) < 8) continue;
             return new Vector2Int(x, y);
         }
@@ -174,9 +187,9 @@ public class TerrainGenerator {
                         setPixel(idn, x, y, Land.Hill);
                     } else if (neighborCount(id, x, y, Land.Water) > 4) {
                         setPixel(idn, x, y, Land.Water);
-                    } else if (neighborCount(id, x, y, Land.Forest,Land.Hill) > 4) {
+                    } else if (neighborCount(id, x, y, Land.Forest,Land.Water) > 4) {
                         setPixel(idn, x, y, Land.Forest);
-                    } else if (neighborCount(id, x, y, Land.Grass,Land.Hill) > 4) {
+                    } else if (neighborCount(id, x, y, Land.Grass,Land.Water) > 4) {
                         setPixel(idn, x, y, Land.Grass);
                     } else {
                         copyPixel(id, x, y, idn, x, y, Land.Woodpile);
@@ -373,6 +386,23 @@ public class TerrainGenerator {
                 }
             }
         }
+        // add tutorial dirtpiles
+        var tdx = DIM * 3 / 32 - 1;
+        var tdy = DIM * 3 / 32;
+        for (var i = 0; i < DIM; i++) {
+            if (getPixel(id, tdx, tdy) != Land.Grass) break;
+            setPixel(idn, tdx, tdy, Land.Dirtpile);
+            tdy++;
+            if (Random.value < .5) tdx--;
+        }
+        tdx = DIM * 3 / 32;
+        tdy = DIM * 3 / 32 - 1;
+        for (var i = 0; i < DIM; i++) {
+            if (getPixel(id, tdx, tdy) != Land.Grass) break;
+            setPixel(idn, tdx, tdy, Land.Dirtpile);
+            tdx++;
+            if (Random.value < .5) tdy--;
+        }
         id = idn;
 
         return id;
@@ -392,7 +422,7 @@ public class TerrainGenerator {
         Vector2Int location;
         Vector2Int startLocation = Vector2Int.zero;
         // water
-        for (int x = DIM / 8 - 1; x >= 0; x--) {
+        for (int x = DIM / 16 - 1; x >= 0; x--) {
             startLocation = new Vector2Int(x, x);
             if (terrain.Land[startLocation] == Land.Hill || terrain.Land[startLocation + new Vector2Int(1, 1)] == Land.Hill) continue;
             terrain.Land[startLocation] = Land.Grass;
