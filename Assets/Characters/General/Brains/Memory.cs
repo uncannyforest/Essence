@@ -71,6 +71,7 @@ public struct CreatureState {
     public Optional<Transform> characterFocus;
     public DesireMessage.Obstacle? terrainFocus;
     public Vector3? investigation;
+    public Vector2Int? shelter;
     public CreatureState WithCharacterFocus(Transform characterFocus) {
         CreatureState state = this;
         state.type = CreatureStateType.Focus;
@@ -95,6 +96,12 @@ public struct CreatureState {
         state.investigation = investigation;
         return state;
     }
+    public CreatureState WithShelter(Vector2Int shelter) {
+        CreatureState state = this;
+        state.type = CreatureStateType.Rest;
+        state.shelter = shelter;
+        return state;
+    }
     public CreatureState ClearFocus() {
         CreatureState state = this;
         state.focusIsPair = Optional<Creature>.Empty();
@@ -102,6 +109,7 @@ public struct CreatureState {
         state.characterFocus = Optional<Transform>.Empty();
         state.terrainFocus = null;
         state.investigation = null;
+        state.shelter = null;
         return state;
     }
 

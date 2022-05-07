@@ -143,12 +143,15 @@ public struct Senses {
         public Delta<Transform> characterFocus;
         public Optional<Creature> focusIsPair;
         public bool removeInvestigation;
+        public Delta<Vector2Int> shelter;
 
         override  public string ToString(){
             string result = "";
             if (characterFocus.IsAdd) result += " add character focus: " + characterFocus.Value.gameObject.name;
             if (characterFocus.IsRemove) result += " remove character focus";
             if (removeInvestigation) result += " remove investigation";
+            if (shelter.IsAdd) result += " add shelter: " + shelter.Value;
+            if (shelter.IsRemove) result += " remove shelter";
             return result.Substring(1);
         }
     }

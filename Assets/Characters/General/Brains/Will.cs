@@ -34,6 +34,7 @@ public class Will {
                 case CreatureStateType.Pair:
                     return CreatureState.Unpair(state);
                 case CreatureStateType.Focus:
+                case CreatureStateType.Rest:
                 case CreatureStateType.Investigate:
                     return state.ClearFocus();
                 case CreatureStateType.PassiveCommand:
@@ -127,23 +128,25 @@ public class Will {
 
         } else if (input.environment is Senses.Environment environment) {
             if (environment.characterFocus.IsAdd) {
-                if (state.characterFocus.HasValue)
-                    return "Trying to add characterFocus " + environment.characterFocus.Value +
-                            " when already focused on " + state.characterFocus.Value;
                 CreatureState result = state.ClearFocus().WithCharacterFocus(environment.characterFocus.Value);
                 if (environment.focusIsPair.HasValue) result = result.WhereFocusIsPair(environment.focusIsPair.Value);
                 return result;
             } else if (environment.characterFocus.IsRemove) {
-                if (state.characterFocus.HasValue) {
-                    relinquishedPriority = (int)CreatureStateType.Focus; // end focus
-                    return state.ClearFocus();
-                } else return "Trying to remove characterFocus when none present";
+                if (!state.characterFocus.HasValue)
+                    return "Trying to remove characterFocus when none present";
+                relinquishedPriority = (int)CreatureStateType.Focus; // end focus
+                return state.ClearFocus();
             } else if (environment.removeInvestigation) {
-                if (state.characterFocus.HasValue)
-                    return "Trying to remove investigation when focused on " + state.characterFocus.Value;
                 if (state.investigation == null)
                     return "Trying to remove investigation when none present";
                 relinquishedPriority = (int)CreatureStateType.Investigate; // end investigate
+                return state.ClearFocus();
+            } else if (environment.shelter.IsAdd) {
+                return state.ClearFocus().WithShelter(environment.shelter.Value);
+            } else if (environment.shelter.IsRemove) {
+                if (state.shelter == null)
+                    return "Trying to remove shelter when none present";
+                relinquishedPriority = (int)CreatureStateType.Rest; // end rest
                 return state.ClearFocus();
             } else return "environment present, but no change";
         } else return "No change";

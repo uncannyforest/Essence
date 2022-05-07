@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum CreatureStateType {
-    Override = 800,
-    Faint = 700,
-    Execute = 500,
-    Focus = 340,
-    Pair = 300,
-    Investigate = 260,
+    Override = 1000,
+    Faint = 800,
+    Execute = 600,
+    Focus = 410,
+    Rest = 370,
+    Pair = 330,
+    Investigate = 290,
     PassiveCommand = 100,
 }
 public static class CreatureStateTypeExtensions {
@@ -20,7 +21,7 @@ public static class CreatureStateTypeExtensions {
         return priority >= (int)from;
     }
     public static bool CanTransitionTo(this CreatureStateType from, CreatureStateType type) {
-        return from.CanTransition((int)type - 50);
+        return from.CanTransition((int)type - 100);
     }
 }
 
@@ -168,6 +169,12 @@ public struct Habit {
             onRunStep = (state, brain) => brain.pathfinding.ApproachThenIdle(state.pairDirective.Value.transform.position, brain.movement.personalBubble)
         },
 
+        [CreatureStateType.Rest] = new Node(CreatureStateType.Rest) {
+            onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.shelter),
+            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
+                brain.Habitat.RestBehavior((Vector2Int)state.shelter)),
+        },
+
         [CreatureStateType.Investigate] = new Node(CreatureStateType.Investigate) {
             onEnter = (_, brain) => brain.investigationCancel =
                 RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
@@ -202,7 +209,7 @@ public struct Habit {
         [CommandType.Station] = new PassiveCommandNode(CommandType.Station) {
             nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.stationDirective),
             passiveCommandRunStep = (state, brain) => brain.pathfinding
-                .ApproachThenIdle((Vector3)state.command?.stationDirective, 1f / CharacterController.subGridUnit)
+                .ApproachThenIdle((Vector3)state.command?.stationDirective)
         },
     };
 }

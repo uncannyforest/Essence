@@ -57,7 +57,7 @@ public class Pathfinding {
     public YieldInstruction Roam() {
         if (Random.value < general.roamRestingFraction) movement.Idle();
         else movement.InDirection(RandomVelocity());
-        return new WaitForSeconds(Random.value * general.reconsiderRateRoam);
+        return new WaitForSeconds(Random.value * general.reconsiderMaxRateRoam);
     }
 
     private Displacement FollowTargetDirection(Vector3 targetPosition) {
@@ -79,11 +79,11 @@ public class Pathfinding {
 
     public YieldInstruction TypicalWait { get => new WaitForSeconds(general.reconsiderRateTarget); }
 
-    public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop) {
+    public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = CharacterController.subGridUnit) {
         return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
     }
 
-    public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop) {
+    public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop = CharacterController.subGridUnit) {
         if (CheckTargetForObstacles(target).IsValue(out YieldInstruction unblockSelf))
             return Optional.Of(unblockSelf);
         float distance = Vector2.Distance(target, transform.position);
@@ -96,8 +96,8 @@ public class Pathfinding {
         }
     }
 
-    public ApproachThenBuild ApproachThenBuild(float buildDistance, float buildTime, Action<Terrain.Position> buildAction)
-        => new ApproachThenBuild(brain, buildDistance, buildTime, buildAction);
+    public ApproachThenInteract ApproachThenInteract(float interactionDistance, float interactionTime, Action<Terrain.Position> interaction)
+        => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction);
 
     public Func<YieldInstruction> FaceAnd(string animationTrigger,
             Vector2 location,
@@ -159,36 +159,37 @@ public class Pathfinding {
     }
 }
 
-public class ApproachThenBuild : TargetedBehavior<Terrain.Position> {
+public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
     private readonly Brain brain;
-    private readonly float buildDistance;
-    private readonly float buildTime;
-    private readonly Action<Terrain.Position> buildAction;
+    private readonly float interactDistance;
+    private readonly float interactTime;
+    private readonly Action<Terrain.Position> interaction;
 
-    public ApproachThenBuild (
+    public ApproachThenInteract (
             Brain brain,
-            float buildDistance,
-            float buildTime,
-            Action<Terrain.Position> buildAction) {
+            float interactDistance,
+            float interactTime,
+            Action<Terrain.Position> interaction) {
         this.brain = brain;
-        this.buildDistance = buildDistance;
-        this.buildTime = buildTime;
-        this.buildAction = buildAction;
+        this.interactDistance = interactDistance;
+        this.interactTime = interactTime;
+        this.interaction = interaction;
         this.enumeratorWithParam = E;
     }
 
-    public IEnumerator E(Terrain.Position buildLocation) {
+    public IEnumerator E(Terrain.Position location) {
         for (int i = 0; i < 100_000; i++) {
-            if (brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(buildLocation))
+            if (brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location))
                     .IsValue(out YieldInstruction unblockSelf)) {
                 yield return unblockSelf;
                 continue;
             }
-            Optional<YieldInstruction> approaching = brain.pathfinding.Approach(Terrain.I.CellCenter(buildLocation), buildDistance);
+            Optional<YieldInstruction> approaching = brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance);
             if (approaching.HasValue) yield return approaching.Value;
             else {
-                buildAction(buildLocation);
-                yield return new WaitForSeconds(buildTime);
+                brain.movement.IdleFacing(Terrain.I.CellCenter(location));
+                interaction(location);
+                yield return new WaitForSeconds(interactTime);
                 yield break;
             }
         }

@@ -9,9 +9,10 @@ using Random = UnityEngine.Random;
 public class BrainConfig {
     public Pathfinding.AIDirections numMovementDirections;
     public bool canFaint = false;
+    public float lureMaxTime = 10f;
     public float roamRestingFraction = .5f;
-    public float reconsiderRateRoam = 5;
-    public float reconsiderRateFollow = 2.5f;
+    public float reconsiderMaxRateRoam = 5;
+    public float reconsiderRateFollow = 2f;
     public float reconsiderRateTarget = 1f;
     public float scanningRate = 1f;
     public bool scanForFocusWhenFollowing = true;
@@ -104,6 +105,7 @@ public class Brain {
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
     virtual public YieldInstruction UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
+    virtual public Habitat Habitat => null;
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS
@@ -178,7 +180,17 @@ public class Brain {
                     (general.hasAttack || !general.scanForFocusWhenFollowing))
                 continue;
             Optional<Transform> maybeFocus = FindFocus();
-            if (maybeFocus.HasValue) SetFocus(maybeFocus.Value);
+            if (maybeFocus.HasValue) { 
+                SetFocus(maybeFocus.Value);
+                continue;
+            }
+            if (Habitat != null) {
+                Optional<Vector2Int> maybeShelter = Habitat.FindShelter();
+                if (maybeShelter.HasValue) {
+                    SetShelter(maybeShelter.Value);
+                    continue;
+                }
+            }
         }
     }
 
@@ -232,6 +244,12 @@ public class Brain {
         if (!threat.HasValue) DisableFollowOffensive();
         else SetFocus(threat.Value);
     }
+
+    private void SetShelter(Vector2Int shelter) => new Senses() {
+        environment = new Senses.Environment() {
+            shelter = Delta<Vector2Int>.Add(shelter)
+        }
+    }.TryUpdateCreature(creature);
 
     ////////////////
     // SANITY CHECKS

@@ -27,12 +27,12 @@ public class RedDwarfBrain : Brain {
     override public List<CreatureAction> Actions() {
         return new List<CreatureAction>() {
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
-                pathfinding.ApproachThenBuild(
+                pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, redDwarf.buildTime,
                     (loc) => terrain[loc] = Construction.Wood).Queued(),
                 TeleFilter.Terrain.WOODBUILDING),
             CreatureAction.WithFeature(FeatureLibrary.P.boat,
-                pathfinding.ApproachThenBuild(
+                pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, redDwarf.buildTime,
                     (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).ForVector2Int().Queued())
         };
