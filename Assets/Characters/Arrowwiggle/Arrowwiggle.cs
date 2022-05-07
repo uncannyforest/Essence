@@ -23,12 +23,7 @@ public class ArrowwiggleBrain : Brain {
     public ArrowwiggleBrain(Arrowwiggle species, BrainConfig general, ArrowwiggleConfig arrowwiggle) : base(species, general) {
         this.arrowwiggle = arrowwiggle;
     }
-
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
-        };
-    }
-
+    
     override public bool CanTame(Transform player) =>
         player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Arrow, arrowwiggle.tamingCost);
 

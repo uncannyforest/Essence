@@ -22,10 +22,8 @@ public class RedDwarfBrain : Brain {
 
     public RedDwarfBrain(RedDwarf species, BrainConfig general, RedDwarfConfig redDwarf) : base(species, general) {
         this.redDwarf = redDwarf;
-    }
 
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
+        Actions = new List<CreatureAction>() {
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
                 pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, redDwarf.buildTime,

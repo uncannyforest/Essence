@@ -24,11 +24,6 @@ public class BunnyBrain : Brain {
         this.healing = species.GetComponentStrict<Healing>();
     }
 
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
-        };
-    }
-
     override public bool CanTame(Transform player) => true;
     override public bool ExtractTamingCost(Transform player) => true;
 

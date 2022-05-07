@@ -23,20 +23,18 @@ public class MooseBrain : Brain {
 
     public MooseBrain(Moose species, BrainConfig general, MooseConfig moose) : base(species, general) {
         this.moose = moose;
-    }
 
-    override public bool CanTame(Transform player) => true;
-
-    public override bool ExtractTamingCost(Transform player) => true;
-
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
+        Actions = new List<CreatureAction>() {
             CreatureAction.WithObject(moose.attackAction,
                 new PathTracingBehavior.Targeted(transform, IsDestroyable, ApproachAndAttack),
                 new TeleFilter(TeleFilter.Terrain.TILES, null)
                     .WithLine(GetDestinationsForDisplay))
         };
     }
+
+    override public bool CanTame(Transform player) => true;
+
+    public override bool ExtractTamingCost(Transform player) => true;
 
     private List<Vector3> GetDestinationsForDisplay() => 
         (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;

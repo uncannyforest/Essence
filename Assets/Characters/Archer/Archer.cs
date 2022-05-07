@@ -26,6 +26,14 @@ public class ArcherBrain : Brain {
     public ArcherBrain(Archer species, BrainConfig general, ArcherConfig archer) : base(species, general) {
         this.archer = archer;
         expectedArrowReach = archer.arrowPrefab.reach + archer.arrowPrefab.GetComponentStrict<CircleCollider2D>().radius;
+
+        Actions = new List<CreatureAction>() {
+            CreatureAction.WithCharacter(archer.attackAction,
+                new CharacterTargetedBehavior(ExecuteBehavior),
+                (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
+                    c.GetComponent<Health>() != null &&
+                    c.GetComponentStrict<Team>().TeamId != teamId; })
+        };
     }
 
     override public bool CanTame(Transform player) {
@@ -39,17 +47,6 @@ public class ArcherBrain : Brain {
             GetComponentStrict<Health>().ResetTo(1);
             return true;
         } else return false;
-    }
-
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
-            CreatureAction.WithCharacter(archer.attackAction,
-                new CharacterTargetedBehavior(ExecuteBehavior),
-                (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
-                    c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != teamId;}
-                )
-        };
     }
 
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this,

@@ -111,7 +111,7 @@ public class Creature : MonoBehaviour {
     private void InitializeActionList(Brain brain) {
         action.Add(CreatureAction.Roam);
         action.Add(CreatureAction.Station);
-        action.AddRange(brain.Actions());
+        action.AddRange(brain.Actions);
     }
 
     private void TeamChangedEventHandler(int team) {

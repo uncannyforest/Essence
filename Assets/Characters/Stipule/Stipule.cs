@@ -26,6 +26,15 @@ public class StipuleBrain : Brain {
 
     public StipuleBrain(Stipule species, BrainConfig general, StipuleConfig stipule) : base(species, general) {
         this.stipule = stipule;
+
+        Actions = new List<CreatureAction>() {
+            CreatureAction.WithCharacter(stipule.attackAction,
+                AttackBehavior,
+                (c) => 
+                    c.GetComponent<Health>() != null &&
+                    c.GetComponentStrict<Team>().TeamId != teamId
+                )
+        };
     }
 
     override public bool CanTame(Transform player) =>
@@ -34,17 +43,6 @@ public class StipuleBrain : Brain {
     // Returns true if successful.
     public override bool ExtractTamingCost(Transform player) {
         return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Scale, stipule.scaleCost);
-    }
-
-    override public List<CreatureAction> Actions() {
-        return new List<CreatureAction>() {
-            CreatureAction.WithCharacter(stipule.attackAction,
-                AttackBehavior,
-                (c) => 
-                    c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != teamId
-                )
-        };
     }
 
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this);

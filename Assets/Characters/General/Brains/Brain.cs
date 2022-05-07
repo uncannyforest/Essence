@@ -95,7 +95,7 @@ public class Brain {
         return this;
     }
     virtual protected void Initialize() {}
-    virtual public List<CreatureAction> Actions() => new List<CreatureAction>();
+    public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
     virtual public bool CanTame(Transform player) => false;
     virtual public bool ExtractTamingCost(Transform player) => false;
 
@@ -105,7 +105,7 @@ public class Brain {
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
     virtual public YieldInstruction UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
-    virtual public Habitat Habitat => null;
+    public Habitat Habitat { get; protected set; } = null;
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS
