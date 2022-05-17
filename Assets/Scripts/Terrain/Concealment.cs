@@ -62,7 +62,7 @@ public class Concealment {
         }
         Land? land = terrain.GetLand(terrain.CellAt(seen.transform.position));
         if (land?.PlantLevel() >= seen.Height) {
-            if (Disp.FT(seerPosition, seen.transform.position).sqrMagnitude < 2.5f * 2.5f)
+            if (Disp.FT(seerPosition, seen.transform.position) < 2.5f)
                 return true;
             foreach (Land? adjLand in terrain.GetFourLandTilesAround(seen.transform.position))
                 if (adjLand == null || adjLand?.PlantLevel() < seen.Height)

@@ -80,4 +80,8 @@ public struct Optional<T> {
     public override int GetHashCode() {
         return base.GetHashCode() + value.GetHashCode();
     }
+    public override string ToString() {
+        if (HasValue) return "[" + Value + "]";
+        else return "_";
+    }
 }

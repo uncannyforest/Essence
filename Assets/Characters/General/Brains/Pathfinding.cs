@@ -50,7 +50,7 @@ public class Pathfinding {
     }
 
     public void MoveTowardWithoutClearingObstacles(Vector3 target) {
-        CheckTargetForObstacles(target);
+        CheckTargetForObstacles(target, 0);
         movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
     }
 
@@ -70,7 +70,7 @@ public class Pathfinding {
         return toTarget - toThreatCorrected;
     }
     public YieldInstruction Follow(Transform followDirective) {
-        if (CheckTargetForObstacles(followDirective.position).IsValue(out YieldInstruction unblockSelf))
+        if (CheckTargetForObstacles(followDirective.position, 0).IsValue(out YieldInstruction unblockSelf))
             return unblockSelf;
         Displacement targetDirection = FollowTargetDirection(followDirective.position);
         movement.InDirection(IndexedVelocity(targetDirection));
@@ -79,12 +79,12 @@ public class Pathfinding {
 
     public YieldInstruction TypicalWait { get => new WaitForSeconds(general.reconsiderRateTarget); }
 
-    public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = CharacterController.subGridUnit) {
+    public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
     }
 
-    public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop = CharacterController.subGridUnit) {
-        if (CheckTargetForObstacles(target).IsValue(out YieldInstruction unblockSelf))
+    public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
+        if (CheckTargetForObstacles(target, proximityToStop).IsValue(out YieldInstruction unblockSelf))
             return Optional.Of(unblockSelf);
         float distance = Vector2.Distance(target, transform.position);
         if (distance <= proximityToStop) {
@@ -116,8 +116,9 @@ public class Pathfinding {
         return TypicalWait;
     };
 
-    public Optional<YieldInstruction> CheckTargetForObstacles(Vector2 target) {
-        if (IdentifyObstacles(target) is DesireMessage.Obstacle obstacle) {
+    public Optional<YieldInstruction> CheckTargetForObstacles(Vector2 target, float exceptWithinRadius) {
+        if (IdentifyObstacles(target) is DesireMessage.Obstacle obstacle &&
+                Disp.FT(target, Terrain.I.CellCenter(obstacle.location)) > exceptWithinRadius) {
             if (Will.CanClearObstacleAt(brain.general, obstacle.location)) {
                 return Optional.Of(brain.UnblockSelf(obstacle.location));
             } else BroadcastObstacle(obstacle);
@@ -179,12 +180,13 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
 
     public IEnumerator E(Terrain.Position location) {
         for (int i = 0; i < 100_000; i++) {
-            if (brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location))
+            if (brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location), interactDistance)
                     .IsValue(out YieldInstruction unblockSelf)) {
                 yield return unblockSelf;
                 continue;
             }
             Optional<YieldInstruction> approaching = brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance);
+            Debug.Log(approaching);
             if (approaching.HasValue) yield return approaching.Value;
             else {
                 brain.movement.IdleFacing(Terrain.I.CellCenter(location));

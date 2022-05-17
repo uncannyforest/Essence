@@ -30,11 +30,14 @@ public class MooseBrain : Brain {
                 new TeleFilter(TeleFilter.Terrain.TILES, null)
                     .WithLine(GetDestinationsForDisplay))
         };
+
+        Habitat = new Habitat(this, Habitat.InteractionMode.Inside) {
+            IsShelter = (loc) => terrain.Land[loc] == Land.Ditch
+        };
     }
 
-    override public bool CanTame(Transform player) => true;
-
-    public override bool ExtractTamingCost(Transform player) => true;
+    override public bool ExtractTamingCost(Transform player) => CanTame(player);
+    override public bool CanTame(Transform player) => Habitat.CanTame();
 
     private List<Vector3> GetDestinationsForDisplay() => 
         (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;

@@ -81,9 +81,9 @@ public class Brain {
     public Brain(Species species, BrainConfig general) {
         this.species = species;
         this.general = general;
+        pathfinding = new Pathfinding(this);
     }
     public Brain InitializeAll() {
-        pathfinding = new Pathfinding(this);
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
         taste = GetComponent<GoodTaste>();

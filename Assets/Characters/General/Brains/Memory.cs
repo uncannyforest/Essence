@@ -131,10 +131,12 @@ public struct CreatureState {
             + " | previous state: " + controlOverridePrevState;
         if (command is Command actualCommand) result += " | command: " + command;
         if (pairDirective.HasValue) result += " | pair directive: " + pairDirective.Value.gameObject.name;
+        if (shelter is Vector2Int realShelter) result += " | shelter: " + realShelter + " at " + Terrain.I.CellCenter(realShelter);
         if (followOffensive) result += " | follow offensive";
         if (focusIsPair.HasValue) result += " | pair focus: " + focusIsPair.Value.gameObject.name;
         if (characterFocus.HasValue) result += " | character focus: " + characterFocus.Value.gameObject.name;
-        if (investigation is Vector3 actualInvestigation) result += " | investigation: " + actualInvestigation;
+        if (terrainFocus is DesireMessage.Obstacle focus) result += " | terrain focus: unblocking " + focus.requestor;
+        if (investigation is Vector3 realInvestigation) result += " | investigation: " + realInvestigation;
         return result;
     }
 }

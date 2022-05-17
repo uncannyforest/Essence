@@ -40,6 +40,14 @@ public struct Displacement {
         => new Displacement(d.displacement / f);
     public static Displacement operator*(Quaternion q, Displacement d)
         => new Displacement(q * d.displacement);
+    public static bool operator<(Displacement d, float dist)
+        => d.sqrMagnitude < dist * dist;
+    public static bool operator>(Displacement d, float dist)
+        => d.sqrMagnitude > dist * dist;
+    public static bool operator<=(Displacement d, float dist)
+        => d.sqrMagnitude <= dist * dist;
+    public static bool operator>=(Displacement d, float dist)
+        => d.sqrMagnitude >= dist * dist;
 
     public float x { get => displacement.x; }
     public float y { get => displacement.y; }
