@@ -263,16 +263,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 1
+    canFaint: 0
+    lureMaxTime: 10
     roamRestingFraction: 0.4
-    reconsiderRateRoam: 5
+    reconsiderMaxRateRoam: 5
     reconsiderRateFollow: 2.5
     reconsiderRateTarget: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0
+    canClearObstacles: 
+    canClearConstruction: 
+    canClearFeatures: 0
     timidity: 0.75
   species: {fileID: -7616915303342351412}
   creatureName: Bunny
+  creatureShortName: Bun
   icon: {fileID: 1185625210376227553, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
   breastplate: {fileID: -1622973192143475964, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
   tamingInfoShort: Whistle song (press and hold) to tame
@@ -280,7 +286,8 @@ MonoBehaviour:
     sufficient time.  Press and hold the left mouse button to whistle a song.  A
     blue stat bar will appear beneath the <creature/> to indicate it can hear you;
     when the stat bar reaches the end the <creature/> will be tamed.
-  stateForEditorDebugging: 0
+  stats:
+    name: 
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -370,9 +377,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     healAction: {fileID: 0}
-    healDistance: 1
-    healQuantity: 10
-    healTime: 0.5
 --- !u!95 &3938203489945016266
 Animator:
   serializedVersion: 3
@@ -429,9 +433,6 @@ MonoBehaviour:
   personalBubble: 0.25
   setAnimatorDirectionDirectly: 0
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls: []
   defaultSpeed: 1
   waterSpeed: 0
 --- !u!1 &4481103850873570948

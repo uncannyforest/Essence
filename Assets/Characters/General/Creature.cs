@@ -78,11 +78,13 @@ public class Creature : MonoBehaviour {
     public BrainConfig brainConfig;
     public Species species;
     public string creatureName;
+    public string creatureShortName;
     public Sprite icon;
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
 
+    public Stats stats;
     public Brain brain;
     public CreatureState State {
         get => brain.state;
@@ -99,6 +101,7 @@ public class Creature : MonoBehaviour {
     [NonSerialized] public Creature.Data? serializedData;
     void Start() {
         controller = GetComponent<CharacterController>();
+        stats = new Stats(this);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         spriteManager = GetComponentInChildren<SpriteSorter>();

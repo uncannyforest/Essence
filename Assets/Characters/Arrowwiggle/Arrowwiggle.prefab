@@ -261,16 +261,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 1
+    canFaint: 0
+    lureMaxTime: 10
     roamRestingFraction: 0.5
-    reconsiderRateRoam: 5
+    reconsiderMaxRateRoam: 5
     reconsiderRateFollow: 2.5
     reconsiderRateTarget: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0
+    canClearObstacles: 
+    canClearConstruction: 
+    canClearFeatures: 0
     timidity: 0.5
   species: {fileID: 3243608439128122060}
   creatureName: Arrowwiggle
+  creatureShortName: Arrow
   icon: {fileID: 6399436051876537120, guid: 4ab05ede570204ae6a60ef9e20b89eca, type: 3}
   breastplate: {fileID: -5489052246051778459, guid: 4ab05ede570204ae6a60ef9e20b89eca, type: 3}
   tamingInfoShort: You need one arrow to tame
@@ -281,7 +287,8 @@ MonoBehaviour:
     You
     can collect a dropped arrow from an <color=creature>Archer</color>, if you dodge
     its shots and then pick up the arrow.'
-  stateForEditorDebugging: 0
+  stats:
+    name: 
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -374,7 +381,6 @@ MonoBehaviour:
     restockDistance: 1
     restockQuantity: 1
     restockTime: 0.1
-    arrowCollectibleSprite: {fileID: 21300000, guid: c57205f8fbdbb44549fbe55ea803c2da, type: 3}
 --- !u!114 &3622125727487898204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,9 +396,6 @@ MonoBehaviour:
   personalBubble: 0.25
   setAnimatorDirectionDirectly: 0
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls: []
   defaultSpeed: 1
   waterSpeed: 0
 --- !u!1 &4481103850873570948

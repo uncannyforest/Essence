@@ -90,6 +90,10 @@ PrefabInstance:
       value: You need one gemstone to tame a
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureShortName
+      value: Red
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.timidity
       value: 0.25
       objectReference: {fileID: 0}

@@ -513,16 +513,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 3
+    canFaint: 0
+    lureMaxTime: 10
     roamRestingFraction: 0.75
-    reconsiderRateRoam: 5
+    reconsiderMaxRateRoam: 5
     reconsiderRateFollow: 2.5
     reconsiderRateTarget: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 1
+    canClearObstacles: 
+    canClearConstruction: 
+    canClearFeatures: 0
     timidity: 0.3
   species: {fileID: 4481103850635713288}
   creatureName: Archer
+  creatureShortName: Arch
   icon: {fileID: -7132172409892320828, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   breastplate: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
   tamingInfoShort: Must defeat + have bunny near to tame
@@ -531,7 +537,8 @@ MonoBehaviour:
 
     You can tame
     a fainted <creature/> as long as you have a bunny on your team within view.'
-  stateForEditorDebugging: 0
+  stats:
+    name: 
 --- !u!114 &4481103850635713288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -566,7 +573,6 @@ MonoBehaviour:
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   itemDrop: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
   itemDropSize: 1
-  collectiblePrefab: {fileID: 0}
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
 --- !u!50 &4481103850635713295
@@ -678,9 +684,6 @@ MonoBehaviour:
   personalBubble: 0.25
   setAnimatorDirectionDirectly: 0
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls: []
   defaultSpeed: 1
   waterSpeed: 0
 --- !u!1 &4481103850873570948

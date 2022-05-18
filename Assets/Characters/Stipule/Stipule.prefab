@@ -513,22 +513,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 3
+    canFaint: 0
+    lureMaxTime: 10
     roamRestingFraction: 0.25
-    reconsiderRateRoam: 5
+    reconsiderMaxRateRoam: 5
     reconsiderRateFollow: 2.5
     reconsiderRateTarget: 1
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 1
+    canClearObstacles: 
+    canClearConstruction: 
+    canClearFeatures: 0
     timidity: 0.2
   species: {fileID: 8273002267813487745}
   creatureName: Stipule
+  creatureShortName: Stip
   icon: {fileID: 5684846723981245244, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   breastplate: {fileID: -7264097725937428021, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
   tamingInfoShort: You need three scales to tame
   tamingInfoLong: To tame any <creature/>, you need three scales.  Scales are orange
     objects dropped when you defeat them.
-  stateForEditorDebugging: 0
+  stats:
+    name: 
 --- !u!114 &4481103850635713293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,7 +554,6 @@ MonoBehaviour:
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   itemDrop: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
   itemDropSize: 1
-  collectiblePrefab: {fileID: 0}
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
 --- !u!50 &4481103850635713295
@@ -676,9 +682,6 @@ MonoBehaviour:
   personalBubble: 0.25
   setAnimatorDirectionDirectly: 0
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls: []
   defaultSpeed: 1
   waterSpeed: 0
 --- !u!1 &4481103850873570948
