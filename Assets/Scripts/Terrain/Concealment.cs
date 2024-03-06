@@ -10,7 +10,7 @@ public class Concealment {
     private Tilemap transparentTiles;
     private Dictionary<Construction, TileBase> buildingTiles;
 
-    private Vector2Int currentCenter = Vector2Int.zero;
+    private Vector2Int currentCenter = Vector2Int.zero; // of player, updated by HandleCrossedTile
     private int[] currentCardinalExtents = new int[] {0, 0, 0, 0};
 
     public Concealment(Terrain terrain) {
@@ -28,16 +28,18 @@ public class Concealment {
         GameObject.FindObjectOfType<PointOfView>().CrossedTile += HandleCrossedTile;
     }
 
+    // usage of currentCenter assumes seen is player. TODO: fix
     public bool CanSee(Vector3 seerPosition, Character seen) {
         Construction? expectedConstruction = terrain.Roof.Get(terrain.CellAt(seen.transform.position));
         if (expectedConstruction != null && expectedConstruction != Construction.None) {
+            // expectedConstruction is the roof above seen
             Vector2Int cellDistance =
                 terrain.CellAt(seerPosition) - terrain.CellAt(seen.transform.position);
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4; i++) { // seen next to entrance is visible
                 Terrain.Position wall = Terrain.Position.Edge(currentCenter, i);
                 Vector2Int roof = currentCenter + Vct.Cardinals[i];
-                if (terrain.GetConstruction(wall) != expectedConstruction &&
-                    terrain.Roof.Get(roof) != expectedConstruction) return true;
+                if (terrain.GetConstruction(wall) != expectedConstruction && // entrance is defined by absence of wall . . .
+                    terrain.Roof.Get(roof) != expectedConstruction) return true; // and absence of roof beyond it
             }
             if (cellDistance.IsCardinal()) {
                 // At this point, we know we have an opening to an adjacent roof
@@ -89,6 +91,7 @@ public class Concealment {
         }
     }
 
+    // Determines which cardinal roofs should be hidden (made transparent).
     private void UpdateExtents() {
         for (int i = 0; i < 4; i++) {
             Construction? expectedConstruction = terrain.Roof.Get(currentCenter + Vct.Cardinals[i]);
@@ -111,15 +114,18 @@ public class Concealment {
         if (pos == currentCenter) UpdateTile(pos, true);
         else {
             Vector2Int relativePos = pos - currentCenter;
-            if (!relativePos.IsCardinal()) UpdateTile(pos, false);
+            if (!relativePos.IsCardinal()) UpdateTile(pos, false); // show non-cardinal roofs (default)
             else {
                 int cardinal = relativePos.GetCardinal();
                 int magnitude = relativePos.CardinalMagnitude();
-                UpdateTile(pos, magnitude <= currentCardinalExtents[cardinal]);
+                UpdateTile(pos, magnitude <= currentCardinalExtents[cardinal]); // hide certain cardinal roofs
             }
         }
     }
 
+    // Move tile between mainTiles and transparentTiles.
+    // transparentTiles have a special shader that only renders one out of four pixels.
+    // hide indicates whether to make the tile transparent.
     private void UpdateTile(Vector2Int pos, bool hide) {
         if (hide) {
             mainTiles[Terrain.RoofLevel].SetTile((Vector3Int)pos, null);
