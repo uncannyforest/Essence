@@ -479,7 +479,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1f50513120004f08902507264e5e881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadGirth: 0
   verticalDisplacement: 0
 --- !u!1 &7016486793898893324
 GameObject:
@@ -654,6 +653,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6572608233696125373}
+  - component: {fileID: 4957690152975860324}
   - component: {fileID: 7002142338850342785}
   - component: {fileID: -89785125535887156}
   - component: {fileID: 3200447014513491315}
@@ -684,6 +684,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4957690152975860324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7775390753821550864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 624671c5343584b09a1b1cf893f806ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  height: 0
+  broadGirth: 0
+  spriteSorter: {fileID: 0}
 --- !u!50 &7002142338850342785
 Rigidbody2D:
   serializedVersion: 4
@@ -793,9 +808,8 @@ MonoBehaviour:
   personalBubble: 0.25
   setAnimatorDirectionDirectly: 0
   snap: 0
-  CrossedTile:
-    m_PersistentCalls:
-      m_Calls: []
+  defaultSpeed: 2
+  waterSpeed: 0
 --- !u!114 &2763505932110915963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,23 +824,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brainConfig:
     numMovementDirections: 0
-    movementSpeed: 0
+    canFaint: 0
+    lureMaxTime: 10
     roamRestingFraction: 0.5
-    reconsiderRateRoam: 5
+    reconsiderMaxRateRoam: 5
     reconsiderRateFollow: 2.5
     reconsiderRateTarget: 2.5
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0
+    canClearObstacles: 
+    canClearConstruction: 
+    canClearFeatures: 0
     timidity: 0.75
   species: {fileID: 0}
   creatureName: 
+  creatureShortName: 
   icon: {fileID: 0}
   breastplate: {fileID: 0}
   tamingInfoShort: You cannot tame any
   tamingInfoLong: That creature cannot be tamed.
-  personalBubble: 0.25
-  stateForEditorDebugging: 0
 --- !u!1 &8652825595509261789
 GameObject:
   m_ObjectHideFlags: 0

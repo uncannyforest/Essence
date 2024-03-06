@@ -191,7 +191,7 @@ public class Will {
     public static bool CanSee(Vector3 seerPosition, Transform seen) {
         if (Vector2.Distance(seerPosition, seen.position) > Creature.neighborhood)
             return false;
-        SpriteSorter seenSprite = seen.GetComponentInChildren<SpriteSorter>();
+        Character seenSprite = seen.GetComponent<Character>();
         if (seenSprite == null)
             return true;
         else {

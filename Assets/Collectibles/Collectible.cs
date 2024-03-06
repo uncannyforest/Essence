@@ -42,10 +42,12 @@ public class Collectible : MonoBehaviour {
         float startTime = Time.time;
         float endTime = startTime + CollectibleLibrary.C.collectAnimationTime;
         float speed = CollectibleLibrary.C.collectAnimationDistance / CollectibleLibrary.C.collectAnimationTime;
-        float startY = spriteSorter.VerticalDisplacement;
-        while (Time.time < endTime) {
-            spriteSorter.VerticalDisplacement = startY + speed * (Time.time - startTime);
-            yield return null;
+        if (spriteSorter != null) {
+            float startY = spriteSorter.VerticalDisplacement;
+            while (Time.time < endTime) {
+                spriteSorter.VerticalDisplacement = startY + speed * (Time.time - startTime);
+                yield return null;
+            }
         }
         Destroy(gameObject);
     }

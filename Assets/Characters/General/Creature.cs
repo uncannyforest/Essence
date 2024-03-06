@@ -40,7 +40,7 @@ public struct CreatureAction {
             TargetedBehavior<Transform> executingBehavior,
             Func<Transform, bool> characterFilter) =>
         new CreatureAction(icon, null,
-            (creature, target) => creature.Execute(executingBehavior.WithTarget(((SpriteSorter)target).Character)),
+            (creature, target) => creature.Execute(executingBehavior.WithTarget(((Character)target).transform)),
             new TeleFilter(TeleFilter.Terrain.NONE, characterFilter),
             null, executingBehavior.canQueue, false, false);
     public static CreatureAction WithTerrain(Sprite icon,
@@ -95,8 +95,6 @@ public class Creature : MonoBehaviour {
     public const float neighborhood = 6.5f;
 
     [NonSerialized] public CharacterController controller;
-    private SpriteSorter spriteManager;
-    public SpriteSorter SpriteManager { get => spriteManager; }
 
     [NonSerialized] public Creature.Data? serializedData;
     void Start() {
@@ -104,7 +102,6 @@ public class Creature : MonoBehaviour {
         stats = new Stats(this);
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
-        spriteManager = GetComponentInChildren<SpriteSorter>();
         GetComponent<Team>().changed += TeamChangedEventHandler;
 
         if (serializedData is Data data) DeserializeNow(data);

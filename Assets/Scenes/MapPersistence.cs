@@ -70,7 +70,7 @@ public class MapPersistence : MonoBehaviour {
                     .DeserializeUponStart(creature);
             }
 
-            Debug.Log("Game data loaded!");
+            Debug.Log("Game data loaded from " + Application.persistentDataPath + "/MySaveData.dat");
         } else Debug.LogError("There is no save data!");
     }
 }

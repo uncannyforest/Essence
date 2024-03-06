@@ -53,6 +53,10 @@ public struct Interaction {
 }
 
 public class WorldInteraction : MonoBehaviour {
+    private static WorldInteraction instance;
+    public static WorldInteraction I { get => instance; }
+    void Awake() { if (instance == null) instance = this; }
+
     public Melee.Config meleeConfig = new Melee.Config(1, .5f, 10);
     public Ranged.Config rangedConfig = new Ranged.Config(1f, 6f, 15, null, 6, 100);
     public MeleeSquare.Config praxelSelectConfig = new MeleeSquare.Config(.5f, .0625f);
@@ -97,10 +101,10 @@ public class WorldInteraction : MonoBehaviour {
     private Vector3Int activeTile = Vector3Int.zero;
     private Tilemap activeGrid;
     private bool lineStarterUpdate;
-    private SpriteSorter activeCharacter;
-    private SortingGroup activeCharacterHighlight;
-    private DeStack<SpriteSorter> followingCharacters = new DeStack<SpriteSorter>();
-    private SortingGroup followingCharacterHighlight;
+    private Character activeCharacter; // hover
+    private GameObject activeCharacterHighlight;
+    private DeStack<Character> followingCharacters = new DeStack<Character>();
+    private GameObject followingCharacterHighlight;
     private Dictionary<Terrain.Grid, TileBase> hoverTiles;
     private Dictionary<Terrain.Grid, Tilemap> uiMaps;
 
@@ -188,20 +192,30 @@ public class WorldInteraction : MonoBehaviour {
 
     public void ClearTile() => activeGrid?.SetTile(activeTile, null);
     public void ClearCharacter() {
-        if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight.gameObject);
+        if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight);
+        activeCharacterHighlight = null;
         activeCharacter = null;
     }
     public void ClearLine() {
         lineSelect.positionCount = 0;
         lineStarterUpdate = false;
     }
+    public void NewActiveCharacter(Character character) {
+        activeCharacter = character;
+        if (activeCharacter != null) {
+            activeCharacterHighlight = CharacterHighlight2D.New(activeCharacter, true).gameObject;
+        } else if (activeCharacterHighlight != null) {
+            GameObject.Destroy(activeCharacterHighlight);
+            activeCharacterHighlight = null;
+        }
+    }
     public void ActiveCharacterToFollowing() {
-        followingCharacters.Push(activeCharacter);
         Debug.Log("Updating UI with active character " + activeCharacter);
-        if (creatureChanged != null) creatureChanged(CurrentAction, activeCharacter.GetCharacterComponent<Creature>());
-        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
+        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight);
         followingCharacterHighlight = activeCharacterHighlight;
-        followingCharacterHighlight.GetComponentInChildren<SpriteRenderer>().color = followingCharacterColor;
+        CharacterHighlight2D.SetHighlightHoverToFollowing(followingCharacterHighlight);
+        followingCharacters.Push(activeCharacter);
+        if (creatureChanged != null) creatureChanged(CurrentAction, activeCharacter.GetComponentStrict<Creature>());
         activeCharacterHighlight = null;
         activeCharacter = null;
         Debug.Log("Pushed, num following characters: " + followingCharacters.Count);
@@ -209,45 +223,40 @@ public class WorldInteraction : MonoBehaviour {
     /** Output: make sure to check for null in case stack was empty */
     public Creature ForcePopFollowing() {
         Debug.Log("Popping, num following characters: " + followingCharacters.Count);
-        Creature result = followingCharacters.Pop().GetCharacterComponent<Creature>();
+        Character oldFollowingCharacter = followingCharacters.Pop();
+        Creature result = oldFollowingCharacter.GetComponentStrict<Creature>();
         if (creatureChanged != null) creatureChanged(CurrentAction, PeekFollowing());
-        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
-        if (followingCharacters.Count > 0) {
-            SpriteSorter followingCharacter = followingCharacters.Peek();
-            followingCharacterHighlight = NewCharacterHighlight(followingCharacter, false);
-        }
+        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight);
+
+        Character newFollowingCharacter = PeekFollowingCharacter();
+        if (newFollowingCharacter != null)
+            followingCharacterHighlight = CharacterHighlight2D.New(newFollowingCharacter, false).gameObject;
+        else followingCharacterHighlight = null;
         return result;
     }
-    public Creature PeekFollowing() {
+    public Character PeekFollowingCharacter() {
         // TODO: check for death
-        SpriteSorter possCreature = null;
-        while (possCreature == null && followingCharacters.Count > 0) {
+        Character possCharacter = null;
+        while (possCharacter == null && followingCharacters.Count > 0) {
             Debug.Log("Peeking top character from the stack.  If multiple in a row, some died");
-            possCreature = followingCharacters.Peek();
-            if (possCreature == null) followingCharacters.Pop();
+            possCharacter = followingCharacters.Peek();
+            if (possCharacter == null) followingCharacters.Pop();
         } // loop if it died
-        if (possCreature == null) // none left
+        if (possCharacter == null) // none left
             return null;
-        Creature result = possCreature.GetCharacterComponent<Creature>();
-        return result;
+        return possCharacter;
     }
+    public Creature PeekFollowing() => PeekFollowingCharacter()?.GetComponentStrict<Creature>();
+
     public void EnqueueFollowing(Creature creature) {
-        SpriteSorter characterSprite = creature.GetComponentInChildren<SpriteSorter>();
+        Character character = creature.GetComponentStrict<Character>();
         QuickCleanUpFollowingCharacters();
-        followingCharacters.PushToBottom(characterSprite);
+        followingCharacters.PushToBottom(character);
         if (followingCharacters.Count == 1) {
             if (creatureChanged != null) creatureChanged(CurrentAction, creature);
-            followingCharacterHighlight = NewCharacterHighlight(characterSprite, false);
+            followingCharacterHighlight = CharacterHighlight2D.New(character, false).gameObject;
         }
     }
-    public SortingGroup NewCharacterHighlight(SpriteSorter character, bool active) {
-        SortingGroup result = character.AddGroup(
-            character.broadGirth ? largeCharacterSelectPrefab : smallCharacterSelectPrefab,
-            GlobalConfig.I.elevation.groundLevelHighlight);
-        if (!active) result.GetComponentInChildren<SpriteRenderer>().color = followingCharacterColor;
-        return result;
-    }
-
     public void PlayerMove(Vector2 velocity) {
         switch (PlayerAction) {
             case Mode.Sword:
@@ -285,19 +294,17 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Taming:
                 if (duringPress) break;
-                SpriteSorter newActiveCharacter = teleSelect.SelectCharacterOnly(pointer);
+                Character newActiveCharacter = teleSelect.SelectCharacterOnly(pointer);
                 if (newActiveCharacter == activeCharacter) break;
                 if (activeCharacter != null) ClearCharacter();
-                activeCharacter = newActiveCharacter;
-                if (activeCharacter != null)
-                    activeCharacterHighlight = NewCharacterHighlight(activeCharacter, true);
+                NewActiveCharacter(newActiveCharacter);
             break;
             case Mode.Directing:
                 if (duringPress) break;
                 ClearTile();
                 ClearCharacter();
                 ClearLine();
-                OneOf<Terrain.Position, SpriteSorter> target = teleSelect.SelectDynamic(pointer);
+                OneOf<Terrain.Position, Character> target = teleSelect.SelectDynamic(pointer);
                 if (target.Is(out Terrain.Position tile)) {
                     activeTile = (Vector3Int)tile.Coord;
                     activeGrid = uiMaps[tile.grid];
@@ -311,9 +318,8 @@ public class WorldInteraction : MonoBehaviour {
                             lineSelect.SetPositions(line.ToArray());
                         }
                     }
-                } else if (target.Is(out SpriteSorter character)) {
-                    activeCharacter = character;
-                    activeCharacterHighlight = NewCharacterHighlight(activeCharacter, true);
+                } else if (target.Is(out Character character)) {
+                    NewActiveCharacter(character);
                 }
             break;
         }
@@ -384,16 +390,16 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;
-                if (activeCharacter.GetCharacterComponent<Team>().SameTeam(player)) {
-                    activeCharacter.GetCharacterComponent<Creature>().Follow(player);
+                if (activeCharacter.Team.SameTeam(player)) {
+                    activeCharacter.GetComponentStrict<Creature>().Follow(player);
                     ActiveCharacterToFollowing();
                 } else {
-                    creature = activeCharacter.GetCharacterComponent<Creature>();
+                    creature = activeCharacter.GetComponentStrict<Creature>();
                     if (freeTamingCheat) {
                         creature.ForceTame(player);
                         ActiveCharacterToFollowing();
                     } else if (creature.CanTame(player)) {
-                        GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
+                        GoodTaste taste = activeCharacter.GetComponent<GoodTaste>();
                         if (taste != null && !freeTamingCheat) {
                             taste.StartTaming(player, ActiveCharacterToFollowing);
                         } else {
@@ -474,7 +480,7 @@ public class WorldInteraction : MonoBehaviour {
         switch (PlayerAction) {
             case Mode.Taming:
                 if (activeCharacter == null) break;
-                GoodTaste taste = activeCharacter.MaybeGetCharacterComponent<GoodTaste>();
+                GoodTaste taste = activeCharacter.GetComponent<GoodTaste>();
                 if (taste != null) {
                     ExpandableInfo? result = taste.StopTaming(player);
                     if (result is ExpandableInfo info) TextDisplay.I.ShowTip(info);
@@ -495,9 +501,9 @@ public class WorldInteraction : MonoBehaviour {
         if (displayNeedsUpdate) {
             if (CurrentAction.mode == Mode.Directing) CurrentAction = Interaction.Player(Mode.Taming);
             if (followingCharacters.Count > 0) {
-                followingCharacterHighlight = NewCharacterHighlight(followingCharacters.Peek(), false);
+                followingCharacterHighlight = CharacterHighlight2D.New(followingCharacters.Peek(), false).gameObject;
                 if (creatureChanged != null) creatureChanged(CurrentAction,
-                        followingCharacters.Peek().GetCharacterComponent<Creature>());
+                        followingCharacters.Peek().GetComponentStrict<Creature>());
             } else if (creatureChanged != null) creatureChanged(CurrentAction, null);
         }
     }
@@ -530,8 +536,8 @@ public class WorldInteraction : MonoBehaviour {
             player.GetComponent<Team>().TeamId, player.position, direction,
             castRadius, castStart, castDistance);
         Debug.Log("Signaling to attack: " + offensiveTarget);
-        foreach (SpriteSorter character in followingCharacters) if (character != null)
-            character.GetCharacterComponent<Creature>().FollowOffensive(offensiveTarget);
+        foreach (Character character in followingCharacters) if (character != null)
+            character.GetComponentStrict<Creature>().FollowOffensive(offensiveTarget);
     }
 
     private Vector2 PointerForAim(Vector2 pointer) =>

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Target : OneOf<Terrain.Position, SpriteSorter> {
+public class Target : OneOf<Terrain.Position, Character> {
     private Target() : base() {}
     public Target(Terrain.Position t) : base(t) {}
-    public Target(SpriteSorter u) : base(u) {}
+    public Target(Character u) : base(u) {}
     new public static Target Neither { get => new Target(); }
 
     public Vector3 Position {
         get {
             if (this.Is(out Terrain.Position position))
                 return Terrain.I.CellCenter(position);
-            else if (this.Is(out SpriteSorter character))
-                return character.Character.position;
+            else if (this.Is(out Character character))
+                return character.transform.position;
             else throw new InvalidOperationException("Neither");
         }
     }
@@ -60,7 +60,7 @@ public class Tele {
     public Target SelectDynamic(Vector2 point) {
         if (dynamicFilter == null) throw new InvalidOperationException("No dynamic filter set");
         if (dynamicFilter.characterFilter != null) {
-            SpriteSorter character = SelectCharacterWithFilter(point, dynamicFilter.characterFilter);
+            Character character = SelectCharacterWithFilter(point, dynamicFilter.characterFilter);
             if (character != null) return new Target(character);
         }
         switch (dynamicFilter.terrainSelection) {
@@ -80,16 +80,16 @@ public class Tele {
         return terrain.CellAt(point);
     }
 
-    public SpriteSorter SelectCharacterOnly(Vector2 point) {
+    public Character SelectCharacterOnly(Vector2 point) {
         Collider2D[] colliders = Physics2D.OverlapPointAll(point, LayerMask.GetMask("Clickable"));
         if (colliders.Length > 0) return colliders
                 .Select(collider => collider.transform.parent)
                 .MinBy(transform => Vector2.Distance((Vector2)transform.position, point))
-                .GetComponentInChildren<SpriteSorter>();
+                .GetComponentStrict<Character>();
         return null;
     }
 
-    public SpriteSorter SelectCharacterWithFilter(Vector2 point, Func<Transform, bool> characterFilter) {
+    public Character SelectCharacterWithFilter(Vector2 point, Func<Transform, bool> characterFilter) {
         Collider2D[] colliders = Physics2D.OverlapPointAll(point, LayerMask.GetMask("Clickable"));
         if (colliders.Length == 0) return null;
         IEnumerable<Transform> charactersFiltered = colliders
@@ -98,7 +98,7 @@ public class Tele {
         if (charactersFiltered.Count() == 0) return null;
         return charactersFiltered
                 .MinBy(transform => Vector2.Distance((Vector2)transform.position, point))
-                .GetComponentInChildren<SpriteSorter>();
+                .GetComponentStrict<Character>();
     }
 
     public Terrain.Position? SelectBuildLoc(Vector2 point) {

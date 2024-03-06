@@ -6,8 +6,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class SpriteSorter : MonoBehaviour {
-    public bool broadGirth;
-
     private Terrain terrain;
     private ScreenVector spriteDisplacement;
     private OrientableChild orientable;
@@ -22,6 +20,13 @@ public class SpriteSorter : MonoBehaviour {
     // Whew!  This was a nightmare to debug.
     private const float pixelPerfectCorrection = 1/32f;
 
+    public bool BroadGirth {
+        get{
+            if (Character != null) return Character.broadGirth;
+            if (GetComponentInParent<Collectible>() != null) return false;
+            throw new InvalidOperationException("SpriteSorter child of neither character nor collectible");
+        }
+    }
     public bool LegsVisible {
         set => SortingGroups.First<OrientableChild>().gameObject.SetActive(value);
     }
@@ -49,7 +54,7 @@ public class SpriteSorter : MonoBehaviour {
         orientable = new OrientableChild(transform);
         terrain = GameObject.FindObjectOfType<Terrain>();
         spriteDisplacement =
-            (broadGirth ? broadGirthMeasure : thinGirthMeasure)
+            (BroadGirth ? broadGirthMeasure : thinGirthMeasure)
             * new ScreenVector(0, -1);
     }
 
@@ -77,15 +82,10 @@ public class SpriteSorter : MonoBehaviour {
         ForceUpdate(false);
         this.enabled = false;
     }
-
-    public SortingGroup AddGroup(SortingGroup prefab, float z) {
-        SortingGroup result = GameObject.Instantiate(prefab, transform);
-        result.transform.localPosition = new Vector3(0, 0, z);
-        return result;
-    }
-
-    public Transform Character {
-        get => orientable.rootParent.transform;
+    
+    // null if collectible
+    public Character Character {
+        get => MaybeGetCharacterComponent<Character>();
     }
     public T MaybeGetCharacterComponent<T>() where T : Component =>
         orientable.rootParent.GetComponent<T>();

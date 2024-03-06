@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// usage: behaviorNode.enumerator()
 public class BehaviorNode {
     virtual public Func<IEnumerator> enumerator { get; protected set; }
 
@@ -23,6 +24,7 @@ public class BehaviorNode {
     }
 }
 
+// places condition on subBehavior to give up when target exceeds distance
 public class RestrictNearbyBehavior : BehaviorNode {
     private BehaviorNode subBehavior;
     private Transform ai;
@@ -45,6 +47,11 @@ public class RestrictNearbyBehavior : BehaviorNode {
     }
 }
 
+// behavior generator with unspecified target
+// 1. At construction:
+//        targetedBehavior = new TargetedBehavior(targetToEnumeratorFunction)
+// 2. When target is known:
+//        behaviorNode = targetedBehavior.WithTarget(target)
 public class TargetedBehavior<T> {
     virtual public bool canQueue { get; protected set; } = false;
 
@@ -73,6 +80,7 @@ public class TargetedBehavior<T> {
         }
     }
 
+    // not currently used
     public TargetedBehavior<U> For<U>(Func<U, T> func) => new TargetedBehavior<U>(
         (target) =>enumeratorWithParam(func(target))
     );
@@ -81,13 +89,16 @@ public class TargetedBehavior<T> {
         new QueueOperator.Targeted<T>(enumeratorWithParam);
 }
 
+// common TargetedBehavior use case, implementation simply specifies <Transform>
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
     public CharacterTargetedBehavior(Func<Transform, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
     public CharacterTargetedBehavior(Func<Transform, YieldInstruction> singleLine) : base(singleLine) {}
 
-    public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((SpriteSorter)t).Character);
+    // not currently used. See CreatureAction.WithCharacter()
+    public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((Character)t).transform);
 }
 
+// queue multiple sub-behaviors
 public class QueueOperator : BehaviorNode {
     private Queue<BehaviorNode> queue = new Queue<BehaviorNode>();
 
