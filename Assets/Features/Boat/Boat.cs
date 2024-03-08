@@ -16,6 +16,7 @@ public class Boat : MonoBehaviour {
     public Transform seats;
 
     private Terrain terrain;
+    private MapRenderer2D mapRenderer;
     private Feature feature;
     [NonSerialized] public CharacterController movement;
     private SortingGroup[] seatSorters = new SortingGroup[4];
@@ -42,6 +43,7 @@ public class Boat : MonoBehaviour {
 
     void Start() {
         terrain = Terrain.I;
+        mapRenderer = terrain.GetComponentStrict<MapRenderer2D>();
         movement = GetComponent<CharacterController>();
         movement.CrossingTile += HandleCrossingTile;
         feature = GetComponent<Feature>();
@@ -127,14 +129,7 @@ public class Boat : MonoBehaviour {
     void FixedUpdate() {
         if (!inUse) return;
 
-        Vector2 shoreCorrection = Vector2.zero;
-        Land?[] nearTiles = terrain.GetFourLandTilesAround(transform.position);
-        Vector2 sub = terrain.PositionInCell(transform.position);
-        if (sub.magnitude < shorePushNoZone) sub = Vector2.zero;
-        if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush * (Mathf.Abs(sub.x) - sub.y));
-        if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x - Mathf.Abs(sub.y)), 0);
-        if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(shorePush * (- sub.x + Mathf.Abs(sub.y)), 0);
-        if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, shorePush * (-Mathf.Abs(sub.x) - sub.y));
+        Vector2 shoreCorrection = mapRenderer.ShoreEdgeFactor(transform.position, shorePushNoZone) * shorePush;
         Vector2 expectedVelocity = inputVelocity + shoreCorrection;
 
         if (currentVelocity != expectedVelocity) {

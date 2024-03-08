@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,25 +7,18 @@ using UnityEngine.Tilemaps;
 
 public class Concealment {
     private Terrain terrain;
-    private Tilemap[] mainTiles;
-    private Tilemap transparentTiles;
-    private Dictionary<Construction, TileBase> buildingTiles;
 
     private Vector2Int currentCenter = Vector2Int.zero; // of player, updated by HandleCrossedTile
     private int[] currentCardinalExtents = new int[] {0, 0, 0, 0};
+
+    private Action<Vector2Int, bool> hideTile;
 
     public Concealment(Terrain terrain) {
         this.terrain = terrain;
     }
 
-    public void Initialize(Tilemap[] mainTiles) {
-        this.mainTiles = mainTiles;
-
-        buildingTiles = new Dictionary<Construction, TileBase> {
-            [Construction.None] = null,
-            [Construction.Wood] = terrain.tiles.woodBldg
-        };
-        transparentTiles = terrain.transform.Find("Transparent").GetComponent<Tilemap>();
+    public void Initialize(Action<Vector2Int, bool> hideTile) {
+        this.hideTile = hideTile;
         GameObject.FindObjectOfType<PointOfView>().CrossedTile += HandleCrossedTile;
     }
 
@@ -82,12 +76,12 @@ public class Concealment {
         currentCenter = curr;
         UpdateExtents();
         UpdateTile(oldCenter);
-        UpdateTile(currentCenter, true);
+        hideTile(currentCenter, true);
         for(int i = 0; i < 4; i++) {
             for (int j = 1; j <= oldCardinalExtents[i]; j++)
                 UpdateTile(oldCenter + j * Vct.Cardinals[i]);
             for (int j = 1; j <= currentCardinalExtents[i]; j++)
-                UpdateTile(currentCenter + j * Vct.Cardinals[i], true);
+                hideTile(currentCenter + j * Vct.Cardinals[i], true);
         }
     }
 
@@ -111,28 +105,15 @@ public class Concealment {
     }
 
     private void UpdateTile(Vector2Int pos) {
-        if (pos == currentCenter) UpdateTile(pos, true);
+        if (pos == currentCenter) hideTile(pos, true);
         else {
             Vector2Int relativePos = pos - currentCenter;
-            if (!relativePos.IsCardinal()) UpdateTile(pos, false); // show non-cardinal roofs (default)
+            if (!relativePos.IsCardinal()) hideTile(pos, false); // show non-cardinal roofs (default)
             else {
                 int cardinal = relativePos.GetCardinal();
                 int magnitude = relativePos.CardinalMagnitude();
-                UpdateTile(pos, magnitude <= currentCardinalExtents[cardinal]); // hide certain cardinal roofs
+                hideTile(pos, magnitude <= currentCardinalExtents[cardinal]); // hide certain cardinal roofs
             }
-        }
-    }
-
-    // Move tile between mainTiles and transparentTiles.
-    // transparentTiles have a special shader that only renders one out of four pixels.
-    // hide indicates whether to make the tile transparent.
-    private void UpdateTile(Vector2Int pos, bool hide) {
-        if (hide) {
-            mainTiles[Terrain.RoofLevel].SetTile((Vector3Int)pos, null);
-            transparentTiles.SetTile((Vector3Int)pos, buildingTiles[terrain.Roof.Get(pos) ?? Construction.None]);
-        } else {
-            mainTiles[Terrain.RoofLevel].SetTile((Vector3Int)pos, buildingTiles[terrain.Roof.Get(pos) ?? Construction.None]);
-            transparentTiles.SetTile((Vector3Int)pos, null);
         }
     }
 

@@ -37424,6 +37424,7 @@ GameObject:
   - component: {fileID: 2120764632}
   - component: {fileID: 2120764634}
   - component: {fileID: 2120764633}
+  - component: {fileID: 2120764644}
   - component: {fileID: 2120764636}
   - component: {fileID: 2120764635}
   - component: {fileID: 2120764637}
@@ -37501,7 +37502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5943a37e19d334e259a7eec52460f503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tiles: {fileID: 2120764636}
   validationUpdateTime: 0.5
   collapsePrefab: {fileID: 2250385588179260924, guid: e98e27e1e5d164c27abe45a5c49b8197, type: 3}
   spawnPrefab: {fileID: -269789415231399089, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
@@ -37657,10 +37657,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elevation:
-    groundLevelHighlight: 1
-    collectibles: 2.001
-    features: 2.001
 --- !u!114 &2120764640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37726,6 +37722,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b0c898714f844dd875ac7a1f523609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2120764644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ece3176e1a8e9480d8857de5c2f8ed43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elevation:
+    groundLevelHighlight: 1
+    collectibles: 2.001
+    features: 2.001
+  tiles: {fileID: 2120764636}
 --- !u!1001 &443831002852150587
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System;
 using System.Linq;
 
@@ -60,9 +59,6 @@ public class Terrain : MonoBehaviour {
         }
     }
 
-    public static readonly int RoofLevel = 6;
-
-    public TileLibrary tiles;
     public float validationUpdateTime = 0.5f;
     public GameObject collapsePrefab;
     public Fountain spawnPrefab;
@@ -83,11 +79,7 @@ public class Terrain : MonoBehaviour {
     public ConstructionIndex Roof;
     public FeatureIndex Feature;
 
-    private UnityEngine.Grid gameGrid;
-    private Tilemap[] mainTiles;
-    private Tilemap xWallTiles;
-    private Tilemap yWallTiles;
-    private Dictionary<Land, TileBase[]> landTiles;
+    private MapRenderer2D mapRenderer;
 
     private static Terrain instance;
     public static Terrain I { get => instance; }
@@ -107,35 +99,12 @@ public class Terrain : MonoBehaviour {
         Feature = new FeatureIndex(this);
 
         validator.Initialize();
+        mapRenderer = this.GetComponentStrict<MapRenderer2D>();
+        concealment.Initialize(mapRenderer.HideTile);
 
-        gameGrid = GetComponent<UnityEngine.Grid>();
-        mainTiles = transform.Find("Main Tiles").transform.Cast<Transform>()
-            .Select(c => c.GetComponent<Tilemap>()).ToArray();
-        xWallTiles = transform.Find("X Walls").GetComponent<Tilemap>();
-        yWallTiles = transform.Find("Y Walls").GetComponent<Tilemap>();
-        concealment.Initialize(mainTiles);
-
-        landTiles = new Dictionary<Land, TileBase[]>() {
-            [global::Land.Grass] = new TileBase[] { tiles.grass, null, null, null, null, null},
-            [global::Land.Meadow] = new TileBase[] { tiles.grass, null, tiles.meadow, null, null, null},
-            [global::Land.Shrub] = new TileBase[] { tiles.grass, null, null, tiles.shrub, null, null},
-            [global::Land.Forest] = new TileBase[] { tiles.grass, null, null, null, tiles.forest, null},
-            [global::Land.Water] = new TileBase[] { tiles.ditch, tiles.water, null, null, null, null},
-            [global::Land.Ditch] = new TileBase[] { tiles.ditch, null, null, null, null, null},
-            [global::Land.Dirtpile] = new TileBase[] { tiles.grass, null, null, null, null, tiles.dirtpile},
-            [global::Land.Woodpile] = new TileBase[] { tiles.grass, tiles.woodpile, null, null, null, null},
-            [global::Land.Hill] = new TileBase[] { tiles.grass, null, null, null, null, tiles.hill}
-        };
-
+        mapRenderer.OnTerrainStart();
         if (Started != null) Started();
-        AddDepths();
     }
-
-    private Dictionary<Land, int> voluminousTiles = new Dictionary<Land, int> {
-        [global::Land.Meadow] = 2,
-        [global::Land.Shrub] = 3,
-        [global::Land.Forest] = 4
-    };
 
     void StabilizeNow() => validator.StabilizeNow();
 
@@ -156,20 +125,10 @@ public class Terrain : MonoBehaviour {
                 return (pos.x >= 0 && pos.y >= 0 && pos.x < Bounds.x && pos.y < Bounds.y);
         }
     }
-    public Vector2 CellCenter(Position position) {
-        switch (position.grid) {
-            case Grid.XWalls:
-                return xWallTiles.GetCellCenterWorld((Vector3Int) position.Coord);
-            case Grid.YWalls:
-                return yWallTiles.GetCellCenterWorld((Vector3Int) position.Coord);
-            default:
-                return CellCenter(position.Coord);
-        }
-    }
-    public Vector2 CellCenter(Vector2Int cellPosition) => gameGrid.GetCellCenterWorld((Vector3Int) cellPosition);
-    public Vector2Int CellAt(Vector3 worldPosition) => (Vector2Int)gameGrid.WorldToCell(worldPosition);
-    public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
-    public Vector2 PositionInCell(Vector2 position) /* -1 <= x + y <= 1 */ => 2 * (position - CellCenterAt(position));
+    public Vector2 CellCenter(Position position) => mapRenderer.CellCenter(position);
+    public Vector2 CellCenter(Vector2Int cellPosition) => mapRenderer.CellCenter(cellPosition);
+    public Vector2Int CellAt(Vector3 worldPosition) => mapRenderer.CellAt(worldPosition);
+    public Vector2 CellCenterAt(Vector3 screenPosition) => mapRenderer.CellCenterAt(screenPosition);
 
     public Land? GetLand(Vector2Int coord) {
         return InBounds(coord) ? (Land?)Land[coord] : null;
@@ -178,9 +137,7 @@ public class Terrain : MonoBehaviour {
     public bool SetLand(Vector2Int pos, Land terrain, bool force = false) {
         if (!force && !validator.IsValidLand(pos, terrain)) return false;
         land[pos.x, pos.y] = terrain;
-        for (int i = 0; i < RoofLevel; i++) {
-            mainTiles[i].SetTile((Vector3Int)pos, landTiles[terrain][i]);
-        }
+        mapRenderer.SetLand(pos, terrain);
         if (force) return true;
         validator.StabilizeNext(() => validator.StabilizeLand(pos));
         validator.StabilizeAdjacentLandNext(pos);
@@ -203,7 +160,7 @@ public class Terrain : MonoBehaviour {
     }
     public Feature BuildFeature(Vector2Int pos, Feature featurePrefab) {
         if (!featurePrefab.IsValidTerrain(Land[pos]) || !featurePrefab.IsValidTerrain(Roof[pos])) return null;
-        Feature feature = GameObject.Instantiate(featurePrefab, gameGrid.transform);
+        Feature feature = GameObject.Instantiate(featurePrefab, mapRenderer.WorldParent);
         PlaceFeature(pos, feature);
         return feature;
     }
@@ -223,47 +180,28 @@ public class Terrain : MonoBehaviour {
 
     private void SetXWall(int x, int y, Construction construction, bool force = false) {
         xWalls[x, y] = construction;
-        switch (construction) {
-            case Construction.None:
-                xWallTiles.SetTile(new Vector3Int(x, y, 0), null);
-                if (!force) validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
-            break;
-            case Construction.Wood:
-                xWallTiles.SetTile(new Vector3Int(x, y, 0), tiles.xFence);
-            break;
-        }
+        mapRenderer.SetXWall(x, y, construction);
+        if (construction == Construction.None && !force)
+            validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
     }
 
     private void SetYWall(int x, int y, Construction construction, bool force = false) {
         yWalls[x, y] = construction;
-        switch (construction) {
-            case Construction.None:
-                yWallTiles.SetTile(new Vector3Int(x, y, 0), null);
-                if (!force) validator.StabilizeAdjacentConstructionNext(new Position(Grid.YWalls, x, y));
-            break;
-            case Construction.Wood:
-                yWallTiles.SetTile(new Vector3Int(x, y, 0), tiles.yFence);
-            break;
-        }
+        mapRenderer.SetYWall(x, y, construction);
+        if (construction == Construction.None && !force)
+            validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
     }
 
     private void SetRoof(Vector2Int pos, Construction construction, bool force = false) {
-        Vector3Int coord = (Vector3Int) pos;
-        Construction oldRoof = roofs[coord.x, coord.y];
-        roofs[coord.x, coord.y] = construction;
-        switch (construction) {
-            case Construction.None:
-                mainTiles[RoofLevel].SetTile(coord, null);
-                if (force) return;
-                validator.StabilizeAdjacentConstructionNext(new Position(Grid.Roof, pos));
-                if (oldRoof == Construction.Wood) {
-                    GameObject collapse = GameObject.Instantiate(collapsePrefab, gameGrid.transform);
-                    collapse.transform.position = gameGrid.GetCellCenterWorld((Vector3Int)pos);
-                }
-            break;
-            case Construction.Wood:
-                mainTiles[RoofLevel].SetTile(coord, tiles.woodBldg);
-            break;
+        Construction oldRoof = roofs[pos.x, pos.y];
+        roofs[pos.x, pos.y] = construction;
+        mapRenderer.SetRoof(pos, construction);
+        if (construction == Construction.None && !force) {
+            validator.StabilizeAdjacentConstructionNext(new Position(Grid.Roof, pos));
+            if (oldRoof == Construction.Wood) {
+                GameObject collapse = GameObject.Instantiate(collapsePrefab, mapRenderer.WorldParent);
+                collapse.transform.position = CellCenter(pos);
+            }
         }
     }
 
@@ -295,19 +233,6 @@ public class Terrain : MonoBehaviour {
         };
     }
 
-    private void AddDepths() {
-        for (int x = -16; x < Bounds.x + 16; ) {
-            for (int y = -16; y < Bounds.y + 16; y++) mainTiles[1].SetTile(new Vector3Int(x, y, 0), tiles.deepWater);
-            x++;
-            if (x == 0) x = Bounds.x;
-        }
-        for (int x = 0; x < Bounds.x; x++) for (int y = -16; y < Bounds.y + 16; ) {
-            mainTiles[1].SetTile(new Vector3Int(x, y, 0), tiles.deepWater);
-            y++;
-            if (y == 0) y = Bounds.y;
-        }
-    }
-
     public Land[,] AllLandTiles => land;
     public Construction[,] AllXWallTiles => xWalls;
     public Construction[,] AllYWallTiles => yWalls;
@@ -331,47 +256,6 @@ public class Terrain : MonoBehaviour {
         TerrainGenerator.GenerateTerrain(I);
         Vector2Int startLocation = TerrainGenerator.PlaceFountains(I);
         TerrainGenerator.FinalDecor(I, startLocation);
-    }
-
-    private void PopulateTerrainFromUnityEditor() {
-        foreach (var tilemap in mainTiles) {
-            foreach (var position in tilemap.cellBounds.allPositionsWithin) {
-                if (tilemap.HasTile(position)) {
-                    TileBase tile = tilemap.GetTile(position);
-                    switch (tile.name) {
-                        case "Grass":
-                            break;
-                        case "Meadow":
-                        case "Shrub":
-                        case "Forest":
-                        case "Hill":
-                        case "Water":
-                            land[position.x, position.y] = (Land) Enum.Parse(typeof(Land), tile.name);
-                            break;
-                        case "Ditch":
-                            if (land[position.x, position.y] == global::Land.Grass) {
-                                land[position.x, position.y] = global::Land.Ditch;
-                            }
-                            break;
-                        case "WoodBldg":
-                            roofs[position.x, position.y] = Construction.Wood;
-                            break;
-                    }
-                }
-            }
-        }
-        foreach (var position in xWallTiles.cellBounds.allPositionsWithin) {
-            if (xWallTiles.HasTile(position)) {
-                TileBase tile = xWallTiles.GetTile(position);
-                xWalls[position.x, position.y] = Construction.Wood;
-            }
-        }
-        foreach (var position in yWallTiles.cellBounds.allPositionsWithin) {
-            if (yWallTiles.HasTile(position)) {
-                TileBase tile = yWallTiles.GetTile(position);
-                yWalls[position.x, position.y] = Construction.Wood;
-            }
-        }
     }
 
     public readonly struct Position {
