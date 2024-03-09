@@ -66,7 +66,7 @@ public class Terrain : MonoBehaviour {
     public readonly TerrainValidator validator;
     public readonly Concealment concealment;
 
-    private const int Dim = 128;
+    public const int Dim = 128;
     private Land[,] land = new Land[Dim, Dim];
     private Construction[,] xWalls = new Construction[Dim, Dim + 1];
     private Construction[,] yWalls = new Construction[Dim + 1, Dim];
