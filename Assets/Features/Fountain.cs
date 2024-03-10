@@ -36,7 +36,7 @@ public class Fountain : MonoBehaviour {
         terrain = GameObject.FindObjectOfType<Terrain>();
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
-        if (team != 0) GameObject.FindObjectOfType<PlayerCharacter>().HandleDeath();
+        if (team != 0) GameManager.I.YourPlayer.HandleDeath();
     }
 
     int[] Serialize() => new int[] { team };

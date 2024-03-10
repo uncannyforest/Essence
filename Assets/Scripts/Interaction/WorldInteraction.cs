@@ -70,7 +70,6 @@ public class WorldInteraction : MonoBehaviour {
     public Color followingCharacterColor;
 
     new public Camera camera;
-    public Transform player;
     public Inventory inventory;
     public Grid grid;
     public Terrain terrain;
@@ -94,6 +93,7 @@ public class WorldInteraction : MonoBehaviour {
 
     public bool freeTamingCheat = false;
 
+    private Transform player;
     private Ranged rangedSelect;
     private Melee meleeSelect;
     private MeleeSquare meleeSquare;
@@ -170,6 +170,7 @@ public class WorldInteraction : MonoBehaviour {
     }
 
     void Start() {
+        player = GameManager.I.YourPlayer.transform;
         rangedSelect = new Ranged(rangedConfig);
         meleeSelect = new Melee(meleeConfig, player);
         meleeSquare = new MeleeSquare(praxelSelectConfig, player, grid);

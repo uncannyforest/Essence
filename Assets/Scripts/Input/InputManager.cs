@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerCharacter))]
 public class InputManager : MonoBehaviour {
-    public PlayerCharacter playerScript;
     public WorldInteraction world;
     public TextDisplay textDisplay;
     public bool useWASD;
@@ -15,8 +15,11 @@ public class InputManager : MonoBehaviour {
         "<color=key>S</color> - save\n" +
         "<color=key>/</color> - expand info message / if none, this page";
 
+    private PlayerCharacter playerScript;
+
     void Start() {
         SelectAction1();
+        playerScript = GetComponent<PlayerCharacter>();
     }
 
     public static Vector2 PointerPosition {

@@ -31,13 +31,13 @@ public class BunnyBrain : Brain {
         healing.CanHeal(characterFocus, Creature.neighborhood);
 
     override public Optional<Transform> FindFocus() {
-        Transform player = GameObject.FindObjectOfType<PlayerCharacter>().transform;
+        Transform player = GameManager.I.AnyPlayer.transform;
         if (healing.CanHeal(player, Creature.neighborhood)) return Optional.Of(player);
         else return RequestPair(healing.FindOneCreatureToHeal()); 
     }
 
     private bool ShouldHealPlayer() {
-        PlayerCharacter player = GameObject.FindObjectOfType<PlayerCharacter>();
+        PlayerCharacter player = GameManager.I.AnyPlayer;
         return player.GetComponentStrict<Team>().TeamId == teamId &&
                 !player.GetComponentStrict<Health>().IsFull() &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;

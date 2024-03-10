@@ -35,11 +35,11 @@ public class ArrowwiggleBrain : Brain {
         ShouldRestockPlayer();
 
     override public Optional<Transform> FindFocus() =>
-        ShouldRestockPlayer() ? Optional.Of(GameObject.FindObjectOfType<PlayerCharacter>().transform)
+        ShouldRestockPlayer() ? Optional.Of(GameManager.I.AnyPlayer.transform)
             : Optional<Transform>.Empty();
 
     private bool ShouldRestockPlayer() {
-        PlayerCharacter player = GameObject.FindObjectOfType<PlayerCharacter>();
+        PlayerCharacter player = GameManager.I.AnyPlayer;
         return player.GetComponentStrict<Team>().TeamId == teamId &&
                 !player.GetComponentStrict<Inventory>().materials[Material.Type.Arrow].IsFull &&
                 Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;

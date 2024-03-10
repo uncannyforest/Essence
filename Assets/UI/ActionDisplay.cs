@@ -31,10 +31,10 @@ public class ActionDisplay : MonoBehaviour {
         for (int i = 0; i < 10; i++) {
             Transform creature = hotbar.GetChild(i).Find("Creature");
             creature.Find("Breastplate").GetComponent<Image>().color =
-                GameObject.FindObjectOfType<PlayerCharacter>().GetComponent<Team>().Color;
+                GameManager.I.YourTeam.Color;
         }
         currentCreature.transform.Find("Breastplate").GetComponent<Image>().color =
-            GameObject.FindObjectOfType<PlayerCharacter>().GetComponent<Team>().Color;
+            GameManager.I.YourTeam.Color;
         UpdateHotbar();
     }
 
