@@ -36,6 +36,7 @@ public class Fountain : MonoBehaviour {
         terrain = GameObject.FindObjectOfType<Terrain>();
         collider = GetComponent<Collider2D>();
         health = GetComponent<Health>();
+        // If this were in PlayerController Fountains might not be loaded yet.
         if (team != 0) GameManager.I.YourPlayer.HandleDeath();
     }
 

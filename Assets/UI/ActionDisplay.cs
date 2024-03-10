@@ -17,6 +17,7 @@ public class ActionDisplay : MonoBehaviour {
     public Sprite station;
 
     public WorldInteraction interaction;
+    private InputManager input;
 
     public Image currentAction;
     public Image currentCreature;
@@ -28,6 +29,7 @@ public class ActionDisplay : MonoBehaviour {
     }
 
     void Start() {
+        input = interaction.GetComponentStrict<InputManager>();
         for (int i = 0; i < 10; i++) {
             Transform creature = hotbar.GetChild(i).Find("Creature");
             creature.Find("Breastplate").GetComponent<Image>().color =
@@ -37,6 +39,8 @@ public class ActionDisplay : MonoBehaviour {
             GameManager.I.YourTeam.Color;
         UpdateHotbar();
     }
+
+    public void SelectAction(int id) => input.SelectAction(id);
 
     public void UpdateHotbar() {
         List<Interaction> actions = interaction.Actions();

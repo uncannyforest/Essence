@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
 
     private PlayerCharacter singlePlayer;
 
-    void Start() {
+    void Awake() {
         singlePlayer = GameObject.FindObjectOfType<PlayerCharacter>();
     }
 

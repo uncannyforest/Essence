@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerCharacter))]
+[RequireComponent(typeof(WorldInteraction))]
 public class InputManager : MonoBehaviour {
-    public WorldInteraction world;
     public TextDisplay textDisplay;
     public bool useWASD;
 
@@ -15,11 +14,11 @@ public class InputManager : MonoBehaviour {
         "<color=key>S</color> - save\n" +
         "<color=key>/</color> - expand info message / if none, this page";
 
-    private PlayerCharacter playerScript;
-
+    private WorldInteraction world;
+    
     void Start() {
-        SelectAction1();
-        playerScript = GetComponent<PlayerCharacter>();
+        world = GetComponent<WorldInteraction>();
+        SelectAction(1);
     }
 
     public static Vector2 PointerPosition {
@@ -54,18 +53,19 @@ public class InputManager : MonoBehaviour {
         return new Vector2Int(x, y);
     }
 
-    public void SelectAction1() => world.PlayerAction = WorldInteraction.Mode.Sword;
-    public void SelectAction2() =>  world.PlayerAction = WorldInteraction.Mode.Arrow;
-    public void SelectAction3() =>  world.PlayerAction = WorldInteraction.Mode.Praxel;
-    public void SelectAction4() =>  world.PlayerAction = WorldInteraction.Mode.WoodBuilding;
-    public void SelectAction5() =>  world.PlayerAction = WorldInteraction.Mode.Sod;
-    public void SelectAction6() =>  world.PlayerAction = WorldInteraction.Mode.Taming;
-    public void SelectAction7() =>  world.MaybeUseCreatureAction(0);
-    public void SelectAction8() =>  world.MaybeUseCreatureAction(1);
-    public void SelectAction9() =>  world.MaybeUseCreatureAction(2);
-    public void SelectAction0() =>  world.MaybeUseCreatureAction(3);
+    public void SelectAction(int id) {
+        switch (id) {
+            case 1: world.PlayerAction = WorldInteraction.Mode.Sword; break;
+            case 2: world.PlayerAction = WorldInteraction.Mode.Arrow; break;
+            case 3: world.PlayerAction = WorldInteraction.Mode.Praxel; break;
+            case 4: world.PlayerAction = WorldInteraction.Mode.WoodBuilding; break;
+            case 5: world.PlayerAction = WorldInteraction.Mode.Sod; break;
+            case 6: world.PlayerAction = WorldInteraction.Mode.Taming; break;
+            default: world.MaybeUseCreatureAction(id - 7); break;
+        }
+    }
 
-    public void Update() {
+    void Update() {
         if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0) {
             world.PointerMove(PointerPosition, Firing);
         }
@@ -94,16 +94,16 @@ public class InputManager : MonoBehaviour {
             world.ConfirmComplete(PointerPosition);
         }
 
-        if (Input.GetKeyDown("1")) SelectAction1();
-        if (Input.GetKeyDown("2")) SelectAction2();
-        if (Input.GetKeyDown("3")) SelectAction3();
-        if (Input.GetKeyDown("4")) SelectAction4();
-        if (Input.GetKeyDown("5")) SelectAction5();
-        if (Input.GetKeyDown("6")) SelectAction6();
-        if (Input.GetKeyDown("7")) SelectAction7();
-        if (Input.GetKeyDown("8")) SelectAction8();
-        if (Input.GetKeyDown("9")) SelectAction9();
-        if (Input.GetKeyDown("0")) SelectAction0();
+        if (Input.GetKeyDown("1")) SelectAction(1);
+        if (Input.GetKeyDown("2")) SelectAction(2);
+        if (Input.GetKeyDown("3")) SelectAction(3);
+        if (Input.GetKeyDown("4")) SelectAction(4);
+        if (Input.GetKeyDown("5")) SelectAction(5);
+        if (Input.GetKeyDown("6")) SelectAction(6);
+        if (Input.GetKeyDown("7")) SelectAction(7);
+        if (Input.GetKeyDown("8")) SelectAction(8);
+        if (Input.GetKeyDown("9")) SelectAction(9);
+        if (Input.GetKeyDown("0")) SelectAction(10);
 
         float h = Math.Sign(SimpleInput.GetAxis("Horizontal"));
         float v = Math.Sign(SimpleInput.GetAxis("Vertical"));
@@ -111,7 +111,7 @@ public class InputManager : MonoBehaviour {
         Vector2 move = Orientor.WorldFromScreen(
             new ScreenVector(new Vector2(h, v) + GetLeftHandDirection()));
         Vector2Int moveUnit = new Vector2Int(move.x > .1 ? 1 : move.x < -.1 ? -1 : 0, move.y > .1 ? 1 : move.y < -.1 ? -1 : 0);
-        playerScript.InputVelocity = (Input.GetKey("left shift") || Input.GetKey("right shift"))
+        GameManager.I.YourPlayer.InputVelocity = (Input.GetKey("left shift") || Input.GetKey("right shift"))
             ? Vector2Int.zero : moveUnit;
         world.PlayerMove(moveUnit);
 
