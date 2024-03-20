@@ -228,15 +228,7 @@ public class Terrain : MonoBehaviour {
         if (position.grid == Grid.Roof) SetRoof(position.Coord, construction);
     }
 
-    public Land?[] GetFourLandTilesAround(Vector2 pos) {
-        Vector2Int firstCell = CellAt(pos + Vct.F(0, -.5f));
-        return new Land?[] {
-            GetLand(firstCell),
-            GetLand(firstCell + Vct.I(1, 0)),
-            GetLand(firstCell + Vct.I(0, 1)),
-            GetLand(firstCell + Vct.I(1, 1))
-        };
-    }
+    public Land?[] GetFourLandTilesAround(Vector2 pos) => mapRenderer.GetFourLandTilesAround(pos);
 
     public Land[,] AllLandTiles => land;
     public Construction[,] AllXWallTiles => xWalls;

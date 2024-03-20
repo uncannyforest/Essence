@@ -123,12 +123,22 @@ public class MapRenderer2D : MonoBehaviour {
         }
     }
 
+    public Land?[] GetFourLandTilesAround(Vector2 pos) {
+        Vector2Int firstCell = CellAt(pos + Vct.F(0, -.5f));
+        return new Land?[] {
+            terrain.GetLand(firstCell),
+            terrain.GetLand(firstCell + Vct.I(1, 0)),
+            terrain.GetLand(firstCell + Vct.I(0, 1)),
+            terrain.GetLand(firstCell + Vct.I(1, 1))
+        };
+    }
+
     // Returns a Vector2 indicating nearby shore.
     // Direction of the Vector2 indicates direction of shore.
     // Magnitude of the Vector2 indicates the *closeness* of the shore (closer = greater magnitude).
     public Vector2 ShoreEdgeFactor(Vector3 position, float shorePushNoZone) {
         Vector2 shoreCorrection = Vector2.zero;
-        Land?[] nearTiles = terrain.GetFourLandTilesAround(position);
+        Land?[] nearTiles = GetFourLandTilesAround(position);
         Vector2 sub = PositionInCell(position);
         if (sub.magnitude < shorePushNoZone) sub = Vector2.zero;
         if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, Mathf.Abs(sub.x) - sub.y);
