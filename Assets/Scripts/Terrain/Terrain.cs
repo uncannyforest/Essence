@@ -79,7 +79,7 @@ public class Terrain : MonoBehaviour {
     public ConstructionIndex Roof;
     public FeatureIndex Feature;
 
-    private MapRenderer2D mapRenderer;
+    private MapRenderer3D mapRenderer;
 
     private static Terrain instance;
     public static Terrain I { get => instance; }
@@ -91,7 +91,7 @@ public class Terrain : MonoBehaviour {
 
     public Action Started; // must be set before Start() is run
 
-    void Start() {
+    void Awake() {
         Land = new LandIndex(this);
         XWall = new ConstructionIndex(this, Grid.XWalls);
         YWall = new ConstructionIndex(this, Grid.YWalls);
@@ -99,11 +99,16 @@ public class Terrain : MonoBehaviour {
         Feature = new FeatureIndex(this);
 
         validator.Initialize();
-        mapRenderer = this.GetComponentStrict<MapRenderer2D>();
+        mapRenderer = this.GetComponentStrict<MapRenderer3D>();
         concealment.Initialize(mapRenderer.HideTile);
+    }
 
-        mapRenderer.OnTerrainStart();
+    void Start() {
         if (Started != null) Started();
+    }
+
+    void Loaded() {
+        mapRenderer.OnTerrainLoaded();
     }
 
     void StabilizeNow() => validator.StabilizeNow();
@@ -137,7 +142,7 @@ public class Terrain : MonoBehaviour {
     public bool SetLand(Vector2Int pos, Land terrain, bool force = false) {
         if (!force && !validator.IsValidLand(pos, terrain)) return false;
         land[pos.x, pos.y] = terrain;
-        mapRenderer.SetLand(pos, terrain);
+        mapRenderer.UpdateLand(pos);
         if (force) return true;
         validator.StabilizeNext(() => validator.StabilizeLand(pos));
         validator.StabilizeAdjacentLandNext(pos);
@@ -180,14 +185,14 @@ public class Terrain : MonoBehaviour {
 
     private void SetXWall(int x, int y, Construction construction, bool force = false) {
         xWalls[x, y] = construction;
-        mapRenderer.SetXWall(x, y, construction);
+        mapRenderer.UpdateXWall(x, y);
         if (construction == Construction.None && !force)
             validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
     }
 
     private void SetYWall(int x, int y, Construction construction, bool force = false) {
         yWalls[x, y] = construction;
-        mapRenderer.SetYWall(x, y, construction);
+        mapRenderer.UpdateYWall(x, y);
         if (construction == Construction.None && !force)
             validator.StabilizeAdjacentConstructionNext(new Position(Grid.XWalls, x, y));
     }
@@ -195,7 +200,7 @@ public class Terrain : MonoBehaviour {
     private void SetRoof(Vector2Int pos, Construction construction, bool force = false) {
         Construction oldRoof = roofs[pos.x, pos.y];
         roofs[pos.x, pos.y] = construction;
-        mapRenderer.SetRoof(pos, construction);
+        mapRenderer.UpdateRoof(pos);
         if (construction == Construction.None && !force) {
             validator.StabilizeAdjacentConstructionNext(new Position(Grid.Roof, pos));
             if (oldRoof == Construction.Wood) {
@@ -250,12 +255,15 @@ public class Terrain : MonoBehaviour {
         foreach (Feature.Data featureData in mapData.features)
             BuildFeature(featureData.tile, FeatureLibrary.P.ByTypeName(featureData.type))
                 .DeserializeUponStart(featureData.customFields);
+        I.Loaded();
     }
 
     public static void GenerateNewWorld() {
         TerrainGenerator.GenerateTerrain(I);
         Vector2Int startLocation = TerrainGenerator.PlaceFountains(I);
         TerrainGenerator.FinalDecor(I, startLocation);
+        Debug.Log("Loadededed");
+        I.Loaded();
     }
 
     public readonly struct Position {

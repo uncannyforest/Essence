@@ -15,15 +15,13 @@ public class MeleeSquare {
     private Vector2Int inputVelocity = Vector2Int.zero; // not scaled to speed, instant update on key change
     private float timeDoneMoving = 0;
     private Vector2Int currentTile = Vector2Int.zero;
-    private Vector3Int? waitingOnPlayerToLeave = null; // if null and timeDoneMoving == 0, we're waiting on input
+    private Vector2Int? waitingOnPlayerToLeave = null; // if null and timeDoneMoving == 0, we're waiting on input
 
     private Transform player;
-    private Grid grid;
-    public MeleeSquare(Config meleeSquareConfig, Transform player, Grid grid) {
+    public MeleeSquare(Config meleeSquareConfig, Transform player) {
         this.config = meleeSquareConfig;
         this.player = player;
-        this.grid = grid;
-        currentTile = (Vector2Int)grid.WorldToCell(player.position);
+        currentTile = Terrain.I.CellAt(player.position);
     }
 
     // input x and y are from {-1, 0, 1}: 9 possibilities
@@ -52,7 +50,7 @@ public class MeleeSquare {
 
     public Vector2Int? TryMove() {
         Vector2Int nextSquare = currentTile + inputVelocity;
-        Vector2Int relativeToPlayer = nextSquare - (Vector2Int)grid.WorldToCell(player.position);
+        Vector2Int relativeToPlayer = nextSquare - Terrain.I.CellAt(player.position);
 
         if (Math.Abs(relativeToPlayer.x) + Math.Abs(relativeToPlayer.y) > 1) {
             if (BounceWithinBounds() is Vector2Int bounce) {
@@ -60,7 +58,7 @@ public class MeleeSquare {
                 currentTile = bounce;
                 return bounce;
             }
-            waitingOnPlayerToLeave = grid.WorldToCell(player.position);
+            waitingOnPlayerToLeave = Terrain.I.CellAt(player.position);
             timeDoneMoving = 0f;
             return null;
         }
@@ -68,7 +66,7 @@ public class MeleeSquare {
         if (waitingOnPlayerToLeave == null) {
             timeDoneMoving = config.latency + Time.fixedTime;
         } else {
-            waitingOnPlayerToLeave = grid.WorldToCell(player.position);
+            waitingOnPlayerToLeave = Terrain.I.CellAt(player.position);
         }
 
         currentTile = nextSquare;
@@ -76,9 +74,9 @@ public class MeleeSquare {
     }
 
     public Vector2Int? BounceWithinBounds() {
-        Vector2Int relativeToPlayer = currentTile - (Vector2Int)grid.WorldToCell(player.position);
+        Vector2Int relativeToPlayer = currentTile - Terrain.I.CellAt(player.position);
         if (Math.Abs(relativeToPlayer.x) + Math.Abs(relativeToPlayer.y) > 1) {
-            Vector2Int bounce = (Vector2Int)grid.WorldToCell(player.position) + inputVelocity;
+            Vector2Int bounce = Terrain.I.CellAt(player.position) + inputVelocity;
             return bounce;
         } else {
             return null;
@@ -87,8 +85,8 @@ public class MeleeSquare {
 
     public Vector2Int? GetResultForFixedUpdate() {
         if (timeDoneMoving == 0f) {
-            if (waitingOnPlayerToLeave is Vector3Int oldSquare) {
-                Vector3Int newSquare = grid.WorldToCell(player.position);
+            if (waitingOnPlayerToLeave is Vector2Int oldSquare) {
+                Vector2Int newSquare = Terrain.I.CellAt(player.position);
                 if (oldSquare != newSquare) {
                     return TryMove();
                 } else {

@@ -8,13 +8,13 @@ public class GlobalConfig : MonoBehaviour {
     private static GlobalConfig instance;
     void Awake() {
         instance = this;
-        mapRenderer = GetComponent<MapRenderer2D>();
+        mapRenderer = GetComponent<MapRenderer3D>();
     }
     public static GlobalConfig I {
         get => instance;
     }
     
-    private MapRenderer2D mapRenderer;
+    private MapRenderer3D mapRenderer;
     public Elevation elevation { get => mapRenderer.elevation; }
     [Serializable] public class Elevation {
         public float groundLevelHighlight;

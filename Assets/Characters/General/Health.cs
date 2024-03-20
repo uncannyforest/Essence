@@ -16,7 +16,7 @@ public class Health : StatusQuantity {
     override protected void Awake() {
         base.Awake();
         ReachedZero += HandleDeath;
-        grid = GameObject.FindObjectOfType<Grid>().transform;
+        grid = Terrain.I.transform;
     }
 
     public void Decrease(int quantity, Transform blame) {

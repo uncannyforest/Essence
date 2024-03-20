@@ -71,8 +71,9 @@ public class WorldInteraction : MonoBehaviour {
 
     new public Camera camera;
     public Inventory inventory;
-    public Grid grid;
+    public Grid grid; // TODO remove
     public Terrain terrain;
+    public Transform bag;
     public SortingGroup largeCharacterSelectPrefab;
     public SortingGroup smallCharacterSelectPrefab;
     public Tilemap uiMap;
@@ -173,7 +174,7 @@ public class WorldInteraction : MonoBehaviour {
         player = GameManager.I.YourPlayer.transform;
         rangedSelect = new Ranged(rangedConfig);
         meleeSelect = new Melee(meleeConfig, player);
-        meleeSquare = new MeleeSquare(praxelSelectConfig, player, grid);
+        meleeSquare = new MeleeSquare(praxelSelectConfig, player);
         teleSelect = new Tele(terrain);
         hoverTiles = new Dictionary<Terrain.Grid, TileBase>() {
             [Terrain.Grid.XWalls] = edgeHoverTileX,
@@ -361,15 +362,15 @@ public class WorldInteraction : MonoBehaviour {
                     terrain.Feature[coord].Attack(player);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
-                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);
+                    Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);
                 } else if (terrain.GetLand(coord) == Land.Dirtpile) {
                     terrain.Land[coord] = Land.Grass;
-                    Collectible.Instantiate(soil, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), dirtPileCost);
+                    Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), dirtPileCost);
                 } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
                     int woodQuantity = terrain.GetLand(coord) == Land.Meadow ? 1 :
                         terrain.GetLand(coord) == Land.Shrub ? 3 : 6;
                     terrain.Land[coord] = Land.Grass;
-                    Collectible.Instantiate(wood, grid.transform, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
+                    Collectible.Instantiate(wood, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
                 }
             break;
             case Mode.WoodBuilding:
@@ -447,7 +448,7 @@ public class WorldInteraction : MonoBehaviour {
                     meleeSelect.Damage(player.GetComponent<Team>().TeamId);
                     SignalOffensiveTarget(meleeSelect.InputVelocity,
                         signalMeleeRadius, signalFrontOfPlayer, 0);
-                    Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, grid.transform).transform;
+                    Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, bag).transform;
                     swordSwipe.position = meleeSelect.DamageCenter.WithZ(GlobalConfig.I.elevation.groundLevelHighlight);
                     swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
                     yield return new WaitForSeconds(swordRate);
@@ -458,7 +459,7 @@ public class WorldInteraction : MonoBehaviour {
                     if (inventory.Retrieve(Material.Type.Arrow, 1)) {
                         Arrow.Instantiate(
                             flyingArrowPrefab,
-                            grid.transform,
+                            bag,
                             player,
                             (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
                         SignalOffensiveTarget(rangedSelect.DirectionVector,
