@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1513103252902643624}
   - component: {fileID: 4298521760196247329}
+  - component: {fileID: 8584439774503309894}
   m_Layer: 13
   m_Name: Isometric Diamond
   m_TagString: Untagged
@@ -24,9 +25,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3772003991273503144}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.75, z: 0}
-  m_LocalScale: {x: 0.25, y: 2, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.40824825, z: 0}
+  m_LocalScale: {x: 0.3535535, y: 1.6329932, z: 1}
   m_Children: []
   m_Father: {fileID: 844146212757919443}
   m_RootOrder: 0
@@ -82,6 +83,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8584439774503309894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3772003991273503144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7178775545182903850
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,10 +106,9 @@ GameObject:
   - component: {fileID: 844146212757919443}
   - component: {fileID: -6226454821118147200}
   - component: {fileID: -269789415231399089}
-  - component: {fileID: 8828565130831549889}
-  - component: {fileID: 2514985222897334611}
   - component: {fileID: 676075985585426901}
   - component: {fileID: 8267327629834868875}
+  - component: {fileID: 2116784381847026}
   m_Layer: 13
   m_Name: Fountain
   m_TagString: Untagged
@@ -133,6 +145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   validLand: 1
   roofValid: 0
+  canHit: 1
+  type: 
 --- !u!114 &-269789415231399089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,46 +161,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeToCapture: 5
   timeToReset: 1
---- !u!210 &8828565130831549889
-SortingGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7178775545182903850}
-  m_Enabled: 1
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!60 &2514985222897334611
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7178775545182903850}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.25, y: 0}
-      - {x: 0, y: 0.25}
-      - {x: -0.25, y: 0}
-      - {x: 0, y: -0.25}
 --- !u!114 &676075985585426901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,6 +192,31 @@ MonoBehaviour:
   statBarColor: {r: 0.99607843, g: 0.99607843, b: 0.99607843, a: 1}
   itemDrop: {fileID: 0}
   itemDropSize: 0
-  collectiblePrefab: {fileID: 0}
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+--- !u!61 &2116784381847026
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178775545182903850}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0

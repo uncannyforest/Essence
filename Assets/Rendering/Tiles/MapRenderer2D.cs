@@ -134,9 +134,13 @@ public class MapRenderer2D : MonoBehaviour {
     }
 
     // Returns a Vector2 indicating nearby shore.
-    // Direction of the Vector2 indicates direction of shore.
+    // Direction of the Vector2 is the negative of proximity to shore.
     // Magnitude of the Vector2 indicates the *closeness* of the shore (closer = greater magnitude).
-    public Vector2 ShoreEdgeFactor(Vector3 position, float shorePushNoZone) {
+    //
+    // When position is near a land corner, the output always points the direction the corner points.
+    //
+    // Note different usage of PositionInCell in MapRenderer3D - the algorithm there is different and not just a transformation of this one.
+    public Vector2 ShoreSlope(Vector3 position, float shorePushNoZone) {
         Vector2 shoreCorrection = Vector2.zero;
         Land?[] nearTiles = GetFourLandTilesAround(position);
         Vector2 sub = PositionInCell(position);

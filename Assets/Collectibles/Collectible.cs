@@ -3,13 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteSorter))]
 public class Collectible : MonoBehaviour {
     public Material.Type material;
     public int quantity;
-
-    private SpriteSorter spriteSorter;
-    public void Awake() { spriteSorter = GetComponent<SpriteSorter>(); }
 
     public static Collectible Instantiate(Material material, Vector2 location) {
         Collectible collectible = Instantiate<Collectible>(CollectibleLibrary.P[material.MaterialType],
@@ -42,12 +38,10 @@ public class Collectible : MonoBehaviour {
         float startTime = Time.time;
         float endTime = startTime + CollectibleLibrary.C.collectAnimationTime;
         float speed = CollectibleLibrary.C.collectAnimationDistance / CollectibleLibrary.C.collectAnimationTime;
-        if (spriteSorter != null) {
-            float startY = spriteSorter.VerticalDisplacement;
-            while (Time.time < endTime) {
-                spriteSorter.VerticalDisplacement = startY + speed * (Time.time - startTime);
-                yield return null;
-            }
+        Vector3 startPos = transform.position;
+        while (Time.time < endTime) {
+            transform.position = startPos + Vector3.back * speed * (Time.time - startTime);
+            yield return null;
         }
         Destroy(gameObject);
     }

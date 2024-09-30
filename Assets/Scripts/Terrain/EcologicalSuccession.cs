@@ -5,7 +5,6 @@ public class EcologicalSuccession : MonoBehaviour {
     public float frequency = 1f;
     public int radius = 24;
     public Terrain terrain;
-    public Grid grid;
     public Transform player;
 
     private Vector2Int[] adjacentSquares = {
@@ -32,7 +31,7 @@ public class EcologicalSuccession : MonoBehaviour {
     }
 
     public void Grow() {
-        Vector2Int center = (Vector2Int)grid.WorldToCell(player.position);
+        Vector2Int center = terrain.CellAt(player.position);
 
         Vector2Int location = center;
         Land? attemptedGrowth = null;

@@ -108,21 +108,19 @@ public class InputManager : MonoBehaviour {
         float h = Math.Sign(SimpleInput.GetAxis("Horizontal"));
         float v = Math.Sign(SimpleInput.GetAxis("Vertical"));
 
-        Vector2 move = Orientor.WorldFromScreen(
+        Vector2 move = Orientor3D.WorldFromScreen(
             new ScreenVector(new Vector2(h, v) + GetLeftHandDirection()));
         Vector2Int moveUnit = new Vector2Int(move.x > .1 ? 1 : move.x < -.1 ? -1 : 0, move.y > .1 ? 1 : move.y < -.1 ? -1 : 0);
         GameManager.I.YourPlayer.InputVelocity = (Input.GetKey("left shift") || Input.GetKey("right shift"))
             ? Vector2Int.zero : moveUnit;
         world.PlayerMove(moveUnit);
 
-        int rotate = 0;
-        if (SimpleInput.GetButtonDown("Camera Right")) {
-            rotate = 270;
-        } else if (SimpleInput.GetButtonDown("Camera Left")) {
-            rotate = 90;
+        if (SimpleInput.GetButton("Camera Right")) {
+            Orientor3D.I.RotationKeyUpdate(1);
+        } else if (SimpleInput.GetButton("Camera Left")) {
+            Orientor3D.I.RotationKeyUpdate(-1);
         } else {
-            return;
+            Orientor3D.I.RotationKeyUpdate(0);
         }
-        Orientor.Rotation = (Orientation)(((int)Orientor.Rotation + rotate) % 360);
     }
 }

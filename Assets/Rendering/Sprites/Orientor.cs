@@ -18,6 +18,10 @@ public class Orientor : MonoBehaviour {
     [SerializeField]
     private Orientation rotation;
 
+    public void RotationKeyDown(bool left) {
+        rotation = (Orientation)(((int)rotation + (left ? 90 : 270)) % 360);
+    }
+
     public static Orientation Rotation {
         get => instance.rotation;
         set {

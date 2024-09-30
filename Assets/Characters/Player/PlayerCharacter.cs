@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(CharacterController))]
 public class PlayerCharacter : MonoBehaviour {
-    public Terrain terrain;
-
     private Transform pointOfView;
 
     private Health health;
@@ -47,7 +45,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     public bool HandleCrossingTile(Vector2Int newTile) {
-        if (terrain.Feature[newTile] is Feature feature && feature.PlayerEntered != null) {
+        if (Terrain.I.Feature[newTile] is Feature feature && feature.PlayerEntered != null) {
             return feature.PlayerEntered(this);
         }
         return true;
@@ -62,6 +60,7 @@ public class PlayerCharacter : MonoBehaviour {
             select point).ToArray<Fountain>();
         int randomIndex = Random.Range(0, teamSpawnPoints.Length);
         transform.position = (Vector2)(teamSpawnPoints[randomIndex].transform.position);
+        Terrain.I.mapRenderer.Reset();
     }
 
     public void EnteredVehicle(Transform vehicle, Action<Vector2Int> ReceiveInput) {

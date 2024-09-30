@@ -66,6 +66,18 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 7300553151862852229, guid: e43702e61aa35467a96be823c71272b7, type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7300553151862852229, guid: e43702e61aa35467a96be823c71272b7, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: fb1d89cd8a65f4a70abf58f11c8587c2, type: 3}
+    - target: {fileID: 7300553151862852229, guid: e43702e61aa35467a96be823c71272b7, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8563214007291117290, guid: e43702e61aa35467a96be823c71272b7, type: 3}
       propertyPath: m_Name
       value: Scale

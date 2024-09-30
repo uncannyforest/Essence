@@ -6,7 +6,7 @@ using UnityEngine;
 public class MapRenderer3D : MonoBehaviour {
     public GlobalConfig.Elevation elevation;
     public TileLibrary3D tiles;
-    public GridCell3D gridCell;
+    public GridSubCell3D gridSubCell;
     public int renderWindow;
 
     private Terrain terrain;
@@ -14,12 +14,13 @@ public class MapRenderer3D : MonoBehaviour {
     private Transform xWallTiles;
     private Transform yWallTiles;
 
+    private Transform tilesParent;
+
     public Transform WorldParent { get => transform; }
 
     public void OnTerrainLoaded() {
         terrain = GetComponent<Terrain>();
-        CreateAllCellsInRenderWindow();
-        PopulateAllCellsInRenderWindow();
+        GameManager.I.YourPlayer.movement.CrossingTile += HandleCrossingTile;
     }
 
     private bool TerrainIsLoaded { get => terrain != null; }
@@ -41,6 +42,7 @@ public class MapRenderer3D : MonoBehaviour {
     public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
     private Vector2 PositionInCell(Vector2 position) /* -1 <= x, y <= 1 */ => 2 * (position - CellCenterAt(position));
 
+    private bool IsInRenderWindow(Transform tile) => IsInRenderWindow(((Vector2)tile.GetChild(0).position).RoundToInt());
     public bool IsInRenderWindow(Vector2Int pos) {
         Vector2Int playerPos = CellAt(GameManager.I.YourPlayer.transform.position);
         return pos.x >= playerPos.x - renderWindow / 2
@@ -84,41 +86,51 @@ public class MapRenderer3D : MonoBehaviour {
             }
         }
     }
-    public void CreateAllCellsInRenderWindow() {
+    public void Reset() {
+        if (tilesParent != null) GameObject.Destroy(tilesParent);
+        tilesParent = new GameObject("Tiles").transform;
+        tilesParent.parent = WorldParent;
+        CreateAllCellsInRenderWindow();
+    }
+    public void CreateAllCellsInRenderWindow(bool force = true) {
         Vector2Int playerPos = CellAt(GameManager.I.YourPlayer.transform.position);
         for (int x = playerPos.x - renderWindow / 2; x <= playerPos.x + renderWindow / 2; x++) {
             for (int y = playerPos.y - renderWindow / 2; y <= playerPos.y + renderWindow / 2; y++) {
                 Vector2Int pos = new Vector2Int(x, y); // position: corner NOT cell center
+                if (!force && tilesParent.Find(pos.ToString()) != null) continue;
                 GameObject child = new GameObject(pos.ToString());
-                child.transform.parent = transform;
-                GameObject.Instantiate(gridCell, (Vector2)pos, Quaternion.identity,
+                child.transform.parent = tilesParent;
+                GameObject.Instantiate(gridSubCell, (Vector2)pos, Quaternion.identity,
                     child.transform).name = "0";
-                GameObject.Instantiate(gridCell, pos + Vct.F(1, 0), Quaternion.Euler(0, 0, 90),
+                GameObject.Instantiate(gridSubCell, pos + Vct.F(1, 0), Quaternion.Euler(0, 0, 90),
                     child.transform).name = "1";
-                GameObject.Instantiate(gridCell, pos +  Vct.F(1, 1), Quaternion.Euler(0, 0, 180),
+                GameObject.Instantiate(gridSubCell, pos + Vct.F(1, 1), Quaternion.Euler(0, 0, 180),
                     child.transform).name = "2";
-                GameObject.Instantiate(gridCell, pos + Vct.F(0, 1), Quaternion.Euler(0, 0, 270),
+                GameObject.Instantiate(gridSubCell, pos + Vct.F(0, 1), Quaternion.Euler(0, 0, 270),
                     child.transform).name = "3";
+                PopulateCell(x, y);
             }
         }
     }
-    public void PopulateAllCellsInRenderWindow() {
-        Vector2Int playerPos = CellAt(GameManager.I.YourPlayer.transform.position);
-        for (int x = playerPos.x - renderWindow / 2; x <= playerPos.x + renderWindow / 2; x++) {
-            for (int y = playerPos.y - renderWindow / 2; y <= playerPos.y + renderWindow / 2; y++) {
-                Debug.Log(x + ", " + y + ": " + Terrain.I.GetLand(Vct.I(x, y)));
-                UpdateLandCell(x, y, 0);
-                UpdateLandCell(x, y, 1);
-                UpdateLandCell(x, y, 2);
-                UpdateLandCell(x, y, 3);
-            }
-        }
+    public bool HandleCrossingTile(Vector2Int _) { UpdateRenderWindow(); return true; }
+    public void UpdateRenderWindow() {
+        foreach (Transform child in tilesParent)
+            if (!IsInRenderWindow(child))
+                GameObject.Destroy(child.gameObject);
+        CreateAllCellsInRenderWindow(false);
+    }
+    public void PopulateCell(int x, int y) {
+        Debug.Log(x + ", " + y + ": " + Terrain.I.GetLand(Vct.I(x, y)));
+        UpdateLandCell(x, y, 0);
+        UpdateLandCell(x, y, 1);
+        UpdateLandCell(x, y, 2);
+        UpdateLandCell(x, y, 3);
     }
     public Land GetLand(int x, int y) => Terrain.I.GetLand(Vct.I(x, y)) ?? Terrain.I.Depths;
     public void UpdateLandCell(int x, int y, int rot) {
-        Transform child = transform.Find(new Vector2Int(x, y).ToString());
+        Transform child = tilesParent.Find(new Vector2Int(x, y).ToString());
         switch (rot) {
-            case 0: child.Find("0").GetComponentStrict<GridCell3D>().MaybeRender(
+            case 0: child.Find("0").GetComponentStrict<GridSubCell3D>().MaybeRender(
                     GetLand(x, y),
                     GetLand(x - 1, y),
                     GetLand(x - 1, y - 1),
@@ -126,7 +138,7 @@ public class MapRenderer3D : MonoBehaviour {
                     GetLand(x + 1, y),
                     GetLand(x, y + 1));
                 break;
-            case 1: child.Find("1").GetComponentStrict<GridCell3D>().MaybeRender(
+            case 1: child.Find("1").GetComponentStrict<GridSubCell3D>().MaybeRender(
                     GetLand(x, y),
                     GetLand(x, y - 1),
                     GetLand(x + 1, y - 1),
@@ -134,7 +146,7 @@ public class MapRenderer3D : MonoBehaviour {
                     GetLand(x, y + 1),
                     GetLand(x - 1, y));
                 break;
-            case 2: child.Find("2").GetComponentStrict<GridCell3D>().MaybeRender(
+            case 2: child.Find("2").GetComponentStrict<GridSubCell3D>().MaybeRender(
                     GetLand(x, y),
                     GetLand(x + 1, y),
                     GetLand(x + 1, y + 1),
@@ -142,7 +154,7 @@ public class MapRenderer3D : MonoBehaviour {
                     GetLand(x - 1, y),
                     GetLand(x, y - 1));
                 break;
-            case 3: child.Find("3").GetComponentStrict<GridCell3D>().MaybeRender(
+            case 3: child.Find("3").GetComponentStrict<GridSubCell3D>().MaybeRender(
                     GetLand(x, y),
                     GetLand(x, y + 1),
                     GetLand(x - 1, y + 1),
@@ -177,17 +189,22 @@ public class MapRenderer3D : MonoBehaviour {
     }
 
     // Returns a Vector2 indicating nearby shore.
-    // Direction of the Vector2 indicates direction of shore.
+    // Direction of the Vector2 is the negative of proximity to shore.
     // Magnitude of the Vector2 indicates the *closeness* of the shore (closer = greater magnitude).
-    public Vector2 ShoreEdgeFactor(Vector3 position, float shorePushNoZone) {
+    //
+    // When position is near a land corner, the output always points the direction the corner points.
+    //
+    // This algorithm doesn't treat every point along a flat shore equally,
+    // but it does the job.
+    public Vector2 ShoreSlope(Vector2 position, float shorePushNoZone) {
         Vector2 shoreCorrection = Vector2.zero;
         Land?[] nearTiles = GetFourLandTilesAround(position);
-        Vector2 sub = PositionInCell(position);
-        if (sub.magnitude < shorePushNoZone) sub = Vector2.zero;
-        if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, Mathf.Abs(sub.x) - sub.y);
-        if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(- sub.x - Mathf.Abs(sub.y), 0);
-        if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(- sub.x + Mathf.Abs(sub.y), 0);
-        if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += new Vector2(0, -Mathf.Abs(sub.x) - sub.y);
+        Vector2 sub = PositionInCell(position + Vct.F(-.5f, -.5f));
+        if ((1 - Mathf.Abs(sub.x)) + (1 - Mathf.Abs(sub.y)) < shorePushNoZone) return Vector2.zero; // if sub is near a corner
+        if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(1, 1) * (1 - Mathf.Max(sub.x, sub.y));
+        if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(-1, 1) * (1 - Mathf.Max(-sub.x, sub.y));
+        if ((nearTiles[2] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(1, -1) * (1 - Mathf.Max(sub.x, -sub.y));
+        if ((nearTiles[3] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(-1, -1) * (1 - Mathf.Max(-sub.x, -sub.y));
         return shoreCorrection;
     }
 }

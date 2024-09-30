@@ -16,7 +16,6 @@ public class Boat : MonoBehaviour {
     public Transform seats;
 
     private Terrain terrain;
-    private MapRenderer2D mapRenderer;
     private Feature feature;
     [NonSerialized] public CharacterController movement;
     private SortingGroup[] seatSorters = new SortingGroup[4];
@@ -43,7 +42,6 @@ public class Boat : MonoBehaviour {
 
     void Start() {
         terrain = Terrain.I;
-        mapRenderer = terrain.GetComponentStrict<MapRenderer2D>();
         movement = GetComponent<CharacterController>();
         movement.CrossingTile += HandleCrossingTile;
         feature = GetComponent<Feature>();
@@ -129,7 +127,7 @@ public class Boat : MonoBehaviour {
     void FixedUpdate() {
         if (!inUse) return;
 
-        Vector2 shoreCorrection = mapRenderer.ShoreEdgeFactor(transform.position, shorePushNoZone) * shorePush;
+        Vector2 shoreCorrection = terrain.mapRenderer.ShoreSlope(transform.position, shorePushNoZone) * shorePush;
         Vector2 expectedVelocity = inputVelocity + shoreCorrection;
 
         if (currentVelocity != expectedVelocity) {

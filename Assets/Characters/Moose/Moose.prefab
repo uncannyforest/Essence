@@ -160,6 +160,38 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 9d184062daeec43f99cec46b3d575a14, type: 2}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 290418334460826483, guid: 7e7239e308b1f4af398d71e6f2b81b7a, type: 3}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 4227571806329763833, guid: 7e7239e308b1f4af398d71e6f2b81b7a, type: 3}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4023649891087868684, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer
       value: 10
@@ -175,6 +207,10 @@ PrefabInstance:
     - target: {fileID: 4914513955349957905, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4957690152975860324, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: height
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4957690152975860324, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: broadGirth

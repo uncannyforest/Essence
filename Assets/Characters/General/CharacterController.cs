@@ -6,7 +6,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class CharacterController : MonoBehaviour {
-    public const int subGridUnit = 8;
+    public const int subGridUnit = 4;
 
     public float personalBubble = 0;
     public bool setAnimatorDirectionDirectly = false;
@@ -162,7 +162,9 @@ public class CharacterController : MonoBehaviour {
     }
 
     private bool CanCrossTile(Vector2Int tile) {
-        return waterSpeed != 0f || (terrain.GetLand(tile) ?? terrain.Depths) != Land.Water;
+        Land land = terrain.GetLand(tile) ?? terrain.Depths;
+        bool notWaterProhibited = waterSpeed != 0f || land != Land.Water;
+        return notWaterProhibited && land.IsPassable();
     }
 
     public void OrientFurther() {

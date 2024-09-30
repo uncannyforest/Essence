@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3416530784708741738}
   - component: {fileID: 755612189698866150}
+  - component: {fileID: 6423211704812064368}
   m_Layer: 7
   m_Name: Base
   m_TagString: Untagged
@@ -82,6 +83,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6423211704812064368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2914403946634837083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3564254304208512937
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,6 +105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 990735364471269985}
   - component: {fileID: 5674214303865811904}
+  - component: {fileID: 7760981315448036568}
   m_Layer: 7
   m_Name: Blades
   m_TagString: Untagged
@@ -164,6 +178,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7760981315448036568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3564254304208512937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3679020868515697513
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,10 +201,10 @@ GameObject:
   - component: {fileID: 8720877971179551070}
   - component: {fileID: 5500238641662902520}
   - component: {fileID: 1701968480936570841}
-  - component: {fileID: -25566807075259578}
   - component: {fileID: -3697892114251822067}
   - component: {fileID: 9203515329138306239}
   - component: {fileID: 2998764763587065230}
+  - component: {fileID: 6537596548197068415}
   m_Layer: 7
   m_Name: Windmill
   m_TagString: Untagged
@@ -195,7 +221,7 @@ Transform:
   m_GameObject: {fileID: 3679020868515697513}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3416530784708741738}
   - {fileID: 990735364471269985}
@@ -217,6 +243,7 @@ MonoBehaviour:
   validLand: 1
   roofValid: 0
   canHit: 1
+  type: 
 --- !u!210 &1701968480936570841
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -228,35 +255,6 @@ SortingGroup:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!60 &-25566807075259578
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3679020868515697513}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.5, y: 0}
-      - {x: 0, y: 0.25}
-      - {x: -0.5, y: 0}
-      - {x: 0, y: -0.25}
 --- !u!111 &-3697892114251822067
 Animation:
   m_ObjectHideFlags: 0
@@ -326,3 +324,29 @@ MonoBehaviour:
   itemDropSize: 0
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+--- !u!61 &6537596548197068415
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679020868515697513}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0

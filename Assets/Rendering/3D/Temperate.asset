@@ -54,7 +54,7 @@ MonoBehaviour:
     insideCorner: {fileID: -7511558181221131132, guid: 00cf46aef43e146f991898e82ccc7a5a, type: 3}
     inner: {fileID: -7511558181221131132, guid: 00cf46aef43e146f991898e82ccc7a5a, type: 3}
   ditch:
-    alwaysInclude: 1
+    alwaysInclude: 0
     parentLayer: 7
     corner: {fileID: -7511558181221131132, guid: 8983d87816eb041a3b23cc4c23e6cc57, type: 3}
     taper: {fileID: -7511558181221131132, guid: 8983d87816eb041a3b23cc4c23e6cc57, type: 3}

@@ -79,7 +79,7 @@ public class Terrain : MonoBehaviour {
     public ConstructionIndex Roof;
     public FeatureIndex Feature;
 
-    private MapRenderer3D mapRenderer;
+    public MapRenderer3D mapRenderer;
 
     private static Terrain instance;
     public static Terrain I { get => instance; }
