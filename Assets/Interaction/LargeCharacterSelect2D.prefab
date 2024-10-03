@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4555406568407555295}
   - component: {fileID: 8857988489869317622}
   m_Layer: 0
-  m_Name: LargeCharacterSelect
+  m_Name: LargeCharacterSelect2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

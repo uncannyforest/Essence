@@ -37,6 +37,7 @@ public class MapRenderer3D : MonoBehaviour {
     }
     public Vector2 CellCenter(Vector2Int cellPosition) =>
         new Vector2(cellPosition.x + .5f, cellPosition.y + .5f);
+    public static Vector2 ToWorld(Vector2Int vector) => new Vector2(vector.x, vector.y);
     public Vector2Int CellAt(Vector3 worldPosition) =>
         new Vector2Int(Mathf.FloorToInt(worldPosition.x), Mathf.FloorToInt(worldPosition.y));
     public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));

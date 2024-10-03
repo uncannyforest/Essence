@@ -30,8 +30,8 @@ public class MeleeSquare {
         set {
             Vector2Int oldInputVelocity = inputVelocity;
             inputVelocity = new Vector2Int(
-                value.y + value.x > 0 ? 1 : value.y + value.x < 0 ? -1 : 0,
-                value.y - value.x > 0 ? 1 : value.y - value.x < 0 ? -1 : 0
+                value.x > 0 ? 1 : value.x < 0 ? -1 : 0,
+                value.y > 0 ? 1 : value.y < 0 ? -1 : 0
             );
             if (oldInputVelocity != inputVelocity) {
                 ProcessNewInput();

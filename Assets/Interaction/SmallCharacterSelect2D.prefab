@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 4555406568407555295}
   - component: {fileID: 5741242326734025987}
   m_Layer: 0
-  m_Name: SmallCharacterSelect
+  m_Name: SmallCharacterSelect2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -74,14 +74,18 @@ public class WorldInteraction : MonoBehaviour {
     public Grid grid; // TODO remove
     public Terrain terrain;
     public Transform bag;
-    public SortingGroup largeCharacterSelectPrefab;
-    public SortingGroup smallCharacterSelectPrefab;
-    public Tilemap uiMap;
-    public Tilemap uiMapEdgeX;
-    public Tilemap uiMapEdgeY;
-    public TileBase hoverTile;
-    public TileBase edgeHoverTileX;
-    public TileBase edgeHoverTileY;
+    public SortingGroup largeCharacterSelectPrefab; // will delete
+    public SortingGroup smallCharacterSelectPrefab; // will delete
+    public Cardboard largeCharacterSelectPrefab_new;
+    public Cardboard smallCharacterSelectPrefab_new;
+    public Tilemap uiMap; // will delete
+    public Tilemap uiMapEdgeX; // will delete
+    public Tilemap uiMapEdgeY; // will delete
+    public TileBase hoverTile; // will delete
+    public TileBase edgeHoverTileX; // will delete
+    public TileBase edgeHoverTileY; // will delete
+    public GameObject hoverSquare;
+    public GameObject hoverEdge;
     public LineRenderer lineSelect;
 
     public Collectible wood;
@@ -99,15 +103,15 @@ public class WorldInteraction : MonoBehaviour {
     private Melee meleeSelect;
     private MeleeSquare meleeSquare;
     private Tele teleSelect;
-    private Vector3Int activeTile = Vector3Int.zero;
-    private Tilemap activeGrid;
+    private Vector2Int activeTile = Vector2Int.zero;
+    private Tilemap activeGrid; // will delete
     private bool lineStarterUpdate;
     private Character activeCharacter; // hover
     private GameObject activeCharacterHighlight;
     private DeStack<Character> followingCharacters = new DeStack<Character>();
     private GameObject followingCharacterHighlight;
-    private Dictionary<Terrain.Grid, TileBase> hoverTiles;
-    private Dictionary<Terrain.Grid, Tilemap> uiMaps;
+    private Dictionary<Terrain.Grid, TileBase> hoverTiles; // will delete
+    private Dictionary<Terrain.Grid, Tilemap> uiMaps; // will delete
 
     public Action<Interaction, Creature> interactionChanged;
     public Action<Interaction, Creature> creatureChanged;
@@ -134,7 +138,6 @@ public class WorldInteraction : MonoBehaviour {
             ClearLine();
             if (currentAction.mode == Mode.Arrow && value.mode != Mode.Arrow) rangedSelect.Reset();
             currentAction = value;
-            activeGrid?.SetTile(activeTile, null);
             if (interactionChanged != null) interactionChanged(currentAction, PeekFollowing());
         }
     }
@@ -176,23 +179,26 @@ public class WorldInteraction : MonoBehaviour {
         meleeSelect = new Melee(meleeConfig, player);
         meleeSquare = new MeleeSquare(praxelSelectConfig, player);
         teleSelect = new Tele(terrain);
-        hoverTiles = new Dictionary<Terrain.Grid, TileBase>() {
-            [Terrain.Grid.XWalls] = edgeHoverTileX,
-            [Terrain.Grid.YWalls] = edgeHoverTileY,
-            [Terrain.Grid.Roof] = hoverTile
-        };
-        uiMaps = new Dictionary<Terrain.Grid, Tilemap>() {
-            [Terrain.Grid.XWalls] = uiMapEdgeX,
-            [Terrain.Grid.YWalls] = uiMapEdgeY,
-            [Terrain.Grid.Roof] = uiMap
-        };
+        // hoverTiles = new Dictionary<Terrain.Grid, TileBase>() {
+        //     [Terrain.Grid.XWalls] = edgeHoverTileX,
+        //     [Terrain.Grid.YWalls] = edgeHoverTileY,
+        //     [Terrain.Grid.Roof] = hoverTile
+        // };
+        // uiMaps = new Dictionary<Terrain.Grid, Tilemap>() {
+        //     [Terrain.Grid.XWalls] = uiMapEdgeX,
+        //     [Terrain.Grid.YWalls] = uiMapEdgeY,
+        //     [Terrain.Grid.Roof] = uiMap
+        // };
         ConfirmOngoing = new TaskRunner(ConfirmOngoingE, this);
         inventory = player.GetComponentStrict<Inventory>();
         Orientor.I.onRotation += ClearTile;
         Orientor.I.onRotation += ClearLine;
     }
 
-    public void ClearTile() => activeGrid?.SetTile(activeTile, null);
+    public void ClearTile() {
+        hoverEdge.SetActive(false);
+        hoverSquare.SetActive(false);
+    }
     public void ClearCharacter() {
         if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight);
         activeCharacterHighlight = null;
@@ -202,10 +208,23 @@ public class WorldInteraction : MonoBehaviour {
         lineSelect.positionCount = 0;
         lineStarterUpdate = false;
     }
+    public void SetTile(Terrain.Position position) {
+        activeTile = position.Coord;
+        if (position.grid == Terrain.Grid.Roof) {
+            hoverEdge.SetActive(false);
+            hoverSquare.SetActive(true);
+            hoverSquare.transform.position = MapRenderer3D.ToWorld(activeTile);
+        } else {
+            hoverSquare.SetActive(false);
+            hoverEdge.SetActive(true);
+            hoverEdge.transform.position = MapRenderer3D.ToWorld(activeTile);
+            hoverEdge.transform.rotation = position.grid == Terrain.Grid.XWalls ? Quaternion.identity : Quaternion.Euler(0, 0, 90);
+        }
+    }
     public void NewActiveCharacter(Character character) {
         activeCharacter = character;
         if (activeCharacter != null) {
-            activeCharacterHighlight = CharacterHighlight2D.New(activeCharacter, true).gameObject;
+            activeCharacterHighlight = CharacterHighlight3D.New(activeCharacter, true).gameObject;
         } else if (activeCharacterHighlight != null) {
             GameObject.Destroy(activeCharacterHighlight);
             activeCharacterHighlight = null;
@@ -215,7 +234,7 @@ public class WorldInteraction : MonoBehaviour {
         Debug.Log("Updating UI with active character " + activeCharacter);
         if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight);
         followingCharacterHighlight = activeCharacterHighlight;
-        CharacterHighlight2D.SetHighlightHoverToFollowing(followingCharacterHighlight);
+        CharacterHighlight3D.SetHighlightHoverToFollowing(followingCharacterHighlight);
         followingCharacters.Push(activeCharacter);
         if (creatureChanged != null) creatureChanged(CurrentAction, activeCharacter.GetComponentStrict<Creature>());
         activeCharacterHighlight = null;
@@ -232,7 +251,7 @@ public class WorldInteraction : MonoBehaviour {
 
         Character newFollowingCharacter = PeekFollowingCharacter();
         if (newFollowingCharacter != null)
-            followingCharacterHighlight = CharacterHighlight2D.New(newFollowingCharacter, false).gameObject;
+            followingCharacterHighlight = CharacterHighlight3D.New(newFollowingCharacter, false).gameObject;
         else followingCharacterHighlight = null;
         return result;
     }
@@ -256,7 +275,7 @@ public class WorldInteraction : MonoBehaviour {
         followingCharacters.PushToBottom(character);
         if (followingCharacters.Count == 1) {
             if (creatureChanged != null) creatureChanged(CurrentAction, creature);
-            followingCharacterHighlight = CharacterHighlight2D.New(character, false).gameObject;
+            followingCharacterHighlight = CharacterHighlight3D.New(character, false).gameObject;
         }
     }
     public void PlayerMove(Vector2 velocity) {
@@ -280,19 +299,13 @@ public class WorldInteraction : MonoBehaviour {
                 rangedSelect.PointerToKeys(PointerForAim(pointer));
             break;
             case Mode.Sod:
-                ClearTile();
-                activeTile = (Vector3Int)teleSelect.SelectSquareOnly(pointer);
-                activeGrid = uiMap;
-                uiMap.SetTile(activeTile, hoverTile);
+                activeTile = teleSelect.SelectSquareOnly(pointer);
+                hoverSquare.transform.position = MapRenderer3D.ToWorld(activeTile);
             break;
             case Mode.WoodBuilding:
-                ClearTile();
                 Terrain.Position? buildWhere = teleSelect.SelectBuildLoc(pointer);
-                if (buildWhere is Terrain.Position buildHere) {
-                    activeTile = (Vector3Int)buildHere.Coord;
-                    activeGrid = uiMaps[buildHere.grid];
-                    activeGrid.SetTile(activeTile, hoverTiles[buildHere.grid]);
-                }
+                if (buildWhere is Terrain.Position buildHere) SetTile(buildHere);
+                else ClearTile();
             break;
             case Mode.Taming:
                 if (duringPress) break;
@@ -308,9 +321,8 @@ public class WorldInteraction : MonoBehaviour {
                 ClearLine();
                 OneOf<Terrain.Position, Character> target = teleSelect.SelectDynamic(pointer);
                 if (target.Is(out Terrain.Position tile)) {
-                    activeTile = (Vector3Int)tile.Coord;
-                    activeGrid = uiMaps[tile.grid];
-                    if (teleSelect.Line == null) activeGrid.SetTile(activeTile, hoverTiles[tile.grid]);
+                    // activeTile = tile.Coord; // I don't think this is needed? - during 3D refactor
+                    if (teleSelect.Line == null) SetTile(tile);
                     else {
                         List<Vector3> line = teleSelect.Line();
                         lineStarterUpdate = line == null;
@@ -327,12 +339,8 @@ public class WorldInteraction : MonoBehaviour {
         }
     }
 
-    public void SelectPraxel(Vector2Int praxelSelectLocation) {
-        ClearTile();
-        activeTile = (Vector3Int)praxelSelectLocation;
-        activeGrid = uiMap;
-        uiMap.SetTile(activeTile, hoverTile);
-    }
+    public void SelectPraxel(Vector2Int praxelSelectLocation) =>
+        SetTile(new Terrain.Position(Terrain.Grid.Roof, praxelSelectLocation));
 
     public void Confirm(Vector2 worldPoint) {
         Vector2Int coord;
@@ -503,7 +511,7 @@ public class WorldInteraction : MonoBehaviour {
         if (displayNeedsUpdate) {
             if (CurrentAction.mode == Mode.Directing) CurrentAction = Interaction.Player(Mode.Taming);
             if (followingCharacters.Count > 0) {
-                followingCharacterHighlight = CharacterHighlight2D.New(followingCharacters.Peek(), false).gameObject;
+                followingCharacterHighlight = CharacterHighlight3D.New(followingCharacters.Peek(), false).gameObject;
                 if (creatureChanged != null) creatureChanged(CurrentAction,
                         followingCharacters.Peek().GetComponentStrict<Creature>());
             } else if (creatureChanged != null) creatureChanged(CurrentAction, null);
