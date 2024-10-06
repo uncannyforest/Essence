@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cardboard : MonoBehaviour {
+    public bool keepPerpendicularToGround = true;
+
     private IEnumerable<SpriteRenderer> Sprites {
         get => GetComponentsInChildren<SpriteRenderer>();
     }
@@ -14,16 +16,16 @@ public class Cardboard : MonoBehaviour {
     }
 
     public void Start() {
-        Orient(Orientor3D.I.cardboardDirection);
+        Orient(keepPerpendicularToGround ? Orientor3D.I.cardboardPerpendicularDirection : Orientor3D.I.cameraDirection);
     }
 
     public void Orient(Transform camera) {
         transform.rotation = camera.rotation;
     }
 
-    public static void OrientAllCardboards(Transform camera) {
+    public static void OrientAllCardboards(Transform camera, Transform perpendicular) {
         foreach (Cardboard cardboard in GameObject.FindObjectsOfType<Cardboard>()) {
-            cardboard.Orient(camera);
+            cardboard.Orient(cardboard.keepPerpendicularToGround ? perpendicular : camera);
         }
     }
 }

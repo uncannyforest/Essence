@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4234448771292179287}
   - component: {fileID: 7196300334897916077}
   m_Layer: 7
-  m_Name: Cardboard
+  m_Name: Perpendicular Cardboard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keepPerpendicularToGround: 1
 --- !u!212 &7196300334897916077
 SpriteRenderer:
   m_ObjectHideFlags: 0

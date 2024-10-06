@@ -641,7 +641,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a13a38619e3b74ab7bd29987f51a8c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardboardDirection: {fileID: 7839828376171180188}
+  cameraDirection: {fileID: 3814134692151419978}
+  cardboardPerpendicularDirection: {fileID: 7839828376171180188}
   turnSpeed: 4
 --- !u!1001 &393954918327170177
 PrefabInstance:

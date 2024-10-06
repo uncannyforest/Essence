@@ -7,7 +7,8 @@ public class Orientor3D : MonoBehaviour {
     public static Orientor3D I { get => instance; }
     void Awake() { if (instance == null) instance = this; }
 
-    public Transform cardboardDirection;
+    public Transform cameraDirection;
+    public Transform cardboardPerpendicularDirection;
     public float turnSpeed = 3;
 
     private float aimingForIso = 0;
@@ -60,7 +61,7 @@ public class Orientor3D : MonoBehaviour {
             }
 
             transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle + 45);
-            Cardboard.OrientAllCardboards(cardboardDirection);
+            Cardboard.OrientAllCardboards(cameraDirection, cardboardPerpendicularDirection);
         }
 
     }
