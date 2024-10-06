@@ -10,6 +10,7 @@ public class InventoryDisplay : MonoBehaviour {
     public int columns = 5;
     public int rows = 2;
     public float offset = 2f;
+    public float itemZ = -1;
     public Vector3 localScale = new Vector3(16, 16, 1);
     public Material.Type material1;
     public Material.Type material2;
@@ -36,6 +37,7 @@ public class InventoryDisplay : MonoBehaviour {
             }
             else return;
             GameObject newSprite = GameObject.Instantiate(CollectibleLibrary.P[material].transform.GetComponentInChildren<SpriteRenderer>().gameObject, transform);
+            GameObject.Destroy(newSprite.GetComponent<Cardboard>());
             newSprite.layer = LayerMask.NameToLayer("UI");
             Transform newTransform = newSprite.transform;
             newTransform.localScale = localScale;
@@ -77,6 +79,6 @@ public class InventoryDisplay : MonoBehaviour {
     }
 
     // Pivot point of collectibles is bottom center, so add (offset / 2f, 0)
-    public Vector2 PositionForIndex(int i) =>
-        new Vector2(i / rows * offset + offset / 2f, i % rows * offset);
+    public Vector3 PositionForIndex(int i) =>
+        new Vector3(i / rows * offset + offset / 2f, i % rows * offset, itemZ);
 }
