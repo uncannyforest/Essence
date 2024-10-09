@@ -80,4 +80,7 @@ public struct Displacement {
     override public int GetHashCode() {
         return displacement.GetHashCode();
     }
+    public override string ToString() {
+        return displacement.ToString();
+    }
 }

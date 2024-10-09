@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
 
     void Awake() {
         singlePlayer = GameObject.FindObjectOfType<PlayerCharacter>();
+        Debug.Log("SINGLE PLAYER = " + singlePlayer);
     }
 
     // This is a placeholder for any code

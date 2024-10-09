@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable] public class Bucket {
     [SerializeField] public int max = 60;
 
-    private List<Material> materials = new List<Material>();
+    [SerializeField] private List<Material> materials = new List<Material>();
 
     public Bucket(int max) {
         this.max = max;
@@ -61,6 +61,7 @@ public class Inventory : MonoBehaviour {
     public bool CanRetrieve(Material.Type type, int quantity) => materials[type].Quantity >= quantity;
 
     public bool Retrieve(Material.Type type, int quantity) {
+        return true;
         if (materials[type].TryDecrease(quantity)) {
             if (itemsRetrievedEventHandler != null) itemsRetrievedEventHandler(type, quantity);
             return true;

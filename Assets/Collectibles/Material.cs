@@ -17,7 +17,7 @@ public class Material {
 
     private Type type;
     private Bucket bucket;
-    private int quantity;
+    [SerializeField] private int quantity;
     public Action<int> Changed;
 
     private Material(Type type, Bucket bucket) {

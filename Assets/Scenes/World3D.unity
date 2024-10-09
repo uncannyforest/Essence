@@ -1368,6 +1368,10 @@ PrefabInstance:
       propertyPath: rangedConfig.target
       value: 
       objectReference: {fileID: 2058306383}
+    - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
+      propertyPath: rangedConfig.targetZ
+      value: -0.03
+      objectReference: {fileID: 0}
     - target: {fileID: 9165450013374557087, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: m_RootOrder
       value: 1

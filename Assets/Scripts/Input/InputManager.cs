@@ -3,6 +3,8 @@ using UnityEngine;
 
 [RequireComponent(typeof(WorldInteraction))]
 public class InputManager : MonoBehaviour {
+    public static Vector2 LOWER_LEFT_OFFSET = new Vector2(0, 1.5f) * 8;
+
     public TextDisplay textDisplay;
     public bool useWASD;
 
@@ -23,8 +25,12 @@ public class InputManager : MonoBehaviour {
 
     public static Vector2 PointerPosition {
         get {
-            Vector3 mouse = Input.mousePosition;
-            return Camera.main.ScreenToWorldPoint(mouse);
+            Vector3 mouse = Input.mousePosition - (Vector3)LOWER_LEFT_OFFSET;
+            Plane plane = new Plane(Vector3.back, Vector3.zero);
+            Ray ray = Camera.main.ScreenPointToRay(mouse);
+            plane.Raycast(ray, out float dist);
+            Vector3 world = ray.GetPoint(dist);
+            return world;
         }
     }
     public static bool Firing {

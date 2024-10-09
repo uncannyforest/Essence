@@ -175,6 +175,7 @@ public class WorldInteraction : MonoBehaviour {
 
     void Start() {
         player = GameManager.I.YourPlayer.transform;
+        Debug.Log("PLAYER  = " + player);
         rangedSelect = new Ranged(rangedConfig);
         meleeSelect = new Melee(meleeConfig, player);
         meleeSquare = new MeleeSquare(praxelSelectConfig, player);
@@ -465,6 +466,7 @@ public class WorldInteraction : MonoBehaviour {
                     if (Input.GetMouseButton(0)) // click not space
                         rangedSelect.PointerToKeys(PointerForAim(worldPoint));
                     if (inventory.Retrieve(Material.Type.Arrow, 1)) {
+                        Debug.Log("Player " + player);
                         Arrow.Instantiate(
                             flyingArrowPrefab,
                             bag,

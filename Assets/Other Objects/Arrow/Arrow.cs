@@ -13,16 +13,16 @@ public class Arrow : MonoBehaviour {
 
     public static Arrow Instantiate(Arrow arrowPrefab, Transform parent, Transform source, Vector2 to) {
         Arrow arrow = Instantiate<Arrow>(arrowPrefab, source.position, Quaternion.identity, parent);
-        arrow.Fire(Disp.FT(source.position, to));
+        Displacement direction = Disp.FT(source.position, to);
+        arrow.Fire(direction);
         arrow.GetComponent<Damage>().Source = source.GetComponentStrict<Team>();
         return arrow;
     }
 
     public void Fire(Displacement direction) {
         rigidbody = GetComponent<Rigidbody2D>();
-        sprite = GetComponentInChildren<SpriteRenderer>().transform;
         rigidbody.velocity = direction.ToVelocity(speed);
-        sprite.rotation = Quaternion.Euler(0, 0, direction.angle);
+        transform.rotation = Quaternion.Euler(0, 0, direction.angle);
         Invoke("Land", reach / speed);
     }
 
