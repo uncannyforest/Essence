@@ -1125,7 +1125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   elevation:
-    groundLevelHighlight: 0
+    groundLevelHighlight: 0.01
     collectibles: 0
     features: 0
   tiles: {fileID: 2120764636}

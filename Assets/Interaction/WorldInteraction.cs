@@ -302,6 +302,7 @@ public class WorldInteraction : MonoBehaviour {
             case Mode.Sod:
                 activeTile = teleSelect.SelectSquareOnly(pointer);
                 hoverSquare.transform.position = MapRenderer3D.ToWorld(activeTile);
+                hoverSquare.SetActive(true);
             break;
             case Mode.WoodBuilding:
                 Terrain.Position? buildWhere = teleSelect.SelectBuildLoc(pointer);
