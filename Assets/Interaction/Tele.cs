@@ -139,13 +139,15 @@ public class Tele {
 
     private bool CanBuildWall(Vector2 worldPoint, ref Terrain.Position pos) {
         pos = GetEdgeAt(worldPoint);
-        return terrain[pos] == Construction.None &&
+        return terrain.InBounds(pos) &&
+                terrain[pos] == Construction.None &&
                 terrain.validator.IsStableConstruction(pos, Construction.Wood);
     }
 
     private bool CanBuildRoof(Vector2Int tile) {
-        return terrain.Roof[tile] == Construction.None &&
-            terrain.validator.IsStableConstruction(new Terrain.Position(Terrain.Grid.Roof, tile), Construction.Wood);
+        return terrain.InBounds(tile) &&
+                terrain.Roof[tile] == Construction.None &&
+                terrain.validator.IsStableConstruction(new Terrain.Position(Terrain.Grid.Roof, tile), Construction.Wood);
     }
 
 }

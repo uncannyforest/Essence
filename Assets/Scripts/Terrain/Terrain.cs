@@ -135,9 +135,8 @@ public class Terrain : MonoBehaviour {
     public Vector2Int CellAt(Vector3 worldPosition) => mapRenderer.CellAt(worldPosition);
     public Vector2 CellCenterAt(Vector3 screenPosition) => mapRenderer.CellCenterAt(screenPosition);
 
-    public Land? GetLand(Vector2Int coord) {
-        return InBounds(coord) ? (Land?)Land[coord] : null;
-    }
+    public Land? GetLand(int x, int y) => GetLand(new Vector2Int(x, y));
+    public Land? GetLand(Vector2Int coord) => InBounds(coord) ? (Land?)Land[coord] : null;
 
     public bool SetLand(Vector2Int pos, Land terrain, bool force = false) {
         if (!force && !validator.IsValidLand(pos, terrain)) return false;

@@ -84,9 +84,9 @@ public class TerrainValidator {
         if (!terrain.InBounds(pos)) return false;
         switch (pos.grid) {
             case Terrain.Grid.XWalls:
-                return !terrain.Land[pos.x, pos.y - 1].IsHilly() && !terrain.Land[pos.Coord].IsHilly();
+                return terrain.GetLand(pos.x, pos.y - 1)?.IsHilly() == false && !terrain.Land[pos.Coord].IsHilly();
             case Terrain.Grid.YWalls:
-                return !terrain.Land[pos.x - 1, pos.y].IsHilly() && !terrain.Land[pos.Coord].IsHilly();
+                return terrain.GetLand(pos.x - 1, pos.y)?.IsHilly() == false && !terrain.Land[pos.Coord].IsHilly();
             default:
                 if (terrain.Feature[pos.Coord]?.IsValidTerrain(tile) == false) return false;
                 Land land = terrain.Land[pos.Coord];

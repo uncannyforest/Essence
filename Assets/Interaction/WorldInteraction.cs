@@ -390,7 +390,9 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Sod:
                 coord = teleSelect.SelectSquareOnly(worldPoint);
-                if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water) {
+                if (!terrain.InBounds(coord)) {
+                    TextDisplay.I.ShowMiniText("Cannot modify terrain there");
+                } else if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water) {
                     if (inventory.Retrieve(Material.Type.Soil, sodCost))
                         terrain.Land[coord] = Land.Grass;
                     else TextDisplay.I.ShowMiniText("You don't have any soil to place");
@@ -398,6 +400,8 @@ public class WorldInteraction : MonoBehaviour {
                     if (inventory.Retrieve(Material.Type.Soil, dirtPileCost))
                         terrain.Land[coord] = Land.Dirtpile;
                     else TextDisplay.I.ShowMiniText("You don't have enough soil to place pile");
+                } else {
+                    TextDisplay.I.ShowMiniText("Cannot place soil there");
                 }
             break;
             case Mode.Taming:
