@@ -124,16 +124,19 @@ public class Tele {
         tile = terrain.CellAt(worldPoint);
         Vector2 center = terrain.CellCenter(tile);
         Vector2 diff = worldPoint - center;
-        return Mathf.Abs(diff.x) + Mathf.Abs(diff.y) < 0.25;
+        return Mathf.Abs(diff.x) < 0.25f && Mathf.Abs(diff.y) < 0.25f;
     }
 
-    private static Terrain.Position GetEdgeAt(Vector2 worldPoint) {
-        int x = Mathf.FloorToInt(worldPoint.x * 2);
-        int y = Mathf.FloorToInt(worldPoint.y * 2);
-        if (((x ^ y) & 1) == 0) {
-            return new Terrain.Position(Terrain.Grid.XWalls, (y + x) / 2, (y - x) / 2);
+    private Terrain.Position GetEdgeAt(Vector2 worldPoint) {
+        Vector2Int pos = terrain.CellAt(worldPoint);
+        Vector2 center = terrain.CellCenter(pos);
+        Vector2 diff = worldPoint - center;
+        bool upperLeftQuad = diff.y > diff.x;
+        bool upperRightQuad = diff.y + diff.x > 0;
+        if (upperLeftQuad ^ upperRightQuad) {
+            return new Terrain.Position(Terrain.Grid.YWalls, upperRightQuad ? pos + Vector2Int.right : pos);
         } else {
-            return new Terrain.Position(Terrain.Grid.YWalls, (y + x + 1) / 2, (y - x - 1) / 2);
+            return new Terrain.Position(Terrain.Grid.XWalls, upperRightQuad ? pos + Vector2Int.up : pos);
         }
     }
 
