@@ -5,21 +5,21 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Biome")]
 public class Biome : ScriptableObject {
     public UnityEngine.Material material;
-    public TileVariation grass;
-    public TileVariation meadow;
-    public TileVariation shrub;
-    public TileVariation forest;
-    public TileVariation water;
-    public TileVariation ditch;
-    public TileVariation dirtpile;
-    public TileVariation woodpile;
-    public TileVariation hill;
+    public TileVariation grass = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation meadow = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation shrub = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation forest = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation water = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation ditch = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation dirtpile = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation woodpile = new TileVariation(TileMaterial.Level.Land);
+    public TileVariation hill = new TileVariation(TileMaterial.Level.Land);
 
-    private Dictionary<Land, TileVariation> byLand;
-    public TileVariation this[Land land] { get => byLand[land]; }
+    private Dictionary<TileMaterial, TileVariation> byLand;
+    public TileVariation this[TileMaterial land] { get => byLand[land]; }
 
     void OnEnable() {
-        byLand = new Dictionary<Land, TileVariation> {
+        byLand = new Dictionary<TileMaterial, TileVariation> {
             [Land.Grass] = grass,
             [Land.Meadow] = meadow,
             [Land.Shrub] = shrub,
@@ -31,7 +31,7 @@ public class Biome : ScriptableObject {
             [Land.Hill] = hill,
         };
 
-        foreach (Land land in byLand.Keys) {
+        foreach (TileMaterial land in byLand.Keys) {
             byLand[land].biome = this;
             byLand[land].thisLayer = land;
         }
@@ -41,14 +41,18 @@ public class Biome : ScriptableObject {
 [Serializable] public class TileVariation {
     [NonSerialized] public Biome biome; 
     public bool alwaysInclude;
-    [NonSerialized] public Land thisLayer;
-    public Land parentLayer;
+    [NonSerialized] public TileMaterial thisLayer;
+    public TileMaterial parentLayer;
 
     public MeshRenderer corner;
     public MeshRenderer taper;
     public MeshRenderer side;
     public MeshRenderer insideCorner;
     public MeshRenderer inner;
+
+    public TileVariation(TileMaterial.Level level) {
+        this.parentLayer = new TileMaterial(level);
+    }
 
     // has no parent (signified by setting parent to self) e.g. Grass, Ditch
     public bool IsAdam { get => parentLayer == thisLayer; }
@@ -57,7 +61,7 @@ public class Biome : ScriptableObject {
     // xAdh, yAdh, cc, xNear, yNear: nearby lands to determine orientation. May be simplified using OriginalOrAdam()
     // hashCode: unique int for a given set of graphics object children, different code means rerender
     // exposedSides: how many of the 2 adjacent lands are different
-    protected Action<Transform> RenderThisLayer(Land xAdj, Land yAdj, Land cc, Land xNear, Land yNear,
+    protected Action<Transform> RenderThisLayer(TileMaterial xAdj, TileMaterial yAdj, TileMaterial cc, TileMaterial xNear, TileMaterial yNear,
             out int hashCode, out int exposedSides) {
         if (xAdj == thisLayer && yAdj == thisLayer) { // INSIDECORNER or INNER
             exposedSides = 0;
@@ -97,7 +101,7 @@ public class Biome : ScriptableObject {
     // returns THIS LAND if it is an ancestor, otherwise ADAM e.g. Grass
     // For example, if THIS LAND is Shrub:
     // ADJ is Forest -> return Shrub; ADJ is Meadow -> return Grass
-    private Land OriginalOrAdam(Land adj) {
+    private TileMaterial OriginalOrAdam(TileMaterial adj) {
         int infiniteLoopCatch = 100;
         while (adj != thisLayer && !biome[adj].IsAdam && infiniteLoopCatch --> 0) {
             adj = biome[adj].parentLayer;
@@ -113,7 +117,7 @@ public class Biome : ScriptableObject {
     // potentialExposedSides: max possible exposedSides returned from RenderThisLayer, which we know in advance
     //   - if RenderThisLayer returns this after all, we may ignore this intermediate layer (see next comment)
     // isOrig: whether this is the original child layer that triggered the render
-    public Action<Transform> Render(Land xAdj, Land yAdj, Land cc, Land xNear, Land yNear,
+    public Action<Transform> Render(TileMaterial xAdj, TileMaterial yAdj, TileMaterial cc, TileMaterial xNear, TileMaterial yNear,
             out int hashCode, int potentialExposedSides = 2, bool isOrig = true) {
         Action<Transform> renderLayer =
             RenderThisLayer(OriginalOrAdam(xAdj), OriginalOrAdam(yAdj), OriginalOrAdam(cc),
