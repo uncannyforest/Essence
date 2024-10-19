@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6307209353452045992}
   - component: {fileID: 7550451079841787328}
   - component: {fileID: 2389517619851523478}
+  - component: {fileID: 1362290770826367610}
   m_Layer: 5
   m_Name: WorldView
   m_TagString: Untagged
@@ -81,6 +82,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &1362290770826367610
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518036481434543018}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &5313570216067482160
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,6 +375,7 @@ MonoBehaviour:
   columns: 30
   rows: 1
   offset: 2
+  itemZ: -1
   localScale: {x: 16, y: 16, z: 1}
   material1: 6
   material2: 3
@@ -814,6 +830,7 @@ MonoBehaviour:
   columns: 30
   rows: 1
   offset: 2
+  itemZ: -1
   localScale: {x: 16, y: 16, z: 1}
   material1: 7
   material2: 8
@@ -1036,6 +1053,7 @@ MonoBehaviour:
   columns: 10
   rows: 1
   offset: 2
+  itemZ: -1
   localScale: {x: 16, y: 16, z: 1}
   material1: 0
   material2: 5
@@ -1863,6 +1881,7 @@ MonoBehaviour:
   columns: 10
   rows: 1
   offset: 2
+  itemZ: -1
   localScale: {x: 16, y: 16, z: 1}
   material1: 9
   material2: 3

@@ -3,6 +3,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(WorldInteraction))]
 public class InputManager : MonoBehaviour {
+    private static InputManager instance;
+    public static InputManager I { get => instance; }
+    void Awake() { if (instance == null) instance = this; }
+
     public static Vector2 LOWER_LEFT_OFFSET = new Vector2(0, 1.5f) * 8;
 
     public TextDisplay textDisplay;
@@ -33,6 +37,7 @@ public class InputManager : MonoBehaviour {
             return world;
         }
     }
+    public bool pointerIsOverMap = false;
     public static bool Firing {
         get => SimpleInput.GetButton("Fire");
     }
@@ -89,13 +94,14 @@ public class InputManager : MonoBehaviour {
         if (SimpleInput.GetButtonDown("Keys")) {
             textDisplay.ShowFullText(keysTip);
         }
-		if (SimpleInput.GetButtonDown("Fire")) {
+        if (SimpleInput.GetButtonDown("Fire")) {
             if (textDisplay.IsFullTextUp) {
                 textDisplay.HideFullText();
             } else {
-			    world.Confirm(PointerPosition);
+                if (pointerIsOverMap) world.Confirm(PointerPosition);
+                else FindObjectOfType<MapClickReceiver>().DebugRaycast();
             }
-		}
+        }
         if (SimpleInput.GetButtonUp("Fire")) {
             world.ConfirmComplete(PointerPosition);
         }
