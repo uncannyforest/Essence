@@ -14,6 +14,8 @@ public class Biome : ScriptableObject {
     public TileVariation dirtpile = new TileVariation(TileMaterial.Level.Land);
     public TileVariation woodpile = new TileVariation(TileMaterial.Level.Land);
     public TileVariation hill = new TileVariation(TileMaterial.Level.Land);
+    [NonSerialized] public TileVariation noRoof = new TileVariation(TileMaterial.Level.Roof);
+    public TileVariation woodRoof = new TileVariation(TileMaterial.Level.Roof);
 
     private Dictionary<TileMaterial, TileVariation> byLand;
     public TileVariation this[TileMaterial land] { get => byLand[land]; }
@@ -29,6 +31,8 @@ public class Biome : ScriptableObject {
             [Land.Dirtpile] = dirtpile,
             [Land.Woodpile] = woodpile,
             [Land.Hill] = hill,
+            [Construction.None] = noRoof,
+            [Construction.Wood] = woodRoof,
         };
 
         foreach (TileMaterial land in byLand.Keys) {

@@ -112,3 +112,14 @@ MonoBehaviour:
     side: {fileID: -7511558181221131132, guid: 88ce9b9c912454b69ba39d8080e37e32, type: 3}
     insideCorner: {fileID: -7511558181221131132, guid: 88ce9b9c912454b69ba39d8080e37e32, type: 3}
     inner: {fileID: -7511558181221131132, guid: cceca9f627a1447128ef2f52ad38740d, type: 3}
+  woodRoof:
+    alwaysInclude: 0
+    parentLayer:
+      level: 1
+      land: 0
+      roof: 1
+    corner: {fileID: -7511558181221131132, guid: 92de30b06ef1e4f4b8e99058f54e68ce, type: 3}
+    taper: {fileID: -7511558181221131132, guid: 92de30b06ef1e4f4b8e99058f54e68ce, type: 3}
+    side: {fileID: -7511558181221131132, guid: c23204aa0bc524ffe9b06ad6ef1114a8, type: 3}
+    insideCorner: {fileID: -7511558181221131132, guid: 2c02d709ee24949dfac167dea5e1f194, type: 3}
+    inner: {fileID: -7511558181221131132, guid: 2c02d709ee24949dfac167dea5e1f194, type: 3}

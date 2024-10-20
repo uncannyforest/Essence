@@ -68,22 +68,47 @@ public class MapRenderer3D : MonoBehaviour {
         if (IsInRenderWindow(new Vector2Int(x, y))) {
             UpdateXWallCell(x, y);
         }
+        for (int i = -1; i <= 0; i++) {
+            int localY = y + i;
+            if (!IsInRenderWindow(new Vector2Int(x, localY))) continue;
+            UpdateRoofCell(x, localY, 0);
+            UpdateRoofCell(x, localY, 1);
+            UpdateRoofCell(x, localY, 2);
+            UpdateRoofCell(x, localY, 3);
+        }
     }
     public void UpdateYWall(int x, int y) {
         if (!TerrainIsLoaded) return;
         if (IsInRenderWindow(new Vector2Int(x, y))) {
             UpdateYWallCell(x, y);
         }
+        for (int i = -1; i <= 0; i++) {
+            int localX = x + i;
+            if (!IsInRenderWindow(new Vector2Int(localX, y))) continue;
+            UpdateRoofCell(localX, y, 0);
+            UpdateRoofCell(localX, y, 1);
+            UpdateRoofCell(localX, y, 2);
+            UpdateRoofCell(localX, y, 3);
+        }
     }
     public void UpdateRoof(Vector2Int pos) {
         if (!TerrainIsLoaded) return;
-        for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) {
-            Vector2Int localPos = pos + new Vector2Int(x, y);
-            if (IsInRenderWindow(localPos)) {
-                // UpdateRoofCell(localPos.x, localPos.y, 0);
-                // UpdateRoofCell(localPos.x, localPos.y, 1);
-                // UpdateRoofCell(localPos.x, localPos.y, 2);
-                // UpdateRoofCell(localPos.x, localPos.y, 3);
+        if (IsInRenderWindow(pos)) {
+            UpdateRoofCell(pos.x, pos.y, 0);
+            UpdateRoofCell(pos.x, pos.y, 1);
+            UpdateRoofCell(pos.x, pos.y, 2);
+            UpdateRoofCell(pos.x, pos.y, 3);
+        }
+        for (int i = 0; i <= 1; i++) {
+            int localY = pos.y + i;
+            if (IsInRenderWindow(new Vector2Int(pos.x, localY))) {
+                UpdateXWallCell(pos.x, localY);
+            }
+        }
+        for (int i = 0; i <= 1; i++) {
+            int localX = pos.x + i;
+            if (IsInRenderWindow(new Vector2Int(localX, pos.y))) {
+                UpdateYWallCell(localX, pos.y);
             }
         }
     }
@@ -126,6 +151,10 @@ public class MapRenderer3D : MonoBehaviour {
         UpdateLandCell(x, y, 1);
         UpdateLandCell(x, y, 2);
         UpdateLandCell(x, y, 3);
+        UpdateRoofCell(x, y, 0);
+        UpdateRoofCell(x, y, 1);
+        UpdateRoofCell(x, y, 2);
+        UpdateRoofCell(x, y, 3);
     }
     public Land GetLand(int x, int y) => Terrain.I.GetLand(Vct.I(x, y)) ?? Terrain.I.Depths;
     public void UpdateLandCell(int x, int y, int rot) {
@@ -165,14 +194,73 @@ public class MapRenderer3D : MonoBehaviour {
                 break;
         }
     }
+    public Construction GetXWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.XWalls, x, y)) ?? Construction.None;
     public void UpdateXWallCell(int x, int y) {
         
     }
+    public Construction GetYWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.YWalls, x, y)) ?? Construction.None;
     public void UpdateYWallCell(int x, int y) {
         
     }
-    public void UpdateRoofCell(Vector2Int pos, int rot) {
-        
+    public Construction GetRoof(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.Roof, x, y)) ?? Construction.None;
+    public void UpdateRoofCell(int x, int y, int rot) {
+        Transform child = tilesParent.Find(new Vector2Int(x, y).ToString());
+        if (GetRoof(x, y) == Construction.None) {
+            if (child.Find("R0") != null) {
+                GameObject.Destroy(child.Find("R0"));
+                GameObject.Destroy(child.Find("R1"));
+                GameObject.Destroy(child.Find("R2"));
+                GameObject.Destroy(child.Find("R3"));
+            }
+            return;
+        }
+        if (child.Find("R0") == null) {
+            GameObject.Instantiate(gridSubCell, new Vector2(x, y), Quaternion.identity,
+                child.transform).name = "R0";
+            GameObject.Instantiate(gridSubCell, new Vector2(x + 1, y), Quaternion.Euler(0, 0, 90),
+                child.transform).name = "R1";
+            GameObject.Instantiate(gridSubCell, new Vector2(x + 1, y + 1), Quaternion.Euler(0, 0, 180),
+                child.transform).name = "R2";
+            GameObject.Instantiate(gridSubCell, new Vector2(x, y + 1), Quaternion.Euler(0, 0, 270),
+                child.transform).name = "R3";
+        }
+        switch (rot) {
+            // Since adjacency works the other way:
+            // Here left and right walls (and oppRight and oppLeft) have been swapped.
+            // Corner vs Inner are swapped in the Biome scriptable object .asset file itself.
+            case 0: child.Find("R0").GetComponentStrict<GridSubCell3D>().MaybeRender(
+                    GetRoof(x, y),
+                    GetXWall(x, y),
+                    Construction.None,
+                    GetYWall(x, y),
+                    GetXWall(x, y + 1),
+                    GetYWall(x + 1, y));
+                break;
+            case 1: child.Find("R1").GetComponentStrict<GridSubCell3D>().MaybeRender(
+                    GetRoof(x, y),
+                    GetYWall(x + 1, y),
+                    Construction.None,
+                    GetXWall(x, y),
+                    GetYWall(x, y),
+                    GetXWall(x, y + 1));
+                break;
+            case 2: child.Find("R2").GetComponentStrict<GridSubCell3D>().MaybeRender(
+                    GetRoof(x, y),
+                    GetXWall(x, y + 1),
+                    Construction.None,
+                    GetYWall(x + 1, y),
+                    GetXWall(x, y),
+                    GetYWall(x, y));
+                break;
+            case 3: child.Find("R3").GetComponentStrict<GridSubCell3D>().MaybeRender(
+                    GetRoof(x, y),
+                    GetYWall(x, y),
+                    Construction.None,
+                    GetXWall(x, y + 1),
+                    GetYWall(x + 1, y),
+                    GetXWall(x, y));
+                break;
+        }
     }
 
     public void HideTile(Vector2Int pos, bool hide) {
