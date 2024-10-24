@@ -1146,7 +1146,7 @@ MonoBehaviour:
     collectibles: 0
     features: 0
   tiles: {fileID: 2120764636}
-  gridSubCell: {fileID: -6440932442479170346, guid: 749b4ee8dc11243d19ea868c6f8b48f9, type: 3}
+  gridCell: {fileID: -7148672437839171394, guid: ae5e6f18e58a1491cba38d07e333e642, type: 3}
   renderWindow: 25
 --- !u!1001 &5313570218107531558
 PrefabInstance:
