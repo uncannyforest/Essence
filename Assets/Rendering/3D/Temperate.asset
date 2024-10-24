@@ -123,3 +123,5 @@ MonoBehaviour:
     side: {fileID: -7511558181221131132, guid: c23204aa0bc524ffe9b06ad6ef1114a8, type: 3}
     insideCorner: {fileID: -7511558181221131132, guid: 2c02d709ee24949dfac167dea5e1f194, type: 3}
     inner: {fileID: -7511558181221131132, guid: 2c02d709ee24949dfac167dea5e1f194, type: 3}
+  woodWall:
+    xEdge: {fileID: -7511558181221131132, guid: f85e1ee4062204a99b445266aa007293, type: 3}

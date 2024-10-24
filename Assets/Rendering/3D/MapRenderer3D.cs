@@ -99,21 +99,9 @@ public class MapRenderer3D : MonoBehaviour {
             UpdateRoofCell(pos.x, pos.y, 2);
             UpdateRoofCell(pos.x, pos.y, 3);
         }
-        for (int i = 0; i <= 1; i++) {
-            int localY = pos.y + i;
-            if (IsInRenderWindow(new Vector2Int(pos.x, localY))) {
-                UpdateXWallCell(pos.x, localY);
-            }
-        }
-        for (int i = 0; i <= 1; i++) {
-            int localX = pos.x + i;
-            if (IsInRenderWindow(new Vector2Int(localX, pos.y))) {
-                UpdateYWallCell(localX, pos.y);
-            }
-        }
     }
     public void Reset() {
-        if (tilesParent != null) GameObject.Destroy(tilesParent);
+        if (tilesParent != null) GameObject.Destroy(tilesParent.gameObject);
         tilesParent = new GameObject("Tiles").transform;
         tilesParent.parent = WorldParent;
         CreateAllCellsInRenderWindow();
@@ -196,21 +184,35 @@ public class MapRenderer3D : MonoBehaviour {
     }
     public Construction GetXWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.XWalls, x, y)) ?? Construction.None;
     public void UpdateXWallCell(int x, int y) {
-        
+        Transform child = tilesParent.Find(new Vector2Int(x, y).ToString());
+        Transform xWall = child.Find("X");
+        if (xWall != null) GameObject.Destroy(xWall.gameObject);
+        if (GetXWall(x, y) == Construction.None) return;
+        xWall = new GameObject("X").transform;
+        xWall.parent = child;
+        xWall.position = new Vector2(x, y);
+        TileLibrary3D.E.temperate.woodWall.Render(false)(xWall);
     }
     public Construction GetYWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.YWalls, x, y)) ?? Construction.None;
     public void UpdateYWallCell(int x, int y) {
-        
+        Transform child = tilesParent.Find(new Vector2Int(x, y).ToString());
+        Transform yWall = child.Find("Y");
+        if (yWall != null) GameObject.Destroy(yWall.gameObject);
+        if (GetYWall(x, y) == Construction.None) return;
+        yWall = new GameObject("Y").transform;
+        yWall.parent = child;
+        yWall.position = new Vector2(x, y);
+        TileLibrary3D.E.temperate.woodWall.Render(true)(yWall);
     }
     public Construction GetRoof(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.Roof, x, y)) ?? Construction.None;
     public void UpdateRoofCell(int x, int y, int rot) {
         Transform child = tilesParent.Find(new Vector2Int(x, y).ToString());
         if (GetRoof(x, y) == Construction.None) {
             if (child.Find("R0") != null) {
-                GameObject.Destroy(child.Find("R0"));
-                GameObject.Destroy(child.Find("R1"));
-                GameObject.Destroy(child.Find("R2"));
-                GameObject.Destroy(child.Find("R3"));
+                GameObject.Destroy(child.Find("R0").gameObject);
+                GameObject.Destroy(child.Find("R1").gameObject);
+                GameObject.Destroy(child.Find("R2").gameObject);
+                GameObject.Destroy(child.Find("R3").gameObject);
             }
             return;
         }
