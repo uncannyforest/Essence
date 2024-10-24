@@ -71,15 +71,15 @@ public class Biome : ScriptableObject {
             exposedSides = 0;
             if (cc == thisLayer) {
                 hashCode = 0;
-                return (transform) => { InstantiateNoRotation(inner, transform); };
+                return (transform) => { Instantiate(inner, transform); };
             } else {
                 hashCode = 1;
-                return (transform) => { InstantiateNoRotation(insideCorner, transform); };
+                return (transform) => { Instantiate(insideCorner, transform); };
             }
         } else if (xAdj == thisLayer && yAdj != thisLayer) { // SIDE
             exposedSides = 1;
             hashCode = 2;
-            return (transform) => { InstantiateNoRotation(side, transform); };
+            return (transform) => { Instantiate(side, transform); };
         } else if (xAdj != thisLayer && yAdj == thisLayer) { // other SIDE
             exposedSides = 1;
             hashCode = 3;
@@ -88,16 +88,17 @@ public class Biome : ScriptableObject {
                 GameObject go = GameObject.Instantiate(side.gameObject, transform);
                 go.transform.localScale = new Vector3(-1, 1, 1);
                 go.transform.localEulerAngles = new Vector3(0, 0, 270);
-                go.GetComponentStrict<Renderer>().material = biome.material;
+                Renderer r = go.GetComponentStrict<Renderer>();
+                r.material = biome.material;
             };
         } else { // TAPER or CORNER - all three nearby corners are different land
             exposedSides = 2;
             if (xNear == thisLayer && yNear == thisLayer) { // CORNER
                 hashCode = 5;
-                return (transform) => { InstantiateNoRotation(corner, transform); };
+                return (transform) => { Instantiate(corner, transform); };
             } else { // TAPER
                 hashCode = 4;
-                return (transform) => { InstantiateNoRotation(taper, transform); };
+                return (transform) => { Instantiate(taper, transform); };
             }
         }
     }
@@ -156,10 +157,19 @@ public class Biome : ScriptableObject {
         }
     }
 
-    protected void InstantiateNoRotation(MeshRenderer renderer, Transform parent) {
+    protected void Instantiate(MeshRenderer renderer, Transform parent, bool rotate = false) {
         if (renderer == null) return;
         GameObject go = GameObject.Instantiate(renderer.gameObject, parent);
+        if (rotate) {
+            go.transform.localScale = new Vector3(-1, 1, 1);
+            go.transform.localEulerAngles = new Vector3(0, 0, 270);
+        } else {
+            go.transform.localRotation = Quaternion.identity;
+        }
         go.transform.localRotation = Quaternion.identity;
-        go.GetComponentStrict<Renderer>().material = biome.material;
+        Renderer r = go.GetComponentStrict<Renderer>();
+        r.material = biome.material;
+        if (thisLayer.level == TileMaterial.Level.Land && ((Land)thisLayer).IsPlanty())
+            r.material.shader = Shader.Find("Dither/Nearby");
     }
 }
