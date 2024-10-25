@@ -4,6 +4,8 @@ using UnityEngine;
 public class GridCell3D : MonoBehaviour {
     public Land land;
     public GridSubCell3D gridSubCellPrefab;
+    public Shader unhiddenShader;
+    public Shader hiddenShader;
 
     private Vector2Int pos;
     private BoxCollider2D squareCollider;
@@ -18,7 +20,7 @@ public class GridCell3D : MonoBehaviour {
     private GridSubCell3D roof2;
     private GridSubCell3D roof3;
 
-    void Start() {
+    void Awake() {
         pos = Vector2Int.RoundToInt(transform.position);
         squareCollider = GetComponent<BoxCollider2D>();
         gameObject.name = pos.ToString();
@@ -42,6 +44,14 @@ public class GridCell3D : MonoBehaviour {
         UpdateXWall();
         UpdateYWall();
         UpdateRoof();
+    }
+
+    public void HideRoof(bool hide) {
+        if (roof0 == null) return;
+        roof0.GetComponentInChildren<MeshRenderer>().material.shader = hide ? hiddenShader : unhiddenShader;
+        roof1.GetComponentInChildren<MeshRenderer>().material.shader = hide ? hiddenShader : unhiddenShader;
+        roof2.GetComponentInChildren<MeshRenderer>().material.shader = hide ? hiddenShader : unhiddenShader;
+        roof3.GetComponentInChildren<MeshRenderer>().material.shader = hide ? hiddenShader : unhiddenShader;
     }
 
     private Land GetLand(int x, int y) => Terrain.I.GetLand(Vct.I(x, y)) ?? Terrain.I.Depths;

@@ -8,7 +8,7 @@ public class PointOfView : MonoBehaviour {
 
     private Vector2Int currentTile;
 
-    void Update() {
+    void LateUpdate() {
         if (transform.hasChanged && CrossedTile != null) {
             Vector2Int oldTile = currentTile;
             currentTile = Terrain.I.CellAt(transform.position);

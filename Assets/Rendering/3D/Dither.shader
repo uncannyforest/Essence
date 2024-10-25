@@ -9,12 +9,12 @@ Shader "Dither/All"
     }
     SubShader
     {
-        Tags { "RenderType"="TransparentCutout" }
+        Tags { "RenderType"="Opaque" }
         LOD 200
 
         CGPROGRAM
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows alpha:auto
+        #pragma surface surf Standard fullforwardshadows
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -43,7 +43,7 @@ Shader "Dither/All"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             float2 uv = IN.screenPos.xy;
-            if (uv.x * 192 % 2 >= 1 || uv.y * 96 % 2 >= 1 || ((uv.y + 2 * uv.x) * 48) % 2 >= 1) c.a = 0;
+            if (uv.x * 192 % 2 >= 1 || uv.y * 96 % 2 >= 1 || ((uv.y + 2 * uv.x) * 48) % 2 >= 1) discard;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;

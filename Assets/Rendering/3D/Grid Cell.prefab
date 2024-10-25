@@ -72,3 +72,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   land: 0
   gridSubCellPrefab: {fileID: -6440932442479170346, guid: 749b4ee8dc11243d19ea868c6f8b48f9, type: 3}
+  unhiddenShader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  hiddenShader: {fileID: 4800000, guid: 80111ccbdf8fb43b19ddfedcca063fe4, type: 3}

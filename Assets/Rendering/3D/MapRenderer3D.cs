@@ -114,7 +114,7 @@ public class MapRenderer3D : MonoBehaviour {
     }
 
     public void HideTile(Vector2Int pos, bool hide) {
-
+        if (IsInRenderWindow(pos)) GetRenderedCell(pos).HideRoof(hide);
     }
 
     public Land?[] GetFourLandTilesAround(Vector2 pos) {
