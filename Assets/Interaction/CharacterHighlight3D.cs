@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// grouping together 2.5D character highlight functions
+// grouping together 3D character highlight functions
 public class CharacterHighlight3D {
 
-    public static Cardboard New(Character character, bool hover) {
-        Cardboard result = AddSelect(
+    public static MeshRenderer New(Character character, bool hover) {
+        MeshRenderer result = AddSelect(
             character.transform,
-            character.broadGirth ? WorldInteraction.I.largeCharacterSelectPrefab_new : WorldInteraction.I.smallCharacterSelectPrefab_new,
-            GlobalConfig.I.elevation.groundLevelHighlight);
-        if (!hover) result.GetComponentInChildren<SpriteRenderer>().color = WorldInteraction.I.followingCharacterColor;
+            WorldInteraction.I.characterSelectPrefab,
+            -GlobalConfig.I.elevation.groundLevelHighlight);
+        if (!hover) result.material.color = WorldInteraction.I.followingCharacterColor;
         return result;
     }
 
-    public static Cardboard AddSelect(Transform parent, Cardboard prefab, float z) {
-        Cardboard result = GameObject.Instantiate(prefab, parent);
+    public static MeshRenderer AddSelect(Transform parent, MeshRenderer prefab, float z) {
+        MeshRenderer result = GameObject.Instantiate(prefab, parent);
         result.transform.localPosition = new Vector3(0, 0, z);
         return result;
     }
 
-    public static void SetHighlightHoverToFollowing(GameObject highlight) {
-        highlight.GetComponentInChildren<SpriteRenderer>().color = WorldInteraction.I.followingCharacterColor;
+    public static void SetHighlightHoverToFollowing(MeshRenderer highlight) {
+        highlight.material.color = WorldInteraction.I.followingCharacterColor;
     }
 }

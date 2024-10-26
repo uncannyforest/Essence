@@ -78,6 +78,7 @@ public class WorldInteraction : MonoBehaviour {
     public SortingGroup smallCharacterSelectPrefab; // will delete
     public Cardboard largeCharacterSelectPrefab_new;
     public Cardboard smallCharacterSelectPrefab_new;
+    public MeshRenderer characterSelectPrefab;
     public Tilemap uiMap; // will delete
     public Tilemap uiMapEdgeX; // will delete
     public Tilemap uiMapEdgeY; // will delete
@@ -107,9 +108,9 @@ public class WorldInteraction : MonoBehaviour {
     private Tilemap activeGrid; // will delete
     private bool lineStarterUpdate;
     private Character activeCharacter; // hover
-    private GameObject activeCharacterHighlight;
+    private MeshRenderer activeCharacterHighlight;
     private DeStack<Character> followingCharacters = new DeStack<Character>();
-    private GameObject followingCharacterHighlight;
+    private MeshRenderer followingCharacterHighlight;
     private Dictionary<Terrain.Grid, TileBase> hoverTiles; // will delete
     private Dictionary<Terrain.Grid, Tilemap> uiMaps; // will delete
 
@@ -201,7 +202,7 @@ public class WorldInteraction : MonoBehaviour {
         hoverSquare.SetActive(false);
     }
     public void ClearCharacter() {
-        if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight);
+        if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight.gameObject);
         activeCharacterHighlight = null;
         activeCharacter = null;
     }
@@ -225,15 +226,15 @@ public class WorldInteraction : MonoBehaviour {
     public void NewActiveCharacter(Character character) {
         activeCharacter = character;
         if (activeCharacter != null) {
-            activeCharacterHighlight = CharacterHighlight3D.New(activeCharacter, true).gameObject;
+            activeCharacterHighlight = CharacterHighlight3D.New(activeCharacter, true);
         } else if (activeCharacterHighlight != null) {
-            GameObject.Destroy(activeCharacterHighlight);
+            GameObject.Destroy(activeCharacterHighlight.gameObject);
             activeCharacterHighlight = null;
         }
     }
     public void ActiveCharacterToFollowing() {
         Debug.Log("Updating UI with active character " + activeCharacter);
-        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight);
+        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
         followingCharacterHighlight = activeCharacterHighlight;
         CharacterHighlight3D.SetHighlightHoverToFollowing(followingCharacterHighlight);
         followingCharacters.Push(activeCharacter);
@@ -248,11 +249,11 @@ public class WorldInteraction : MonoBehaviour {
         Character oldFollowingCharacter = followingCharacters.Pop();
         Creature result = oldFollowingCharacter.GetComponentStrict<Creature>();
         if (creatureChanged != null) creatureChanged(CurrentAction, PeekFollowing());
-        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight);
+        if (followingCharacterHighlight != null) Destroy(followingCharacterHighlight.gameObject);
 
         Character newFollowingCharacter = PeekFollowingCharacter();
         if (newFollowingCharacter != null)
-            followingCharacterHighlight = CharacterHighlight3D.New(newFollowingCharacter, false).gameObject;
+            followingCharacterHighlight = CharacterHighlight3D.New(newFollowingCharacter, false);
         else followingCharacterHighlight = null;
         return result;
     }
@@ -276,7 +277,7 @@ public class WorldInteraction : MonoBehaviour {
         followingCharacters.PushToBottom(character);
         if (followingCharacters.Count == 1) {
             if (creatureChanged != null) creatureChanged(CurrentAction, creature);
-            followingCharacterHighlight = CharacterHighlight3D.New(character, false).gameObject;
+            followingCharacterHighlight = CharacterHighlight3D.New(character, false);
         }
     }
     public void PlayerMove(Vector2 velocity) {
@@ -518,7 +519,7 @@ public class WorldInteraction : MonoBehaviour {
         if (displayNeedsUpdate) {
             if (CurrentAction.mode == Mode.Directing) CurrentAction = Interaction.Player(Mode.Taming);
             if (followingCharacters.Count > 0) {
-                followingCharacterHighlight = CharacterHighlight3D.New(followingCharacters.Peek(), false).gameObject;
+                followingCharacterHighlight = CharacterHighlight3D.New(followingCharacters.Peek(), false);
                 if (creatureChanged != null) creatureChanged(CurrentAction,
                         followingCharacters.Peek().GetComponentStrict<Creature>());
             } else if (creatureChanged != null) creatureChanged(CurrentAction, null);

@@ -121,6 +121,7 @@ MonoBehaviour:
   smallCharacterSelectPrefab: {fileID: 5741242326734025987, guid: 36b02cd24d29e4475a5d03184732a54d, type: 3}
   largeCharacterSelectPrefab_new: {fileID: 688956683167725399, guid: 948e7429f06c9413ba8dfe4ad66b0227, type: 3}
   smallCharacterSelectPrefab_new: {fileID: 8933298019174004028, guid: 4241b0c9563344d28830b382a5fabc65, type: 3}
+  characterSelectPrefab: {fileID: 3551978704260710188, guid: 24adba4bfc88b432e83787dc9491a8ed, type: 3}
   uiMap: {fileID: 0}
   uiMapEdgeX: {fileID: 0}
   uiMapEdgeY: {fileID: 0}
@@ -166,6 +167,7 @@ MonoBehaviour:
     - pause
 
     <color=key>/</color> - expand info message / if none, this page'
+  pointerIsOverMap: 0
 --- !u!1001 &487219388940821182
 PrefabInstance:
   m_ObjectHideFlags: 0
