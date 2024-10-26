@@ -677,7 +677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2ef2a94f194a4d2c8b77ef6c95f13e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 3}
+  spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   spriteSolidColor: {fileID: 2100000, guid: a7fdfcf1e36774c7c9ea78e33a63359f, type: 2}
 --- !u!114 &1500105220
 MonoBehaviour:
