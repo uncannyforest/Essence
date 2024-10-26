@@ -48,9 +48,8 @@ public class Collectible : MonoBehaviour {
 
 
     public static bool InstantiateAndCollect(Collectible prefab,
-            Transform parent, Vector2 location, float startY, int quantity, Inventory inventory) {
+            Transform parent, Vector2 location, int quantity, Inventory inventory) {
         Collectible collectible = Instantiate(prefab, parent, location, quantity);
-        collectible.GetComponentStrict<SpriteSorter>().VerticalDisplacement = startY;
         if (collectible.TryCollect(inventory)) return true;
         else {
             Destroy(collectible.gameObject);

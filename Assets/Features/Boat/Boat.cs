@@ -102,7 +102,7 @@ public class Boat : MonoBehaviour {
 
     private void CharacterEnter(int seat, CharacterController movement) {
         movement.rigidbody.bodyType = RigidbodyType2D.Kinematic;
-        movement.spriteSorter.Disable();
+        // movement.spriteSorter.Disable(); // TODO 3D migration
         movement.transform.parent = seats.GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
         movement.Idle().Sitting(true);
@@ -111,7 +111,7 @@ public class Boat : MonoBehaviour {
 
     private void CharacterExit(int seat) {
         CharacterController movement = passengers[seat];
-        movement.spriteSorter.Enable();
+        // movement.spriteSorter.Enable(); // TODO 3D migration
         movement.transform.parent = terrain.transform;
         Debug.DrawLine(movement.transform.position, exitLocation, Color.red, 5);
         movement.transform.position = exitLocation;

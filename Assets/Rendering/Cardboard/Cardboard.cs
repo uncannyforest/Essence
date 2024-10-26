@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Cardboard : MonoBehaviour {
+    private static float SCALE_Y = 0.8164965809f; // sqrt(2/3)
+
     public bool keepPerpendicularToGround = true;
 
     private IEnumerable<SpriteRenderer> Sprites {
@@ -11,8 +13,8 @@ public class Cardboard : MonoBehaviour {
 
     // Set by boats and CharacterController on terrain
     public float VerticalDisplacement {
-        get =>  -1.25f * transform.position.z;
-        set => transform.position = new Vector3(transform.position.x, transform.position.y, -.8f * value);
+        get =>  transform.position.z / -SCALE_Y;
+        set => transform.position = new Vector3(transform.position.x, transform.position.y, -SCALE_Y * value);
     }
 
     public void Start() {

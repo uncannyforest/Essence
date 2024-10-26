@@ -115,7 +115,7 @@ public class Creature : MonoBehaviour {
     }
 
     private void TeamChangedEventHandler(int team) {
-        species.transform.Find("SpriteSort/Torso/Heart").GetComponentStrict<SpriteRenderer>().color =
+        species.transform.Find("Cardboard/Heart").GetComponentStrict<SpriteRenderer>().color =
             GetComponent<Team>().Color;
     }
 

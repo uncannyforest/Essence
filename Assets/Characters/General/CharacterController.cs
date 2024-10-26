@@ -20,8 +20,8 @@ public class CharacterController : MonoBehaviour {
     [NonSerialized] new public Rigidbody2D rigidbody;
     [NonSerialized] new public Collider2D collider;
     [NonSerialized] public Character character;
-    [NonSerialized] public SpriteSorter spriteSorter; // may be null if setAnimatorDirectionDirectly
-                                                      // null checks also added for move to 3D
+    [NonSerialized] public Cardboard cardboard; // may be null if setAnimatorDirectionDirectly
+                                                // null checks also added for move to 3D
     private Animator animator; // may be null
     private TaskRunner MoveCoroutine;
     
@@ -34,7 +34,7 @@ public class CharacterController : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         character = GetComponent<Character>();
-        spriteSorter = GetComponentInChildren<SpriteSorter>();
+        cardboard = GetComponentInChildren<Cardboard>();
         animator = GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
     }
@@ -58,9 +58,8 @@ public class CharacterController : MonoBehaviour {
             
         float elevation = land == Land.Water ? -.375f : land == Land.Ditch ? -.25f : 0;
 
-        if (spriteSorter != null && !setAnimatorDirectionDirectly) {
-            spriteSorter.VerticalDisplacement = elevation;
-            spriteSorter.LegsVisible = land != Land.Water;
+        if (!setAnimatorDirectionDirectly) {
+            cardboard.VerticalDisplacement = elevation;
         }
     }
 
@@ -94,8 +93,6 @@ public class CharacterController : MonoBehaviour {
         } else {
             int x = Math.Sign(orientedDirection.x);
             animator?.SetFloat("X", Math.Abs(x));
-            if (spriteSorter != null)
-                spriteSorter.transform.localScale = new Vector3(x >= 0 ? 1 : -1, 2, 1);
             animator?.SetFloat("Y", Math.Sign(orientedDirection.y));
         }
     }
@@ -111,9 +108,8 @@ public class CharacterController : MonoBehaviour {
 
     public CharacterController Sitting(bool value) {
         if (value) {
-            if (spriteSorter != null) {
-                spriteSorter.LegsVisible = false;
-                spriteSorter.VerticalDisplacement = -.25f;
+            if (cardboard != null) {
+                cardboard.VerticalDisplacement = -.25f;
             }
         } else UpdateTileSpecificParams();
         return this;
