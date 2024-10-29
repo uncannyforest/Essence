@@ -18,21 +18,11 @@ public class Boat : MonoBehaviour {
     private Terrain terrain;
     private Feature feature;
     [NonSerialized] public CharacterController movement;
-    private SortingGroup[] seatSorters = new SortingGroup[4];
-    private int[][] seatSortings = new int[][] {
-        new int[] {2, 3, 1, 0},
-        new int[] {3, 2, 0, 1},
-        new int[] {3, 1, 0, 2},
-        new int[] {2, 0, 1, 3},
-        new int[] {1, 0, 2, 3},
-        new int[] {0, 1, 3, 2},
-        new int[] {0, 2, 3, 1},
-        new int[] {1, 3, 2, 0},
-    };
 
     private bool inUse;
     public PlayerCharacter player { get; private set; }
-    public CharacterController[] passengers = new CharacterController[4];
+    private CharacterController[] passengers = new CharacterController[4];
+    private Cardboard[] seatedCardboards = new Cardboard[0];
     private Vector2 inputVelocity = Vector2.zero;
     private Vector2 currentVelocity = Vector2.zero;
     private Vector2Int currentTile;
@@ -47,9 +37,6 @@ public class Boat : MonoBehaviour {
         feature = GetComponent<Feature>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new TaskRunner(CreatureExitE, this);
-        for (int i = 0; i < 4; i++) 
-            seatSorters[i] = seats.GetChild(i).GetComponentStrict<SortingGroup>();
-
     }
 
     bool HandlePlayerEntered(PlayerCharacter player) {
@@ -102,21 +89,21 @@ public class Boat : MonoBehaviour {
 
     private void CharacterEnter(int seat, CharacterController movement) {
         movement.rigidbody.bodyType = RigidbodyType2D.Kinematic;
-        // movement.spriteSorter.Disable(); // TODO 3D migration
         movement.transform.parent = seats.GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
         movement.Idle().Sitting(true);
+        seatedCardboards = seats.GetComponentsInChildren<Cardboard>();
         passengers[seat] = movement;
     }
 
     private void CharacterExit(int seat) {
         CharacterController movement = passengers[seat];
-        // movement.spriteSorter.Enable(); // TODO 3D migration
         movement.transform.parent = terrain.transform;
         Debug.DrawLine(movement.transform.position, exitLocation, Color.red, 5);
         movement.transform.position = exitLocation;
         movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         movement.Sitting(false);
+        seatedCardboards = seats.GetComponentsInChildren<Cardboard>();
         passengers[seat] = null;
     }
 
@@ -150,18 +137,24 @@ public class Boat : MonoBehaviour {
             return false;
         } else {
             currentTile = tile;
+            foreach (CharacterController passenger in GetPassengers())
+                passenger.CrossingTile(tile);
             return true;
         }
     }
 
     private void FaceDirection(Displacement direction) {
+        // Update passenger cardboards
+        foreach (Cardboard cardboard in seatedCardboards)
+            cardboard.Orient();
         // Update passenger controllers
-        for (int i = 0; i < 4; i++) if (passengers[i] != null)
-            passengers[i].InDirection(direction).Idle();
+        foreach (CharacterController passenger in GetPassengers())
+            passenger.InDirection(direction).Idle();
+    }
 
-        // Sort seat sprites: these properties are not available to the Animator
-        int eightDirectionIndex = Mathf.FloorToInt((direction.angle + 360) % 360 / 45);
+    public IEnumerable<CharacterController> GetPassengers() {
         for (int i = 0; i < 4; i++)
-            seatSorters[i].sortingOrder = seatSortings[eightDirectionIndex][i];
+            if (passengers[i] != null)
+                yield return passengers[i];
     }
 }

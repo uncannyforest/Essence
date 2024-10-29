@@ -9,6 +9,7 @@ public class CharacterController : MonoBehaviour {
     public const int subGridUnit = 4;
 
     public float personalBubble = 0;
+    public Transform body3d; // if not cardboard
     public bool setAnimatorDirectionDirectly = false;
     public bool snap = false;
     public Func<Vector2Int, bool> CrossingTile; // return false to cancel
@@ -85,6 +86,10 @@ public class CharacterController : MonoBehaviour {
     }
 
     private void SetAnimatorDirection(Displacement direction) {
+        if (body3d != null) {
+            body3d.localRotation = direction.quaternion;
+            return;
+        }
         animatorDirection = direction;
         Displacement orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
         if (setAnimatorDirectionDirectly) {

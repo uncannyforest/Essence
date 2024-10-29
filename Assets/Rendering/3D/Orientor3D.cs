@@ -61,7 +61,7 @@ public class Orientor3D : MonoBehaviour {
             }
 
             transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle + 45);
-            Cardboard.OrientAllCardboards(cameraDirection, cardboardPerpendicularDirection);
+            Cardboard.OrientAllCardboards();
         }
 
     }

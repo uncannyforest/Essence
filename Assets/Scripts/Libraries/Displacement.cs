@@ -60,6 +60,9 @@ public struct Displacement {
     public float angle {
         get => Vector2.SignedAngle(Vector3.right, displacement);
     }
+    public Quaternion quaternion {
+        get => Quaternion.Euler(0, 0, angle);
+    }
 
     public Vector2 ToVelocity(float speed) => displacement.normalized * speed;
 

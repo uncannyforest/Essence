@@ -21,13 +21,17 @@ public class Cardboard : MonoBehaviour {
         Orient(keepPerpendicularToGround ? Orientor3D.I.cardboardPerpendicularDirection : Orientor3D.I.cameraDirection);
     }
 
-    public void Orient(Transform camera) {
+    private void Orient(Transform camera) {
         transform.rotation = camera.rotation;
     }
 
-    public static void OrientAllCardboards(Transform camera, Transform perpendicular) {
+    public void Orient() {
+        Orient(keepPerpendicularToGround ? Orientor3D.I.cardboardPerpendicularDirection : Orientor3D.I.cameraDirection);
+    }
+
+    public static void OrientAllCardboards() {
         foreach (Cardboard cardboard in GameObject.FindObjectsOfType<Cardboard>()) {
-            cardboard.Orient(cardboard.keepPerpendicularToGround ? perpendicular : camera);
+            cardboard.Orient();
         }
     }
 }
