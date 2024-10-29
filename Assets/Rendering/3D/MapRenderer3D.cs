@@ -51,42 +51,53 @@ public class MapRenderer3D : MonoBehaviour {
             && pos.y >= playerPos.y - renderWindow / 2
             && pos.y <= playerPos.y + renderWindow / 2;
     }
-    public GridCell3D GetRenderedCell(Vector2Int pos) => tilesParent.Find(pos.ToString()).GetComponentStrict<GridCell3D>();
+    public bool CellRendered(Vector2Int pos, out GridCell3D cell) {
+        if (!IsInRenderWindow(pos)) {
+            cell = null;
+            return false;
+        }
+        cell = tilesParent.Find(pos.ToString()).GetComponent<GridCell3D>();
+        if (cell == null) Debug.LogWarning(pos + " in render window (playerPos "
+            + CellAt(GameManager.I.YourPlayer.transform.position) + ") but not rendered");
+        return cell != null;
+    }
     public void UpdateLand(Vector2Int pos) {
         if (!TerrainIsLoaded) return;
         for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) {
             Vector2Int localPos = pos + new Vector2Int(x, y);
-            if (IsInRenderWindow(localPos)) {
-                GetRenderedCell(pos).UpdateLand();
+            if (CellRendered(localPos, out GridCell3D cell)) {
+                cell.UpdateLand();
             }
         }
     }
     public void UpdateXWall(int x, int y) {
         if (!TerrainIsLoaded) return;
-        if (IsInRenderWindow(new Vector2Int(x, y))) {
-            GetRenderedCell(new Vector2Int(x, y)).UpdateXWall();
+        if (CellRendered(new Vector2Int(x, y), out GridCell3D cell)) {
+            cell.UpdateXWall();
         }
         for (int i = -1; i <= 0; i++) {
             int localY = y + i;
-            if (!IsInRenderWindow(new Vector2Int(x, localY))) continue;
-            GetRenderedCell(new Vector2Int(x, localY)).UpdateRoof();
+            if (CellRendered(new Vector2Int(x, localY), out GridCell3D roofCell)) {
+                roofCell.UpdateRoof();
+            }
         }
     }
     public void UpdateYWall(int x, int y) {
         if (!TerrainIsLoaded) return;
-        if (IsInRenderWindow(new Vector2Int(x, y))) {
-            GetRenderedCell(new Vector2Int(x, y)).UpdateYWall();
+        if (CellRendered(new Vector2Int(x, y), out GridCell3D cell)) {
+            cell.UpdateYWall();
         }
         for (int i = -1; i <= 0; i++) {
             int localX = x + i;
-            if (!IsInRenderWindow(new Vector2Int(localX, y))) continue;
-            GetRenderedCell(new Vector2Int(localX, y)).UpdateRoof();
+            if (CellRendered(new Vector2Int(localX, y), out GridCell3D roofCell)) {
+                roofCell.UpdateRoof();
+            }
         }
     }
     public void UpdateRoof(Vector2Int pos) {
         if (!TerrainIsLoaded) return;
-        if (IsInRenderWindow(pos)) {
-            GetRenderedCell(pos).UpdateRoof();
+        if (CellRendered(pos, out GridCell3D cell)) {
+            cell.UpdateRoof();
         }
     }
     public void Reset() {
@@ -114,7 +125,7 @@ public class MapRenderer3D : MonoBehaviour {
     }
 
     public void HideTile(Vector2Int pos, bool hide) {
-        if (IsInRenderWindow(pos)) GetRenderedCell(pos).HideRoof(hide);
+        if (CellRendered(pos, out GridCell3D cell)) cell.HideRoof(hide);
     }
 
     public Land?[] GetFourLandTilesAround(Vector2 pos) {
