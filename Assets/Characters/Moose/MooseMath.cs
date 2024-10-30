@@ -60,17 +60,9 @@ public class MooseMath {
         yield break;
     }
 
-    public static Vector2 GridFromWorld(Vector2 world) {
-        float x = world.y + world.x;
-        float y = world.y - world.x;
-        return new Vector2(x, y);
-    }
+    public static Vector2 GridFromWorld(Vector2 world) => world;
 
-    public static Vector2 WorldFromGrid(Vector2 grid) {
-        float x = (grid.x - grid.y) / 2;
-        float y = (grid.x + grid.y) / 2;
-        return new Vector2(x, y);
-    }
+    public static Vector2 WorldFromGrid(Vector2 grid) => grid;
 
 }
 
@@ -78,7 +70,7 @@ public class PathTracingBehavior : BehaviorNode {
     private Vector2 previousDestination;
     private Queue<Vector2> destinations = new Queue<Vector2>();
     private Transform ai;
-    private Func<Terrain.Position, bool> positionFilter;
+    private Func<Terrain.Position, bool> positionFilter; // which tile types we can interact with
     private Func<Terrain.Position, YieldInstruction> positionAction;
 
     private Terrain.Position positionFocus;
@@ -87,6 +79,8 @@ public class PathTracingBehavior : BehaviorNode {
         this.enumerator = QueueEnumerator;
     }
 
+    // Create a PathTracingBehavior with one target.
+    // These may be combined afterward through UpdateWithNewBehavior.
     public static PathTracingBehavior Of(
             Vector2 target,
             Transform ai,
@@ -100,9 +94,15 @@ public class PathTracingBehavior : BehaviorNode {
         return queueNode;
     }
 
+    // Overrides "replace" with "chain" command when player Confirms
+    // Receives a PathTracingBehavior (if not - replace, don't chain)
+    // Takes all destinations from it and enqueues them into this one.
     override public BehaviorNode UpdateWithNewBehavior(BehaviorNode newNode) {
         if (newNode is PathTracingBehavior newQueue) {
-            foreach (Vector2 destination in newQueue.destinations) destinations.Enqueue(destination);
+            foreach (Vector2 destination in newQueue.destinations) {
+                Debug.Log("PTB destinations.Count " + destinations.Count + ", enqueuing new one");
+                destinations.Enqueue(destination);
+            }
             return this;
         }
         else return newNode;
@@ -119,10 +119,10 @@ public class PathTracingBehavior : BehaviorNode {
         while (destinations.Count > 0) {
             Vector2 nextDestination = destinations.Peek();
             foreach (Terrain.Position pathPos in MooseMath.GetPathPositions(previousDestination, nextDestination)) {
-                Debug.Log("POSSIBLE POSITION FOCUS: " + pathPos + " NEAR " + Terrain.I.CellCenter(pathPos.Coord));
+                Debug.Log("PTB possible position focus: " + pathPos + " near " + Terrain.I.CellCenter(pathPos.Coord));
                 while (positionFilter(pathPos)) {
                     positionFocus = pathPos;
-                    Debug.Log("FOUND POSITION FOCUS: " + pathPos + " NEAR " + Terrain.I.CellCenter(pathPos.Coord));
+                    Debug.Log("PTB FOUND position focus: " + pathPos + " near " + Terrain.I.CellCenter(pathPos.Coord));
                     Debug.DrawLine(nextDestination, Terrain.I.CellCenter(positionFocus), Color.blue, 1);
                     yield return positionAction(positionFocus);
                     if (i++ > 1000) throw new StackOverflowException();
@@ -131,6 +131,7 @@ public class PathTracingBehavior : BehaviorNode {
             }
             previousDestination = nextDestination;
             Pop();
+            Debug.Log("PTB reached destination, popping; " + destinations.Count + " left");
             if (i++ > 1000) throw new StackOverflowException();
         }
     }

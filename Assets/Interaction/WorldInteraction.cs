@@ -300,7 +300,7 @@ public class WorldInteraction : MonoBehaviour {
                 ClearLine();
                 OneOf<Terrain.Position, Character> target = teleSelect.SelectDynamic(pointer);
                 if (target.Is(out Terrain.Position tile)) {
-                    // activeTile = tile.Coord; // I don't think this is needed? - during 3D refactor
+                    activeTile = tile.Coord; // I don't think this is needed? - during 3D refactor
                     if (teleSelect.Line == null) SetTile(tile);
                     else {
                         List<Vector3> line = teleSelect.Line();

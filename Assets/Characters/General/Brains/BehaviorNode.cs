@@ -15,6 +15,8 @@ public class BehaviorNode {
         this.enumerator = () => FromSingleLine(singleLine);
     }
     
+    // By default, replace old behavior with new one.
+    // Can be overriden to chain commands
     virtual public BehaviorNode UpdateWithNewBehavior(BehaviorNode newNode) {
         return newNode;
     }
