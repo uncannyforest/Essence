@@ -16,6 +16,7 @@ public class Boat : MonoBehaviour {
     public Transform seats;
 
     private Terrain terrain;
+    private Transform worldBag;
     private Feature feature;
     [NonSerialized] public CharacterController movement;
 
@@ -28,10 +29,11 @@ public class Boat : MonoBehaviour {
     private Vector2Int currentTile;
     private Vector2 currentShoreCorrection;
     private TaskRunner CreatureExits;
-    private Vector2 exitLocation;
+    private Vector2? exitLocation;
 
     void Start() {
         terrain = Terrain.I;
+        worldBag = FindObjectOfType<Fauna>().transform;
         movement = GetComponent<CharacterController>();
         movement.CrossingTile += HandleCrossingTile;
         feature = GetComponent<Feature>();
@@ -57,7 +59,7 @@ public class Boat : MonoBehaviour {
         terrain.Feature[currentTile] = feature;
         movement.InDirection((Displacement)currentShoreCorrection).Idle();
         FaceDirection((Displacement)currentShoreCorrection);
-        Debug.DrawLine(location, exitLocation, Color.magenta, 5);
+        Debug.DrawLine(location, (Vector2)exitLocation, Color.magenta, 5);
         CharacterExit(0);
         player.ExitedVehicle();
         CreatureExits.Start();
@@ -76,6 +78,15 @@ public class Boat : MonoBehaviour {
         return true;
     }
 
+    private void BootCreaturesImmediately() {
+        for (int i = 1; i < 4; i++) {
+            CharacterController creature = passengers[i];
+            if (creature == null) continue;
+            CharacterExit(i);
+            creature.transform.GetComponentStrict<Creature>().ReleaseControl();
+        }
+    }
+
     private IEnumerator CreatureExitE() {
         for (int i = 1; i < 4; i++) {
             CharacterController creature = passengers[i];
@@ -92,17 +103,33 @@ public class Boat : MonoBehaviour {
         movement.transform.parent = seats.GetChild(seat);
         movement.transform.localPosition = Vector2.zero;
         movement.Idle().Sitting(true);
+        if (movement.HasComponent(out Health h)) {
+            if (movement.HasComponent(out PlayerCharacter pc)) {
+                h.ReachedZero += HandlePlayerDied;
+            } else {
+                h.Changing += HandleNonPlayerHit;
+            }
+        }
         seatedCardboards = seats.GetComponentsInChildren<Cardboard>();
         passengers[seat] = movement;
     }
 
     private void CharacterExit(int seat) {
         CharacterController movement = passengers[seat];
-        movement.transform.parent = terrain.transform;
-        Debug.DrawLine(movement.transform.position, exitLocation, Color.red, 5);
-        movement.transform.position = exitLocation;
+        movement.transform.parent = worldBag;
+        if (exitLocation is Vector2 actualExitLocation) {
+            Debug.DrawLine(movement.transform.position, actualExitLocation, Color.red, 5);
+            movement.transform.position = actualExitLocation;
+        }
         movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;
         movement.Sitting(false);
+        if (movement.HasComponent(out Health h)) {
+            if (movement.HasComponent(out PlayerCharacter pc)) {
+                h.ReachedZero -= HandlePlayerDied;
+            } else {
+                h.Changing -= HandleNonPlayerHit;
+            }
+        }
         seatedCardboards = seats.GetComponentsInChildren<Cardboard>();
         passengers[seat] = null;
     }
@@ -129,6 +156,12 @@ public class Boat : MonoBehaviour {
         currentShoreCorrection = shoreCorrection;
     }
 
+    public IEnumerable<CharacterController> GetPassengers() {
+        for (int i = 0; i < 4; i++)
+            if (passengers[i] != null)
+                yield return passengers[i];
+    }
+
     public bool HandleCrossingTile(Vector2Int tile) {
         if ((terrain.GetLand(tile) ?? terrain.Depths) != Land.Water) {
             HandlePlayerExited(transform.position);
@@ -138,7 +171,7 @@ public class Boat : MonoBehaviour {
         } else {
             currentTile = tile;
             foreach (CharacterController passenger in GetPassengers())
-                passenger.CrossingTile(tile);
+                passenger.CrossingTile?.Invoke(tile);
             return true;
         }
     }
@@ -152,9 +185,16 @@ public class Boat : MonoBehaviour {
             passenger.InDirection(direction).Idle();
     }
 
-    public IEnumerable<CharacterController> GetPassengers() {
-        for (int i = 0; i < 4; i++)
-            if (passengers[i] != null)
-                yield return passengers[i];
+    private bool HandleNonPlayerHit(int decrease) {
+        if (player != null) player.GetComponentStrict<Health>().DecreaseWithoutBlame(-decrease);
+        return false;
+    }
+
+    private void HandlePlayerDied() {
+        exitLocation = null;
+        CharacterExit(0);
+        player.ExitedVehicle();
+        BootCreaturesImmediately();
+        Destroy(gameObject);
     }
 }

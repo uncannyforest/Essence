@@ -20,8 +20,13 @@ public class Health : StatusQuantity {
     }
 
     public void Decrease(int quantity, Transform blame) {
+        if (!Decrease(quantity)) return;
         GetComponent<Team>()?.OnAttack(blame);
-        Decrease(quantity);
+        ResetDamageVisual();
+    }
+
+    public void DecreaseWithoutBlame(int quantity) {
+        if (!Decrease(quantity)) return;
         ResetDamageVisual();
     }
 

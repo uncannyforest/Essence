@@ -7,6 +7,7 @@ public class StatusQuantity : MonoBehaviour {
     public GameObject statBarPrefab;
     public Color statBarColor = new Color(.8f, 0, .2f);
     
+    public Func<int, bool> Changing;
     public Action ReachedZero;
     public Action ReachedMax;
 
@@ -36,24 +37,26 @@ public class StatusQuantity : MonoBehaviour {
         statBar?.Hide();
     }
 
-
-
     virtual public bool IsFull() {
         return level == max;
     }
 
-    virtual public void Decrease(int quantity) {
+    virtual public bool Decrease(int quantity) {
+        if (Changing != null && !Changing(-quantity)) return false;
         level -= quantity;
         if (level > 0) {
             statBar?.SetPercent((float) level / max);
         }
         else if (ReachedZero != null) ReachedZero();
+        return true;
     }
 
-    virtual public void Increase(int quantity) {
+    virtual public bool Increase(int quantity) {
+        if (Changing != null && !Changing(quantity)) return false;
         level = Math.Min(max, level + quantity);
         statBar?.SetPercent((float) level / max);
         if (IsFull() && ReachedMax != null) ReachedMax();
+        return true;
     }
 
     public void HideStatBar() {

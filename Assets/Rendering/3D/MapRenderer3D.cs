@@ -52,14 +52,18 @@ public class MapRenderer3D : MonoBehaviour {
             && pos.y <= playerPos.y + renderWindow / 2;
     }
     public bool CellRendered(Vector2Int pos, out GridCell3D cell) {
+        cell = null;
         if (!IsInRenderWindow(pos)) {
-            cell = null;
             return false;
         }
-        cell = tilesParent.Find(pos.ToString()).GetComponent<GridCell3D>();
-        if (cell == null) Debug.LogWarning(pos + " in render window (playerPos "
-            + CellAt(GameManager.I.YourPlayer.transform.position) + ") but not rendered");
-        return cell != null;
+        Transform cellTransform = tilesParent.Find(pos.ToString());
+        if (cellTransform == null) {
+            Debug.LogWarning(pos + " in render window (playerPos "
+                + CellAt(GameManager.I.YourPlayer.transform.position) + ") but not rendered");
+            return false;
+        }
+        cell = cellTransform.GetComponentStrict<GridCell3D>();
+        return true;
     }
     public void UpdateLand(Vector2Int pos) {
         if (!TerrainIsLoaded) return;

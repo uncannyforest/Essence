@@ -41,6 +41,11 @@ public static class GameObjectExtensions {
             ("GameObject " + go + " in layer " + go.layer + " has no " + typeof(T));
     }
 
+    public static bool HasComponent<T>(this MonoBehaviour mb, out T component) {
+        component = mb.GetComponent<T>();
+        return component != null;
+    }
+
     public static bool Contains(this LayerMask mask, int layer) {
         return mask == (mask | (1 << layer));
     }
