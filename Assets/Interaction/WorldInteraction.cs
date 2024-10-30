@@ -71,20 +71,9 @@ public class WorldInteraction : MonoBehaviour {
 
     new public Camera camera;
     public Inventory inventory;
-    public Grid grid; // TODO remove
     public Terrain terrain;
     public Transform bag;
-    public SortingGroup largeCharacterSelectPrefab; // will delete
-    public SortingGroup smallCharacterSelectPrefab; // will delete
-    public Cardboard largeCharacterSelectPrefab_new;
-    public Cardboard smallCharacterSelectPrefab_new;
     public MeshRenderer characterSelectPrefab;
-    public Tilemap uiMap; // will delete
-    public Tilemap uiMapEdgeX; // will delete
-    public Tilemap uiMapEdgeY; // will delete
-    public TileBase hoverTile; // will delete
-    public TileBase edgeHoverTileX; // will delete
-    public TileBase edgeHoverTileY; // will delete
     public GameObject hoverSquare;
     public GameObject hoverEdge;
     public LineRenderer lineSelect;
@@ -105,14 +94,11 @@ public class WorldInteraction : MonoBehaviour {
     private MeleeSquare meleeSquare;
     private Tele teleSelect;
     private Vector2Int activeTile = Vector2Int.zero;
-    private Tilemap activeGrid; // will delete
     private bool lineStarterUpdate;
     private Character activeCharacter; // hover
     private MeshRenderer activeCharacterHighlight;
     private DeStack<Character> followingCharacters = new DeStack<Character>();
     private MeshRenderer followingCharacterHighlight;
-    private Dictionary<Terrain.Grid, TileBase> hoverTiles; // will delete
-    private Dictionary<Terrain.Grid, Tilemap> uiMaps; // will delete
 
     public Action<Interaction, Creature> interactionChanged;
     public Action<Interaction, Creature> creatureChanged;
@@ -181,16 +167,6 @@ public class WorldInteraction : MonoBehaviour {
         meleeSelect = new Melee(meleeConfig, player);
         meleeSquare = new MeleeSquare(praxelSelectConfig, player);
         teleSelect = new Tele(terrain);
-        // hoverTiles = new Dictionary<Terrain.Grid, TileBase>() {
-        //     [Terrain.Grid.XWalls] = edgeHoverTileX,
-        //     [Terrain.Grid.YWalls] = edgeHoverTileY,
-        //     [Terrain.Grid.Roof] = hoverTile
-        // };
-        // uiMaps = new Dictionary<Terrain.Grid, Tilemap>() {
-        //     [Terrain.Grid.XWalls] = uiMapEdgeX,
-        //     [Terrain.Grid.YWalls] = uiMapEdgeY,
-        //     [Terrain.Grid.Roof] = uiMap
-        // };
         ConfirmOngoing = new TaskRunner(ConfirmOngoingE, this);
         inventory = player.GetComponentStrict<Inventory>();
         Orientor.I.onRotation += ClearTile;
