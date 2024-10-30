@@ -114,20 +114,9 @@ MonoBehaviour:
   followingCharacterColor: {r: 0.6, g: 0.8666667, b: 0.73333335, a: 1}
   camera: {fileID: 0}
   inventory: {fileID: 0}
-  grid: {fileID: 0}
   terrain: {fileID: 0}
   bag: {fileID: 0}
-  largeCharacterSelectPrefab: {fileID: 8857988489869317622, guid: 4238479deeeaf49b1bb60d97c3c17a1f, type: 3}
-  smallCharacterSelectPrefab: {fileID: 5741242326734025987, guid: 36b02cd24d29e4475a5d03184732a54d, type: 3}
-  largeCharacterSelectPrefab_new: {fileID: 688956683167725399, guid: 948e7429f06c9413ba8dfe4ad66b0227, type: 3}
-  smallCharacterSelectPrefab_new: {fileID: 8933298019174004028, guid: 4241b0c9563344d28830b382a5fabc65, type: 3}
   characterSelectPrefab: {fileID: 3551978704260710188, guid: 24adba4bfc88b432e83787dc9491a8ed, type: 3}
-  uiMap: {fileID: 0}
-  uiMapEdgeX: {fileID: 0}
-  uiMapEdgeY: {fileID: 0}
-  hoverTile: {fileID: 11400000, guid: 7bd45f73260d24921af5f94b334d8fc5, type: 2}
-  edgeHoverTileX: {fileID: 11400000, guid: 535b0d3522a9842bab1cf6eca2be8bf1, type: 2}
-  edgeHoverTileY: {fileID: 11400000, guid: 936a11bcc70f6471897cc6a83d65dc0f, type: 2}
   hoverSquare: {fileID: 6378383576633259684}
   hoverEdge: {fileID: 5406425909142573789}
   lineSelect: {fileID: 6973577878708665254}
@@ -850,6 +839,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9165450013374557087}
     m_Modifications:
+    - target: {fileID: 443831003079275458, guid: 15f6e8582d9274631aed73b7eb708410, type: 3}
+      propertyPath: m_Parameters.numCapVertices
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 443831003079275458, guid: 15f6e8582d9274631aed73b7eb708410, type: 3}
+      propertyPath: m_Parameters.numCornerVertices
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 443831003079275459, guid: 15f6e8582d9274631aed73b7eb708410, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -864,7 +861,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 443831003079275459, guid: 15f6e8582d9274631aed73b7eb708410, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 443831003079275459, guid: 15f6e8582d9274631aed73b7eb708410, type: 3}
       propertyPath: m_LocalRotation.w
