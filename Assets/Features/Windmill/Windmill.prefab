@@ -29,7 +29,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.6123724, z: 0.35355335}
   m_LocalScale: {x: 1.414214, y: 1.632993, z: 1}
   m_Children: []
-  m_Father: {fileID: 8720877971179551070}
+  m_Father: {fileID: 4394854905622565276}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5674214303865811904
@@ -111,7 +111,6 @@ GameObject:
   - component: {fileID: 9203515329138306239}
   - component: {fileID: 2998764763587065230}
   - component: {fileID: 6537596548197068415}
-  - component: {fileID: 8978140599129698542}
   m_Layer: 7
   m_Name: Windmill
   m_TagString: Untagged
@@ -130,8 +129,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 6228280965695911884}
-  - {fileID: 990735364471269985}
+  - {fileID: 4394854905622565276}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -257,19 +255,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8978140599129698542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3679020868515697513}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  keepPerpendicularToGround: 1
 --- !u!1 &5916339106742564382
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,7 +283,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -0.70710677}
   m_LocalScale: {x: 1.414214, y: 1.632993, z: 1}
   m_Children: []
-  m_Father: {fileID: 8720877971179551070}
+  m_Father: {fileID: 4394854905622565276}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1389440156631779460
@@ -352,3 +337,49 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!1 &7200823481567806125
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4394854905622565276}
+  - component: {fileID: 2947574632468816389}
+  m_Layer: 7
+  m_Name: Cardboard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4394854905622565276
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200823481567806125}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6228280965695911884}
+  - {fileID: 990735364471269985}
+  m_Father: {fileID: 8720877971179551070}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2947574632468816389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200823481567806125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712e7362fbd314b268749f2e565a9d68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keepPerpendicularToGround: 1
