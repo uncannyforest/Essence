@@ -74,6 +74,7 @@ public struct CreatureAction {
 
 [RequireComponent(typeof(Team))]
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Stats))]
 public class Creature : MonoBehaviour {
     public BrainConfig brainConfig;
     public Species species;
@@ -84,7 +85,6 @@ public class Creature : MonoBehaviour {
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
 
-    public Stats stats;
     public Brain brain;
     public CreatureState State {
         get => brain.state;
@@ -95,11 +95,12 @@ public class Creature : MonoBehaviour {
     public const float neighborhood = 6.5f;
 
     [NonSerialized] public CharacterController controller;
+    [NonSerialized] public Stats stats;
 
     [NonSerialized] public Creature.Data? serializedData;
     void Start() {
         controller = GetComponent<CharacterController>();
-        stats = new Stats(this);
+        stats = GetComponent<Stats>();
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
         GetComponent<Team>().changed += TeamChangedEventHandler;
@@ -195,6 +196,13 @@ public class Creature : MonoBehaviour {
                 ? new Hint() { target = Optional.Of(target) }
                 : new Hint() { generallyOffensive = true }
         }.TryUpdateCreature(this);
+    }
+
+    public void GenericExeSucceeded() => stats.Exp += 2;
+
+    public void AttackSucceeded(int? completedWithDef = null) {
+        if (completedWithDef is int def) stats.Exp += def;
+        else stats.Exp++;
     }
 
     public bool ReceiveDesireMessage(DesireMessage desireMessage) => new Senses() {

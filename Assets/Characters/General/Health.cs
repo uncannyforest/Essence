@@ -22,6 +22,7 @@ public class Health : StatusQuantity {
     public void Decrease(int quantity, Transform blame) {
         if (!Decrease(quantity)) return;
         GetComponent<Team>()?.OnAttack(blame);
+        if (blame != null) blame.GetComponent<Creature>()?.AttackSucceeded(IsZero() ? max : (int?)null);
         ResetDamageVisual();
     }
 

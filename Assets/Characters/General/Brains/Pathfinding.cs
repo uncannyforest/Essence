@@ -96,8 +96,8 @@ public class Pathfinding {
         }
     }
 
-    public ApproachThenInteract ApproachThenInteract(float interactionDistance, float interactionTime, Action<Terrain.Position> interaction)
-        => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction);
+    public ApproachThenInteract ApproachThenInteract(float interactionDistance, float interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
+        => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
 
     public Func<YieldInstruction> FaceAnd(string animationTrigger,
             Vector2 location,
@@ -165,16 +165,19 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
     private readonly float interactDistance;
     private readonly float interactTime;
     private readonly Action<Terrain.Position> interaction;
+    private readonly bool rewardExp;
 
     public ApproachThenInteract (
             Brain brain,
             float interactDistance,
             float interactTime,
-            Action<Terrain.Position> interaction) {
+            Action<Terrain.Position> interaction,
+            bool rewardExp) {
         this.brain = brain;
         this.interactDistance = interactDistance;
         this.interactTime = interactTime;
         this.interaction = interaction;
+        this.rewardExp = rewardExp;
         this.enumeratorWithParam = E;
     }
 
@@ -191,6 +194,7 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
             else {
                 brain.movement.IdleFacing(Terrain.I.CellCenter(location));
                 interaction(location);
+                if (rewardExp) brain.creature.GenericExeSucceeded();
                 yield return new WaitForSeconds(interactTime);
                 yield break;
             }

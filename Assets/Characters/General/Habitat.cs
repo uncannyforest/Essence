@@ -82,12 +82,12 @@ public class Habitat {
     virtual public BehaviorNode RestBehavior(Vector2Int shelter) {
         switch (restRadius) {
             case InteractionMode.Inside:
-                return brain.pathfinding.ApproachThenInteract(1f / CharacterController.subGridUnit, Random.value * brain.general.lureMaxTime, (_) => recentlyVisited.Add(shelter))
+                return brain.pathfinding.ApproachThenInteract(1f / CharacterController.subGridUnit, Random.value * brain.general.lureMaxTime, (_) => recentlyVisited.Add(shelter), false)
                     .WithTarget(new Terrain.Position(Terrain.Grid.Roof, shelter));
             case InteractionMode.Beside:
             case InteractionMode.Nearby:
             default:
-                return brain.pathfinding.ApproachThenInteract(besideDistance, brain.general.lureMaxTime, (_) => recentlyVisited.Add(shelter))
+                return brain.pathfinding.ApproachThenInteract(besideDistance, brain.general.lureMaxTime, (_) => recentlyVisited.Add(shelter), false)
                     .WithTarget(new Terrain.Position(Terrain.Grid.Roof, shelter));
         }
     }

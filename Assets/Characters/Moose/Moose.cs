@@ -60,8 +60,10 @@ public class MooseBrain : Brain {
     private YieldInstruction Attack(Terrain.Position location) {
         if (location.grid != Terrain.Grid.Roof) {
             terrain[location] = Construction.None;
+            creature.GenericExeSucceeded();
         } else if (terrain.GetLand(location.Coord) == Land.Dirtpile) {
             terrain.Land[location.Coord] = Land.Grass;
+            creature.GenericExeSucceeded();
         } else if (terrain.Feature[location.Coord] != null) {
             terrain.Feature[location.Coord].Attack(transform);
         }

@@ -47,6 +47,7 @@ public class BunnyBrain : Brain {
         while (true) {
             yield return pathfinding.Approach(state.characterFocus.Value.position, healing.healDistance).Else(() => {
                 state.characterFocus.Value.GetComponentStrict<Health>().Increase(healing.healQuantity);
+                creature.GenericExeSucceeded();
                 return new WaitForSeconds(healing.healTime);
             });
         }

@@ -41,6 +41,10 @@ public class StatusQuantity : MonoBehaviour {
         return level == max;
     }
 
+    public bool IsZero() {
+        return level <= 0;
+    }
+
     virtual public bool Decrease(int quantity) {
         if (Changing != null && !Changing(-quantity)) return false;
         level -= quantity;
