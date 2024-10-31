@@ -96,11 +96,11 @@ MonoBehaviour:
       level: 0
       land: 0
       roof: 0
-    corner: {fileID: -7511558181221131132, guid: fc34df3d73dd04f55bd4842795d6b770, type: 3}
-    taper: {fileID: -7511558181221131132, guid: fc34df3d73dd04f55bd4842795d6b770, type: 3}
-    side: {fileID: -7511558181221131132, guid: fc34df3d73dd04f55bd4842795d6b770, type: 3}
-    insideCorner: {fileID: -7511558181221131132, guid: fc34df3d73dd04f55bd4842795d6b770, type: 3}
-    inner: {fileID: -7511558181221131132, guid: fc34df3d73dd04f55bd4842795d6b770, type: 3}
+    corner: {fileID: -7511558181221131132, guid: bb4bcd4dfe42d4f9e9adc191c3072f9a, type: 3}
+    taper: {fileID: -7511558181221131132, guid: bb4bcd4dfe42d4f9e9adc191c3072f9a, type: 3}
+    side: {fileID: -7511558181221131132, guid: bb4bcd4dfe42d4f9e9adc191c3072f9a, type: 3}
+    insideCorner: {fileID: -7511558181221131132, guid: bb4bcd4dfe42d4f9e9adc191c3072f9a, type: 3}
+    inner: {fileID: -7511558181221131132, guid: bb4bcd4dfe42d4f9e9adc191c3072f9a, type: 3}
   hill:
     alwaysInclude: 0
     parentLayer:
