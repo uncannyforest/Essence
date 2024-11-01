@@ -27,18 +27,22 @@ public class Stats : MonoBehaviour {
 
     void Start() {
         creature = GetComponent<Creature>();
-        InitializeStats();
+        if (currentExp == 0) InitializeStats(); // if not deserialized from save
     }
 
     private void InitializeStats() {
         gameObject.name = GenerateName() + " " + creature.creatureShortName;
         int initLevel = GetInitLevel(Terrain.I.CellAt(transform.position));
+        Debug.Log("Setting currentExp for new creature " + gameObject.name);
         currentExp = LevelToExp(initLevel);
     }
 
     public int GetInitLevel(Vector2Int position) =>
         Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / 20736) + 1;
     public int LevelToExp(int level) => level * level * 10;
+
+    // for unusual situations where you're not just incrementing
+    public int SetExp(int exp) => currentExp = exp;
 
     private void OnLevelUp() {
         Debug.Log(gameObject.name + " just reached level " + Level);

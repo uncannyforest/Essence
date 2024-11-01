@@ -254,16 +254,22 @@ public class Creature : MonoBehaviour {
         public int team;
         public bool stationed;
         public string name;
+        public int exp;
 
         public Vector2Int tile { get => Vct.I(x, y); }
 
-        public Data(Vector2Int tile, string species, int team, bool stationed, string name) {
+        public Data(Vector2Int tile, string species, int team, bool stationed, string name, int exp) {
             this.x = tile.x;
             this.y = tile.y;
             this.species = species;
             this.team = team;
             this.stationed = stationed;
             this.name = name;
+            this.exp = exp;
+        }
+
+        override public string ToString() {
+            return species + ": " + name + (stationed ? " @ " : " ~ ") + tile + " " + " T" + team + " E" + exp;
         }
     }
     public Data Serialize() {
@@ -271,7 +277,8 @@ public class Creature : MonoBehaviour {
             creatureName,
             GetComponent<Team>().TeamId,
             brain.state.command?.type == CommandType.Station,
-            gameObject.name);
+            gameObject.name,
+            stats.Exp);
     }
     public void DeserializeUponStart(Data data) {
         serializedData = data;
@@ -279,6 +286,8 @@ public class Creature : MonoBehaviour {
     private void DeserializeNow(Data data) {
         gameObject.name = data.name;
         GetComponent<Team>().TeamId = data.team;
+        Debug.Log("Setting currentExp for saved creature " + gameObject.name);
+        stats.SetExp(data.exp);
         if (data.stationed) Station(data.tile);
     }
 }

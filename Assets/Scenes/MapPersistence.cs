@@ -65,8 +65,9 @@ public class MapPersistence : MonoBehaviour {
             Terrain.I.PopulateTerrainFromData(mapData);
 
             foreach (Creature.Data creature in mapData.creatures) {
+                Debug.Log("Reading saved " + creature);
                 Instantiate(CreatureLibrary.P.BySpeciesName(creature.species),
-                        Terrain.I.CellCenter(creature.tile), Quaternion.identity, Terrain.I.transform)
+                        Terrain.I.CellCenter(creature.tile), Quaternion.identity, WorldInteraction.I.bag)
                     .DeserializeUponStart(creature);
             }
 
