@@ -65,7 +65,7 @@ public class MooseBrain : Brain {
             terrain.Land[location.Coord] = Land.Grass;
             creature.GenericExeSucceeded();
         } else if (terrain.Feature[location.Coord] != null) {
-            terrain.Feature[location.Coord].Attack(transform);
+            terrain.Feature[location.Coord].Attack(transform, creature.stats.Str);
         }
         return new WaitForSeconds(moose.destroyTime);
     }

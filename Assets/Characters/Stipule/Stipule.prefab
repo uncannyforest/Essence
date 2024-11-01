@@ -202,7 +202,6 @@ MonoBehaviour:
     attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     scaleCost: 3
     meleeReach: 1
-    attack: 15
 --- !u!95 &7051101361044908341
 Animator:
   serializedVersion: 3
@@ -235,9 +234,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalBubble: 0.25
+  body3d: {fileID: 0}
   setAnimatorDirectionDirectly: 0
   snap: 0
-  defaultSpeed: 1
   waterSpeed: 0
 --- !u!1 &6868019693913487994
 GameObject:

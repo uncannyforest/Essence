@@ -14,13 +14,13 @@ public class CharacterController : MonoBehaviour {
     public bool snap = false;
     public Func<Vector2Int, bool> CrossingTile; // return false to cancel
 
-    public float defaultSpeed = 2f;
     public float waterSpeed = 0;
     
     private Terrain terrain;
     [NonSerialized] new public Rigidbody2D rigidbody;
     [NonSerialized] new public Collider2D collider;
     [NonSerialized] public Character character;
+    private Stats stats; // null if player
     [NonSerialized] public Cardboard cardboard; // may be null if setAnimatorDirectionDirectly
                                                 // null checks also added for move to 3D
     private Animator animator; // may be null
@@ -29,12 +29,14 @@ public class CharacterController : MonoBehaviour {
     private Displacement velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
     private Displacement animatorDirection;
+    private float terrainSpeed;
 
     void Awake() {
         terrain = GameObject.FindObjectOfType<Terrain>();
         rigidbody = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         character = GetComponent<Character>();
+        stats = GetComponent<Stats>();
         cardboard = GetComponentInChildren<Cardboard>();
         animator = GetComponent<Animator>();
         if (animator == null) animator = null; // *sigh* Unity . . .
@@ -43,7 +45,7 @@ public class CharacterController : MonoBehaviour {
     void Start() {
         MoveCoroutine = new TaskRunner(MoveCoroutineE, this);
         MoveCoroutine.Start();
-        Speed = defaultSpeed;
+        terrainSpeed = 1;
     }
 
     public CharacterController SetRelativeVelocity(Displacement velocity) {
@@ -51,11 +53,12 @@ public class CharacterController : MonoBehaviour {
         else return InDirection(velocity);
     }
 
-    public float Speed { get; set; }
+    public float Speed { get => terrainSpeed * (stats != null ? stats.Spd : 2); }
+    
     private void UpdateTileSpecificParams() {
         Land land = terrain.GetLand(currentTile) ?? terrain.Depths;
 
-        Speed = (waterSpeed != 0 && land == Land.Water) ? waterSpeed : defaultSpeed;
+        terrainSpeed = (waterSpeed != 0 && land == Land.Water) ? waterSpeed : 1;
             
         float elevation = land == Land.Water ? -.375f : land == Land.Ditch ? -.25f : 0;
 

@@ -8,6 +8,12 @@ using Random = UnityEngine.Random;
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
+    public float minStr = 3;
+    public float minDef = 25;
+    public float minExe = 2;
+    public float exeIncrEvery = 10;
+    public float minSpd = 1f;
+    public float minRes = 10;
 
     public int Exp {
         get => currentExp;
@@ -18,10 +24,17 @@ public class Stats : MonoBehaviour {
                 Debug.Log(gameObject.name + " just gained " + (value - currentExp) + " EXP, reaching " + value + " EXP");
             currentExp = value;
             bool justLeveledUp = currentExp == LevelToExp(Level);
-            if (justLeveledUp) OnLevelUp();
+            if (justLeveledUp) OnLevelUp(true);
         }
     }
     public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / 10)); }
+    public int Str { get => Mathf.FloorToInt(minStr * Level); }
+    public int Def { get => Mathf.FloorToInt(minDef * Level); }
+    public float ExeTime { get => 1 / (minExe + Mathf.Log(Level, exeIncrEvery)); }
+    public float Spd { get => minSpd + Mathf.Log(Level, 1000); }
+    public int Res { get => Mathf.FloorToInt(minRes * Level); }
+
+    public Action<Stats> LeveledUp;
 
     private Creature creature;
 
@@ -34,18 +47,22 @@ public class Stats : MonoBehaviour {
         gameObject.name = GenerateName() + " " + creature.creatureShortName;
         int initLevel = GetInitLevel(Terrain.I.CellAt(transform.position));
         Debug.Log("Setting currentExp for new creature " + gameObject.name);
-        currentExp = LevelToExp(initLevel);
+        SetExp(LevelToExp(initLevel));
     }
 
     public int GetInitLevel(Vector2Int position) =>
         Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / 20736) + 1;
     public int LevelToExp(int level) => level * level * 10;
 
-    // for unusual situations where you're not just incrementing
-    public int SetExp(int exp) => currentExp = exp;
+    // for initialization situations where you're not just incrementing
+    public void SetExp(int exp) {
+        currentExp = exp;
+        OnLevelUp(false);
+    }
 
-    private void OnLevelUp() {
-        Debug.Log(gameObject.name + " just reached level " + Level);
+    private void OnLevelUp(bool displayMessage) {
+        if (displayMessage) Debug.Log(gameObject.name + " just reached level " + Level);
+        if (LeveledUp != null) LeveledUp(this);
     }
 
     public static string GenerateName() {

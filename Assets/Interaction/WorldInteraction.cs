@@ -453,7 +453,8 @@ public class WorldInteraction : MonoBehaviour {
                             flyingArrowPrefab,
                             bag,
                             player,
-                            (Vector2)player.position + (Vector2)rangedSelect.DirectionVector);
+                            (Vector2)player.position + (Vector2)rangedSelect.DirectionVector,
+                            10);
                         SignalOffensiveTarget(rangedSelect.DirectionVector,
                             signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
                     } else TextDisplay.I.ShowTip(noArrowsTip);

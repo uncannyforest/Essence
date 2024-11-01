@@ -11,11 +11,13 @@ public class Arrow : MonoBehaviour {
     new private Rigidbody2D rigidbody;
     private Transform sprite;
 
-    public static Arrow Instantiate(Arrow arrowPrefab, Transform parent, Transform source, Vector2 to) {
+    public static Arrow Instantiate(Arrow arrowPrefab, Transform parent, Transform source, Vector2 to, int damage) {
         Arrow arrow = Instantiate<Arrow>(arrowPrefab, source.position, Quaternion.identity, parent);
         Displacement direction = Disp.FT(source.position, to);
         arrow.Fire(direction);
-        arrow.GetComponent<Damage>().Source = source.GetComponentStrict<Team>();
+        Damage damageComponent = arrow.GetComponent<Damage>();
+        damageComponent.Source = source.GetComponentStrict<Team>();
+        damageComponent.power = damage;
         return arrow;
     }
 

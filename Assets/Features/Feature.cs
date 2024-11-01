@@ -38,10 +38,10 @@ public class Feature : MonoBehaviour {
         }
     }
 
-    public void Attack(Transform blame) {
+    public void Attack(Transform blame, int quantity = 1) {
         if (!canHit) return;
         if (Attacked != null) Attacked(blame);
-        else GetComponent<Health>().Decrease(1, blame);
+        else GetComponent<Health>().Decrease(quantity, blame);
     }
     void HandleDied() {
         if (Died != null) Died();

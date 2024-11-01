@@ -237,9 +237,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalBubble: 0.25
+  body3d: {fileID: 0}
   setAnimatorDirectionDirectly: 0
   snap: 0
-  defaultSpeed: 1
   waterSpeed: 0
 --- !u!114 &2958214915424018994
 MonoBehaviour:

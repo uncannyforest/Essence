@@ -77,7 +77,7 @@ public class Pathfinding {
         return new WaitForSeconds(Random.value * general.reconsiderRateFollow);
     }
 
-    public YieldInstruction TypicalWait { get => new WaitForSeconds(general.reconsiderRateTarget); }
+    public YieldInstruction TypicalWait { get => new WaitForSeconds(brain.creature.stats.ExeTime); }
 
     public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
@@ -91,7 +91,7 @@ public class Pathfinding {
             return Optional<YieldInstruction>.Empty();
         } else {
             movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
-            if (distance < movement.Speed * general.reconsiderRateTarget) return Optional<YieldInstruction>.Of(null); // adjust faster when we're close
+            if (distance < movement.Speed * brain.creature.stats.ExeTime) return Optional<YieldInstruction>.Of(null); // adjust faster when we're close
             else return Optional.Of(TypicalWait);
         }
     }

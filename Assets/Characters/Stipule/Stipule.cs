@@ -9,7 +9,6 @@ public class StipuleConfig {
     public Sprite attackAction;
     public int scaleCost;
     public float meleeReach;
-    public int attack;
 }
 
 [RequireComponent(typeof(Health))]
@@ -63,6 +62,6 @@ public class StipuleBrain : Brain {
             Debug.LogError("Unexpected state, target is same team");
             return;
         }
-        health.Decrease(stipule.attack, transform);
+        health.Decrease(creature.stats.Str, transform);
     }
 }

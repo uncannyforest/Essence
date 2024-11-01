@@ -73,4 +73,9 @@ public class GoodTaste : StatusQuantity {
             Increase((int)(max * Time.fixedDeltaTime / timeToTame));
         }
     }
+
+    override protected void OnMaxChanged(Stats stats) {
+        max = stats.Def;
+        Reset();
+    }
 }

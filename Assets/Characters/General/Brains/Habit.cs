@@ -180,11 +180,11 @@ public struct Habit {
                 RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
             onExit = (_, brain) => brain.investigationCancel.Stop(),
             onRunCheck = (state, brain) => ((Vector3)state.investigation - brain.transform.position).magnitude >
-                                            brain.general.reconsiderRateTarget * brain.movement.Speed,
+                                            brain.creature.stats.ExeTime * brain.movement.Speed,
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
                 new BehaviorNode(() => {
                     brain.pathfinding.MoveTowardWithoutClearingObstacles((Vector3)state.investigation);
-                    return new WaitForSeconds(brain.general.reconsiderRateTarget);  
+                    return new WaitForSeconds(brain.creature.stats.ExeTime);  
                 })),
         }.ExitAndEnterOnUpdate(),
 

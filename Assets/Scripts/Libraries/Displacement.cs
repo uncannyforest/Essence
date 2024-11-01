@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,8 +7,9 @@ public class Disp {
     public static Displacement FT(Vector2 from, Vector2 to) => new Displacement(from, to);
 }
 
+[Serializable]
 public struct Displacement {
-    private Vector2 displacement;
+    [SerializeField] Vector2 displacement;
     private Displacement(Vector2 displacement) {
         this.displacement = displacement;
     }

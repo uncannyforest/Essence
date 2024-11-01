@@ -24,6 +24,8 @@ public class StatusQuantity : MonoBehaviour {
     virtual protected void Awake() {
         if (startAtMax) level = max;
         if (statBarPrefab != null) statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
+        Stats stats = GetComponent<Stats>();
+        if (stats != null) stats.LeveledUp += OnMaxChanged;
     }
 
     virtual public void Reset() {
@@ -66,4 +68,6 @@ public class StatusQuantity : MonoBehaviour {
     public void HideStatBar() {
         statBar?.Hide();
     }
+
+    virtual protected void OnMaxChanged(Stats stats) {}
 }

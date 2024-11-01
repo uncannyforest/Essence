@@ -466,10 +466,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalBubble: 0
+  body3d: {fileID: 0}
   setAnimatorDirectionDirectly: 0
   snap: 1
-  defaultSpeed: 2
-  waterSpeed: 1
+  waterSpeed: 0.5
 --- !u!1 &3814134692212952165
 GameObject:
   m_ObjectHideFlags: 0
