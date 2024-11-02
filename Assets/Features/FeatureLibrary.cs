@@ -22,4 +22,5 @@ public class FeatureLibrary : MonoBehaviour {
     public Feature windmill;
     public Feature boat;
     public Feature jasmine;
+    public Feature carrot;
 }

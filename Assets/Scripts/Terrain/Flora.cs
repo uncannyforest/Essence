@@ -30,7 +30,7 @@ public class Flora : MonoBehaviour{
     }
 
     private Feature IdentifyFeature() {
-        return FeatureLibrary.P.jasmine;
+        return FeatureLibrary.P.carrot;
     }
 
     private Vector2Int RandomLocation() {
