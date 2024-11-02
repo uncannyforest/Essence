@@ -26,7 +26,7 @@ public class Habitat {
 
     public Func<Vector2Int, bool> IsShelter;
 
-    public Func<Vector2Int, IEnumerable> MakeShelter;
+    public List<Action<Vector2Int>> MakeShelter; // return list of steps for IEnumerable
 
     public IEnumerable<Vector2Int> ValidShelterLocations(InteractionMode mode) {
         Vector2Int center;
@@ -42,7 +42,7 @@ public class Habitat {
                 yield break;
             case InteractionMode.Nearby:
                 center = Terrain.I.CellAt(brain.transform.position);
-                for (int x = -8; x <= 8; x++) for (int y = -8; y <= 8; y++) {
+                for (int x = -7; x <= 7; x++) for (int y = -7; y <= 7; y++) {
                     Vector2Int possShelterLocation = center + Vct.I(x, y);
                     if (Terrain.I.InBounds(possShelterLocation) &&
                             Disp.FT(brain.transform.position, Terrain.I.CellCenter(possShelterLocation)) <= Creature.neighborhood)
@@ -51,19 +51,7 @@ public class Habitat {
                 yield break;
         }
     }
-
-    public bool MinLevelUp() {
-        foreach (Vector2Int validShelterLocation in ValidShelterLocations(InteractionMode.Nearby))
-            if (IsShelter(validShelterLocation)) return true;
-        return false;
-    }
-
-    virtual public bool MaxLevelUp() {
-        foreach (Vector2Int validShelterLocation in ValidShelterLocations(restRadius))
-            if (IsShelter(validShelterLocation)) return true;
-        return false;
-    }
-
+    
     virtual public bool CanTame() {
         foreach (Vector2Int validShelterLocation in ValidShelterLocations(restRadius))
             if (IsShelter(validShelterLocation)) return true;
@@ -92,4 +80,10 @@ public class Habitat {
         }
     }
 
+    static public Habitat Feature(Brain brain, Feature feature) {
+        return new Habitat(brain, InteractionMode.Nearby) {
+            IsShelter = (loc) => Terrain.I.Feature[loc]?.type == feature.type,
+            MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.ForceBuildFeature(loc, feature) }
+        };
+    }
 }

@@ -168,6 +168,14 @@ public class Terrain : MonoBehaviour {
         PlaceFeature(pos, feature);
         return feature;
     }
+    public Feature ForceBuildFeature(Vector2Int pos, Feature featurePrefab) {
+        DestroyFeature(pos);
+        if (!featurePrefab.IsValidTerrain(Land[pos])) SetLand(pos, featurePrefab.GetSomeValidLand());
+        if (!featurePrefab.IsValidTerrain(Roof[pos])) SetRoof(pos, Construction.None);
+        Feature feature = GameObject.Instantiate(featurePrefab, mapRenderer.WorldParent);
+        PlaceFeature(pos, feature);
+        return feature;
+    }
     public Feature UninstallFeature(Vector2Int pos) {
         Feature feature = features[pos.x, pos.y];
         features[pos.x, pos.y] = null;

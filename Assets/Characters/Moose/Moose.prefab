@@ -121,6 +121,14 @@ PrefabInstance:
       value: Moose
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoLong
+      value: <creature/> can be tamed after defeating if a ditch is nearby.
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoShort
+      value: Defeat with ditch nearby to tame
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureShortName
       value: Moose
       objectReference: {fileID: 0}

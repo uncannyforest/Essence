@@ -24,6 +24,11 @@ public class Feature : MonoBehaviour {
     public bool IsValidTerrain(Construction construction) {
         return construction == Construction.None || roofValid;
     }
+    public Land GetSomeValidLand() {
+        int i = 0;
+        while (!IsValidTerrain((Land)i)) i++;
+        return (Land)i;
+    }
     public void Uninstall() {
         if (tile is Vector2Int realTile) {
             Terrain.I.UninstallFeature(realTile);

@@ -89,11 +89,11 @@ MonoBehaviour:
   creatureShortName: Bun
   icon: {fileID: 1185625210376227553, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
   breastplate: {fileID: -1622973192143475964, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
-  tamingInfoShort: Whistle song (press and hold) to tame
-  tamingInfoLong: The <creature/> will not be tamed unless you whistle a song for
-    sufficient time.  Press and hold the left mouse button to whistle a song.  A
-    blue stat bar will appear beneath the <creature/> to indicate it can hear you;
-    when the stat bar reaches the end the <creature/> will be tamed.
+  tamingInfoShort: With carrot near, whistle song (press and hold) to tame
+  tamingInfoLong: To tame <creature/>, first you must place a Carrot nearby.  Then
+    you must whistle a song for sufficient time.  Press and hold the left mouse button
+    to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate
+    it can hear you; when the stat bar reaches the end the <creature/> will be tamed.
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -218,7 +218,6 @@ MonoBehaviour:
   startAtMax: 0
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
-  timeToTame: 5
   insufficientTimeInfoShort: Whistle song (press and hold) to tame
   insufficientTimeInfoLong: The <creature/> will not be tamed unless you whistle
     a song for sufficient time.  Press and hold the left mouse button to whistle

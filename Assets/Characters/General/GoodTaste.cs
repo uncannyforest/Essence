@@ -4,7 +4,6 @@ using UnityEngine;
 [RequireComponent(typeof(Creature))]
 [RequireComponent(typeof(Team))]
 public class GoodTaste : StatusQuantity {
-    public float timeToTame;
     public string insufficientTimeInfoShort = "Whistle song (press and hold) to tame";
     public string insufficientTimeInfoLong = "The <creature/> will not be tamed unless you whistle a song for sufficient time.  Press and hold the left mouse button to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate it can hear you; when the stat bar reaches the end the <creature/> will be tamed.";
 
@@ -68,9 +67,8 @@ public class GoodTaste : StatusQuantity {
     
     void Update() {
         if (Tamer != null) {
-            Debug.Log("HEY!" + max * Time.deltaTime / timeToTame);
             GetComponent<Team>()?.OnAttack(Tamer);
-            Increase((int)(max * Time.fixedDeltaTime / timeToTame));
+            Increase(1);
         }
     }
 

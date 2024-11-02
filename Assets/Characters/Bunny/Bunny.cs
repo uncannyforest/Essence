@@ -22,10 +22,9 @@ public class BunnyBrain : Brain {
     public BunnyBrain(Bunny species, BrainConfig general, BunnyConfig bunny) : base(species, general) {
         this.bunny = bunny;
         this.healing = species.GetComponentStrict<Healing>();
-    }
 
-    override public bool CanTame(Transform player) => true;
-    override public bool ExtractTamingCost(Transform player) => true;
+        Habitat = Habitat.Feature(this, FeatureLibrary.P.carrot);
+    }
 
     override public bool IsValidFocus(Transform characterFocus) =>
         healing.CanHeal(characterFocus, Creature.neighborhood);
