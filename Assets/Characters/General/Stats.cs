@@ -30,9 +30,11 @@ public class Stats : MonoBehaviour {
     public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / 10)); }
     public int Str { get => Mathf.FloorToInt(minStr * Level); }
     public int Def { get => Mathf.FloorToInt(minDef * Level); }
-    public float ExeTime { get => 1 / (minExe + Mathf.Log(Level, exeIncrEvery)); }
+    public float Exe { get => (minExe + Mathf.Log(Level, exeIncrEvery)); }
+    public float ExeTime { get => 1 / Exe; }
     public float Spd { get => minSpd + Mathf.Log(Level, 1000); }
     public int Res { get => Mathf.FloorToInt(minRes * Level); }
+    public int NextLevelIn { get => LevelToExp(Level + 1) - Exp; }
 
     public Action<Stats> LeveledUp;
 
@@ -51,7 +53,7 @@ public class Stats : MonoBehaviour {
     }
 
     public int GetInitLevel(Vector2Int position) =>
-        Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / 20736) + 1;
+        Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / 2304) + 1;
     public int LevelToExp(int level) => level * level * 10;
 
     // for initialization situations where you're not just incrementing

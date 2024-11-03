@@ -383,7 +383,9 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;
-                if (activeCharacter.Team.SameTeam(player)) {
+                if (activeCharacter == PeekFollowingCharacter()) {
+                    TextDisplay.I.ShowFullOther(GameObject.FindObjectOfType<CreatureInfoUI>(true).gameObject);
+                } else if (activeCharacter.Team.SameTeam(player)) {
                     activeCharacter.GetComponentStrict<Creature>().Follow(player);
                     ActiveCharacterToFollowing();
                 } else {

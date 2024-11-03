@@ -27,8 +27,9 @@ public class TextDisplay : MonoBehaviour {
 
     private bool isFullTextUp = true;
     public bool IsFullTextUp {
-        get => isFullTextUp;
+        get => isFullTextUp || fullOtherUp != null;
     }
+    private GameObject fullOtherUp;
 
     private HashSet<string> tutorialDisplayed = new HashSet<string>();
 
@@ -81,6 +82,12 @@ public class TextDisplay : MonoBehaviour {
         isFullTextUp = true;
     }
 
+    public void ShowFullOther(GameObject other) {
+        other.SetActive(true);
+        fullOtherUp = other;
+        Time.timeScale = 0;
+    }
+
     public void HideFullText() {
         if (!DisplayedYet("third tip")) {
             if (!DisplayedYet("second tip")) {
@@ -93,7 +100,12 @@ public class TextDisplay : MonoBehaviour {
                 return;
             }
         }
-        fullText.transform.parent.gameObject.SetActive(false);
+        if (fullOtherUp != null) {
+            fullOtherUp.SetActive(false);
+            fullOtherUp = null;
+        } else {
+            fullText.transform.parent.gameObject.SetActive(false);
+        }
         Time.timeScale = 1;
         isFullTextUp = false;
     }
