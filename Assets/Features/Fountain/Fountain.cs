@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Feature))]
-[RequireComponent(typeof(Health))]
 public class Fountain : MonoBehaviour {
     public float timeToCapture = 5f;
     public float timeToReset = 1f;
+    public float ringMaxSize = Mathf.Sqrt(10);
+    public Transform ring;
 
     private Feature feature;
     private Terrain terrain;
 
     private int team = 0;
-    private Health health;
+    private float ringSize = 0;
     private int enemyPresent = 0;
     new private Collider2D collider;
     private Transform enemy;
@@ -31,11 +32,8 @@ public class Fountain : MonoBehaviour {
         if (feature.serializedFields != null) Deserialize(feature.serializedFields);
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
-        feature.Attacked += (doNothing => {});
-        feature.Died += HandleDeath;
         terrain = GameObject.FindObjectOfType<Terrain>();
         collider = GetComponent<Collider2D>();
-        health = GetComponent<Health>();
         // If this were in PlayerController Fountains might not be loaded yet.
         if (team != 0) GameManager.I.YourPlayer.HandleDeath();
     }
@@ -53,11 +51,25 @@ public class Fountain : MonoBehaviour {
 
     void FixedUpdate() {
         if (enemyPresent > 0) {
-            if (feature.tile == terrain.CellAt(enemy.position))
-                health.Decrease((int)(health.max * Time.fixedDeltaTime / timeToCapture), enemy);
-            else enemyPresent--;
-        } else if (!health.IsFull()) {
-            health.Increase((int)(health.max * Time.fixedDeltaTime / timeToReset));
+            if (feature.tile == terrain.CellAt(enemy.position)) {
+                if (!ring.gameObject.activeSelf) {
+                    ring.gameObject.SetActive(true);
+                    ringSize = ringMaxSize;
+                } else {
+                    ringSize -= ringMaxSize * Time.deltaTime / timeToCapture;
+                }
+                ring.localScale = Vector3.one * ringSize * ringSize;
+                if (ringSize <= 0) {
+                    HandleDeath();
+                    ring.gameObject.SetActive(false);
+                }
+            } else enemyPresent--;
+        } else if (ring.gameObject.activeSelf) {
+            ringSize += ringMaxSize * Time.deltaTime / timeToReset;
+            ring.localScale = Vector3.one * ringSize * ringSize;
+            if (ringSize >= ringMaxSize) {
+                ring.gameObject.SetActive(false);
+            }
         }
     }
 
