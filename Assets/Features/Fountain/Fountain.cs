@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Feature))]
 public class Fountain : MonoBehaviour {
     public float timeToCapture = 5f;
+    public float timeToTeleport = 2f;
     public float timeToReset = 1f;
     public float ringMaxSize = Mathf.Sqrt(10);
     public Transform ring;
@@ -14,9 +14,12 @@ public class Fountain : MonoBehaviour {
 
     private int team = 0;
     private float ringSize = 0;
-    private int enemyPresent = 0;
     new private Collider2D collider;
+    private int enemyPresent = 0;
     private Transform enemy;
+    private int friendPresent = 0;
+    private PlayerCharacter friend;
+    private bool lastOutward;
 
     public int Team {
         get => team;
@@ -43,38 +46,67 @@ public class Fountain : MonoBehaviour {
 
     bool HandlePlayerEntered(PlayerCharacter target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
-        if (playerTeam == team) return true;
-        enemyPresent = 2; // Rather than using boolean, we need an extra frame for FixedUpdate to run
-        enemy = target.transform;
+        if (playerTeam == team) {
+            friendPresent = 2;
+            friend = target;
+            lastOutward = true;
+        } else {
+            enemyPresent = 2; // Rather than using boolean, we need an extra frame for FixedUpdate to run
+            enemy = target.transform;
+            lastOutward = false;
+        }
         return true;
     }
 
     void FixedUpdate() {
         if (enemyPresent > 0) {
             if (feature.tile == terrain.CellAt(enemy.position)) {
-                if (!ring.gameObject.activeSelf) {
-                    ring.gameObject.SetActive(true);
-                    ringSize = ringMaxSize;
-                } else {
-                    ringSize -= ringMaxSize * Time.deltaTime / timeToCapture;
-                }
-                ring.localScale = Vector3.one * ringSize * ringSize;
-                if (ringSize <= 0) {
-                    HandleDeath();
-                    ring.gameObject.SetActive(false);
-                }
+                RingProgress(HandleDeath);
             } else enemyPresent--;
-        } else if (ring.gameObject.activeSelf) {
-            ringSize += ringMaxSize * Time.deltaTime / timeToReset;
+        } else if (friendPresent > 0) {
+            if (feature.tile == terrain.CellAt(friend.transform.position)) {
+                RingProgress(Teleport);
+            } else friendPresent--;
+        } else RingRegress();
+    }
+
+    private void RingProgress(Action done) {
+        if (!ring.gameObject.activeSelf) {
+            ring.gameObject.SetActive(true);
+            ringSize = lastOutward ? 0 : ringMaxSize;
+        } else {
+            ringSize += ringMaxSize * Time.deltaTime / (lastOutward ? timeToTeleport : -timeToCapture);
+        }
+        ring.localScale = Vector3.one * ringSize * ringSize;
+        if (lastOutward ? (ringSize >= ringMaxSize) : (ringSize <= 0)) {
+            done();
+            ring.gameObject.SetActive(false);
+        }
+    }
+        
+    private void RingRegress() {
+        if (ring.gameObject.activeSelf) {
+            ringSize += ringMaxSize * Time.deltaTime / timeToReset * (lastOutward ? -1 : 1);
             ring.localScale = Vector3.one * ringSize * ringSize;
-            if (ringSize >= ringMaxSize) {
+            if (lastOutward ? (ringSize <= 0) : (ringSize >= ringMaxSize)) {
                 ring.gameObject.SetActive(false);
             }
         }
     }
 
-    void HandleDeath() {
+    private void HandleDeath() {
         Team = enemy.GetComponentStrict<Team>().TeamId;
         enemyPresent = 0;
+    }
+
+    private void Teleport() {
+        friend.MoveViaFountain(this);
+        friendPresent = 0;
+    }
+
+    public void Teleporting() {
+        ring.gameObject.SetActive(true);
+        ringSize = ringMaxSize;
+        lastOutward = true;
     }
 }

@@ -53,13 +53,27 @@ public class PlayerCharacter : MonoBehaviour {
 
     public void HandleDeath() {
         health.Reset();
+        MoveViaFountain(null);
+    }
+
+    public void MoveViaFountain(Fountain prev) {
         Fountain[] allSpawnPoints = GameObject.FindObjectsOfType<Fountain>();
         Fountain[] teamSpawnPoints =
             (from point in allSpawnPoints
             where point.Team == GetComponent<Team>().TeamId
             select point).ToArray<Fountain>();
-        int randomIndex = Random.Range(0, teamSpawnPoints.Length);
-        transform.position = (Vector2)(teamSpawnPoints[randomIndex].transform.position);
+        int index = 0;
+        if (prev == null) {
+            index = Random.Range(0, teamSpawnPoints.Length);
+        } else {
+            for ( ; index < teamSpawnPoints.Length; index++) {
+                if (teamSpawnPoints[index] == prev) break;
+            }
+            index--;
+            if (index < 0) index = teamSpawnPoints.Length - 1;
+            teamSpawnPoints[index].Teleporting();
+        }
+        transform.position = (Vector2)(teamSpawnPoints[index].transform.position);
         Terrain.I.mapRenderer.Reset();
     }
 
