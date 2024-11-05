@@ -89,6 +89,7 @@ public class ArcherBrain : Brain {
         return pos1 + velocity * (approxTimeToHit / 2f);
     }
 
+    // TODO move this to Brain
     override protected void OnHealthReachedZero() {
         new Senses() {
             faint = true

@@ -88,7 +88,10 @@ public class Brain {
         terrain = GameObject.FindObjectOfType<Terrain>();
         taste = GetComponent<GoodTaste>();
         Health health = GetComponent<Health>();
-        if (health != null) health.ReachedZero += OnHealthReachedZero;
+        if (health != null) {
+            health.ReachedZero += OnHealthReachedZero;
+            faintCondition = () => state.type == CreatureStateType.Faint;
+        }
         ScanningBehaviorTask = new TaskRunner(ScanningBehavior, species);
         OnStateChange();
         Initialize();
@@ -96,8 +99,9 @@ public class Brain {
     }
     virtual protected void Initialize() {}
     public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
-    virtual public bool CanTame(Transform player) => Habitat?.CanTame() ?? false;
-    virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
+    virtual public bool CanTame(Transform player) => faintCondition() && (Habitat?.CanTame() ?? false);
+    virtual public bool ExtractTamingCost(Transform player) => faintCondition() && (Habitat?.CanTame() ?? false);
+    private Func<bool> faintCondition = () => true;
 
     virtual public IEnumerator FocusedBehavior() { yield break; }
     virtual public bool IsValidFocus(Transform characterFocus) =>

@@ -34,14 +34,8 @@ public class StipuleBrain : Brain {
                     c.GetComponentStrict<Team>().TeamId != teamId
                 )
         };
-    }
 
-    override public bool CanTame(Transform player) =>
-        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Scale, stipule.scaleCost);
-
-    // Returns true if successful.
-    public override bool ExtractTamingCost(Transform player) {
-        return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Scale, stipule.scaleCost);
+        Habitat = Habitat.Feature(this, FeatureLibrary.P.jasmine);
     }
 
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this);
@@ -63,5 +57,12 @@ public class StipuleBrain : Brain {
             return;
         }
         health.Decrease(creature.stats.Str, transform);
+    }
+
+    // TODO move this to Brain
+    override protected void OnHealthReachedZero() {
+        new Senses() {
+            faint = true
+        }.TryUpdateCreature(creature);
     }
 }
