@@ -49,16 +49,20 @@ public class StatusQuantity : MonoBehaviour {
 
     virtual public bool Decrease(int quantity) {
         if (Changing != null && !Changing(-quantity)) return false;
+        if (level <= 0) return false;
         level -= quantity;
         if (level > 0) {
             statBar?.SetPercent((float) level / max);
+        } else {
+            level = 0;
+            if (ReachedZero != null) ReachedZero();
         }
-        else if (ReachedZero != null) ReachedZero();
         return true;
     }
 
     virtual public bool Increase(int quantity) {
         if (Changing != null && !Changing(quantity)) return false;
+        if (level >= max) return false;
         level = Math.Min(max, level + quantity);
         statBar?.SetPercent((float) level / max);
         if (IsFull() && ReachedMax != null) ReachedMax();

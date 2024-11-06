@@ -42,12 +42,27 @@ public class Health : StatusQuantity {
         }
     }
 
+    // This code is getting increasingly spaghettified because it is on its way out with the transition to 3D.
+    public static List<SpriteRenderer> GetColorableSprites(MonoBehaviour mb) {
+        Health health = mb.GetComponent<Health>();
+        if (health != null && health.damageVisualSprites.Count > 0) {
+            return health.damageVisualSprites;
+        }
+        List<SpriteRenderer> colorableSprites = new List<SpriteRenderer>();
+        SpriteRenderer[] allSprites = mb.GetComponentsInChildren<SpriteRenderer>();
+        foreach (SpriteRenderer sprite in allSprites)
+            if (sprite.color == Color.white || sprite.color == Color.grey)
+                colorableSprites.Add(sprite);
+        return colorableSprites;
+    }
+
     public void ResetDamageVisual() {
+        if (level <= 0) {
+            damageVisualSprites.Clear();
+            return;
+        }
         if (damageVisualSprites.Count == 0) {
-            SpriteRenderer[] allSprites = GetComponentsInChildren<SpriteRenderer>();
-            foreach (SpriteRenderer sprite in allSprites) if (sprite.color == Color.white) {
-                damageVisualSprites.Add(sprite);
-            }
+            damageVisualSprites = GetColorableSprites(this);
         }
         foreach (SpriteRenderer sprite in damageVisualSprites) {
             sprite.material = GeneralAssetLibrary.P.spriteSolidColor;

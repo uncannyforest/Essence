@@ -129,9 +129,9 @@ public struct Habit {
         [CreatureStateType.Faint] = new Node(CreatureStateType.Faint) {
             onEnter = (_, brain) => {
                 brain.movement.Idle();
-                brain.movement.SetBool("Fainted", true);
+                brain.movement.SetFainted(true);
             },
-            onExit = (_, brain) => brain.movement.SetBool("Fainted", false)
+            onExit = (_, brain) => brain.movement.SetFainted(false)
         },
 
         [CreatureStateType.Execute] = new Node(CreatureStateType.Execute) {
