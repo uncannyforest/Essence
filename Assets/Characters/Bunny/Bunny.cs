@@ -27,12 +27,13 @@ public class BunnyBrain : Brain {
     }
 
     override public bool IsValidFocus(Transform characterFocus) =>
-        healing.CanHeal(characterFocus, Creature.neighborhood);
+        resource.Has() && healing.CanHeal(characterFocus, Creature.neighborhood);
 
     override public Optional<Transform> FindFocus() {
+        if (!resource.Has()) return Optional.Empty<Transform>();
         Transform player = GameManager.I.AnyPlayer.transform;
         if (healing.CanHeal(player, Creature.neighborhood)) return Optional.Of(player);
-        else return RequestPair(healing.FindOneCreatureToHeal()); 
+        else return RequestPair(healing.FindOneCreatureToHeal());
     }
 
     private bool ShouldHealPlayer() {
@@ -46,6 +47,7 @@ public class BunnyBrain : Brain {
         while (true) {
             yield return pathfinding.Approach(state.characterFocus.Value.position, healing.healDistance).Else(() => {
                 state.characterFocus.Value.GetComponentStrict<Health>().Increase(creature.stats.Str);
+                resource.Use();
                 creature.GenericExeSucceeded();
                 return new WaitForSeconds(creature.stats.ExeTime);
             });

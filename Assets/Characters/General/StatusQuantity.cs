@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class StatusQuantity : MonoBehaviour {
     public int max = 1;
-    public bool startAtMax = true;
+    public float startAtFraction = 1;
     public GameObject statBarPrefab;
     public Color statBarColor = new Color(.8f, 0, .2f);
     
@@ -22,15 +22,14 @@ public class StatusQuantity : MonoBehaviour {
     }
 
     virtual protected void Awake() {
-        if (startAtMax) level = max;
+        level = Mathf.RoundToInt(max * startAtFraction);
         if (statBarPrefab != null) statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
         Stats stats = GetComponent<Stats>();
         if (stats != null) stats.LeveledUp += OnMaxChanged;
     }
 
     virtual public void Reset() {
-        if (startAtMax) ResetTo(max);
-        else ResetTo(0);
+        ResetTo(Mathf.RoundToInt(max * startAtFraction));
     }
 
     virtual public void ResetTo(int level) {

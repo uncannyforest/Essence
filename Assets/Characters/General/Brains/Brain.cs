@@ -58,7 +58,7 @@ public class Brain {
     public Team team { get => GetComponentStrict<Team>(); }
     public CharacterController movement { get => creature.controller; }
     public Pathfinding pathfinding;
-    private GoodTaste taste;
+    public Resource resource;
     public Transform transform { get => species.transform; }
 
     protected T GetComponent<T>() => species.GetComponent<T>();
@@ -86,7 +86,7 @@ public class Brain {
     public Brain InitializeAll() {
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
-        taste = GetComponent<GoodTaste>();
+        resource = GetComponent<Resource>();
         Health health = GetComponent<Health>();
         if (health != null) {
             health.ReachedZero += OnHealthReachedZero;
