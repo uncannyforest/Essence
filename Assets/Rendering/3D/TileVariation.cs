@@ -42,14 +42,7 @@ using System;
         } else if (xAdj != thisLayer && yAdj == thisLayer) { // other SIDE
             exposedSides = 1;
             hashCode = 3;
-            return (transform) => {
-                if (side == null) return;
-                GameObject go = GameObject.Instantiate(side.gameObject, transform);
-                go.transform.localScale = new Vector3(-1, 1, 1);
-                go.transform.localEulerAngles = new Vector3(0, 0, 270);
-                Renderer r = go.GetComponentStrict<Renderer>();
-                r.material = biome.material;
-            };
+            return (transform) => { Instantiate(side, transform, true); };
         } else { // TAPER or CORNER - all three nearby corners are different land
             exposedSides = 2;
             if (xNear == thisLayer && yNear == thisLayer) { // CORNER
@@ -125,7 +118,6 @@ using System;
         } else {
             go.transform.localRotation = Quaternion.identity;
         }
-        go.transform.localRotation = Quaternion.identity;
         Renderer r = go.GetComponentStrict<Renderer>();
         r.material = biome.material;
         if (thisLayer.level == TileMaterial.Level.Land && ((Land)thisLayer).IsPlanty())
