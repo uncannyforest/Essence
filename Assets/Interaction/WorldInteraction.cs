@@ -178,7 +178,7 @@ public class WorldInteraction : MonoBehaviour {
         hoverSquare.SetActive(false);
     }
     public void ClearCharacter() {
-        if (activeCharacterHighlight != null) Destroy(activeCharacterHighlight.gameObject);
+        CharacterHighlight3D.Clear(activeCharacterHighlight);
         activeCharacterHighlight = null;
         activeCharacter = null;
     }

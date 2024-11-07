@@ -6,6 +6,8 @@ public class StatusQuantity : MonoBehaviour {
     public float startAtFraction = 1;
     public GameObject statBarPrefab;
     public Color statBarColor = new Color(.8f, 0, .2f);
+    public float statBarOffset = .125f;
+    public bool showOnHover = true;
     
     public Func<int, bool> Changing;
     public Action ReachedZero;
@@ -23,7 +25,14 @@ public class StatusQuantity : MonoBehaviour {
 
     virtual protected void Awake() {
         level = Mathf.RoundToInt(max * startAtFraction);
-        if (statBarPrefab != null) statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
+        if (statBarPrefab != null) {
+            statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
+            foreach (Transform child in statBar.gameObject.transform) {
+                Vector3 position = child.localPosition;
+                position.y = -statBarOffset;
+                child.localPosition = position;
+            }
+        }
         Stats stats = GetComponent<Stats>();
         if (stats != null) stats.LeveledUp += OnMaxChanged;
     }
@@ -68,9 +77,21 @@ public class StatusQuantity : MonoBehaviour {
         return true;
     }
 
+    public void ShowStatBar() {
+        statBar?.Show();
+    }
+
     public void HideStatBar() {
         statBar?.Hide();
     }
 
-    virtual protected void OnMaxChanged(Stats stats) {}
+    private void OnMaxChanged(Stats stats) {
+        if (GetMaxFromStats(stats) is int newMax) {
+            int diff = newMax - max;
+            level += Mathf.RoundToInt(diff * startAtFraction);
+            max = newMax;
+        }
+    }
+
+    virtual protected int? GetMaxFromStats(Stats stats) => null;
 }

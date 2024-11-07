@@ -39,7 +39,7 @@ public class StatBar {
         level.transform.localScale = new Vector3(percent / 2f, oldScale.y, oldScale.z);
     }
 
-    private void Show() {
+    public void Show() {
         level.enabled = true;
         background.enabled = true;
     }

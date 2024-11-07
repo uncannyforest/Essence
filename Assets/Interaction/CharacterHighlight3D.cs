@@ -11,7 +11,8 @@ public class CharacterHighlight3D {
             character.transform,
             WorldInteraction.I.characterSelectPrefab,
             -GlobalConfig.I.elevation.groundLevelHighlight);
-        if (!hover) result.material.color = WorldInteraction.I.followingCharacterColor;
+        if (hover) AlsoShowStats(character);
+        else result.material.color = WorldInteraction.I.followingCharacterColor;
         return result;
     }
 
@@ -23,5 +24,26 @@ public class CharacterHighlight3D {
 
     public static void SetHighlightHoverToFollowing(MeshRenderer highlight) {
         highlight.material.color = WorldInteraction.I.followingCharacterColor;
+        AlsoHideStats(highlight);
+    }
+
+    public static void Clear(MeshRenderer highlight) {
+        if (highlight != null) {
+            AlsoHideStats(highlight);
+            GameObject.Destroy(highlight.gameObject);
+        }
+    }
+
+    private static void AlsoShowStats(Character character) {
+        foreach (StatusQuantity sq in character.GetComponents<StatusQuantity>()) {
+            if (sq.showOnHover) sq.ShowStatBar();
+            else sq.HideStatBar();
+        }
+    }
+
+    private static void AlsoHideStats(MeshRenderer highlight) {
+        foreach (StatusQuantity sq in highlight.transform.parent.GetComponents<StatusQuantity>())
+            if (sq.showOnHover)
+                sq.HideStatBar();
     }
 }

@@ -89,9 +89,5 @@ public class Health : StatusQuantity {
         }
     }
 
-    override protected void OnMaxChanged(Stats stats) {
-        int diff = stats.Def - max;
-        level += diff;
-        max = stats.Def;
-    }
+    override protected int? GetMaxFromStats(Stats stats) => stats.Def;
 }

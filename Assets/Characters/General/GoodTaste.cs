@@ -72,8 +72,5 @@ public class GoodTaste : StatusQuantity {
         }
     }
 
-    override protected void OnMaxChanged(Stats stats) {
-        max = stats.Def;
-        Reset();
-    }
+    override protected int? GetMaxFromStats(Stats stats) => stats.Def;
 }
