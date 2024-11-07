@@ -38,7 +38,7 @@ public class StipuleBrain : Brain {
         Habitat = Habitat.Feature(this, FeatureLibrary.P.jasmine);
     }
 
-    override public Optional<Transform> FindFocus() => Will.NearestThreat(this);
+    override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
     override public IEnumerator FocusedBehavior() => AttackBehavior.enumeratorWithParam(state.characterFocus.Value);
     
@@ -57,6 +57,7 @@ public class StipuleBrain : Brain {
             return;
         }
         health.Decrease(creature.stats.Str, transform);
+        resource.Use();
     }
 
     // TODO move this to Brain
