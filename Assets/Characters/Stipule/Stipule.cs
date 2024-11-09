@@ -28,8 +28,8 @@ public class StipuleBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithCharacter(stipule.attackAction,
-                AttackBehavior,
-                (c) => Will.IsThreat(teamId, transform.position, c).NegLog(legalName + " cannot select " + c)
+                new CharacterTargetedBehavior(AttackBehavior),
+                (c) => Will.IsThreat(teamId, transform.position, c)     .NegLog(legalName + " cannot select " + c)
             )
         };
 
@@ -38,14 +38,13 @@ public class StipuleBrain : Brain {
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    override public IEnumerator FocusedBehavior() => AttackBehavior.enumeratorWithParam(state.characterFocus.Value);
+    override public IEnumerator FocusedBehavior() => AttackBehavior(state.characterFocus.Value);
     
-    private CharacterTargetedBehavior AttackBehavior {
-        get => new CharacterTargetedBehavior((Transform focus) =>
-            Optional.If(IsValidFocus(focus).NegLog(legalName + " focus " + focus + " no longer valid"),
-                pathfinding.ApproachIfFar(focus.position, stipule.meleeReach).Else(
-                    pathfinding.FaceAnd("Attack", focus.position, () => Attack(focus)))));
-    }
+    private IEnumerator AttackBehavior(Transform f) =>
+        from focus in Provisionally.For(f)
+        where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
+        select pathfinding.Approach(focus, stipule.meleeReach)
+            .Then(pathfinding.FaceAnd("Attack", focus, Attack));
 
     private void Attack(Transform target) {
         Health health = target.GetComponentStrict<Health>();

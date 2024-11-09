@@ -21,7 +21,7 @@ public class BehaviorNode {
         return newNode;
     }
 
-    private IEnumerator FromSingleLine(Func<YieldInstruction> line) {
+    private static IEnumerator FromSingleLine(Func<YieldInstruction> line) {
         while (true) yield return line();
     }
 }
@@ -41,12 +41,10 @@ public class RestrictNearbyBehavior : BehaviorNode {
         this.enumerator = E;
     }
     
-    public IEnumerator E() {
-        IEnumerator task = subBehavior.enumerator(); // saved here, not reset unless RunBehavior() is called again
-        while (Vector3.Distance(ai.position, targetLocation()) < distance && task.MoveNext()) {
-            yield return task.Current;
-        }
-    }
+    public IEnumerator E() => 
+        from _ in Provisionally.Run(subBehavior.enumerator())
+        where Vector3.Distance(ai.position, targetLocation()) < distance
+        select _;
 }
 
 // behavior generator with unspecified target
@@ -63,26 +61,9 @@ public class TargetedBehavior<T> {
     public TargetedBehavior(Func<T, IEnumerator> enumeratorWithParam) {
         this.enumeratorWithParam = enumeratorWithParam;
     }
-    public TargetedBehavior(Func<T, YieldInstruction> singleLine) {
-        this.enumeratorWithParam = (target) => FromSingleLine(singleLine, target);
-    }
-    public TargetedBehavior(Func<T, Optional<YieldInstruction>> singleLine) {
-        this.enumeratorWithParam = (target) => FromSingleLine(singleLine, target);
-    }
 
     virtual public BehaviorNode WithTarget(T target) {
         return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
-    }
-
-    private IEnumerator FromSingleLine(Func<T, YieldInstruction> line, T target) {
-        while (true) yield return line(target);
-    }
-    private IEnumerator FromSingleLine(Func<T, Optional<YieldInstruction>> line, T target) {
-        while (true) {
-            Optional<YieldInstruction> next = line(target);
-            if (next.HasValue) yield return next.Value;
-            else yield break;
-        }
     }
 
     private IEnumerator CheckNonNullTargetEnumerator(T target) {
@@ -104,8 +85,6 @@ public class TargetedBehavior<T> {
 // common TargetedBehavior use case, implementation simply specifies <Transform>
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
     public CharacterTargetedBehavior(Func<Transform, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
-    public CharacterTargetedBehavior(Func<Transform, YieldInstruction> singleLine) : base(singleLine) {}
-    public CharacterTargetedBehavior(Func<Transform, Optional<YieldInstruction>> singleLine) : base(singleLine) {}
 
     // not currently used. See CreatureAction.WithCharacter()
     public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((Character)t).transform);

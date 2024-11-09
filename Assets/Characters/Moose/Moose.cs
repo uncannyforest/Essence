@@ -26,7 +26,7 @@ public class MooseBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithObject(moose.attackAction,
-                new PathTracingBehavior.Targeted(transform, IsDestroyable, ApproachAndAttack),
+                new PathTracingBehavior.Targeted(transform, IsDestroyable, (pos) => ApproachAndAttack(pos).NextOrDefault()),
                 new TeleFilter(TeleFilter.Terrain.TILES, null)
                     .WithLine(GetDestinationsForDisplay))
         };
@@ -45,17 +45,13 @@ public class MooseBrain : Brain {
     private bool IsDestroyable(Terrain.Position location) =>
         Will.CanClearObstacleAt(general, location);
 
-    override public IEnumerator FocusedBehavior() {
-        while (true) {
-            yield return ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
-        }
-    }
+    override public IEnumerator FocusedBehavior() => ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
 
-    override public YieldInstruction UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
+    override public IEnumerator UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
 
-    private YieldInstruction ApproachAndAttack(Terrain.Position location)
-        => pathfinding.ApproachIfFar(terrain.CellCenter(location), moose.destroyDistance)
-            .Else(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));
+    private IEnumerator ApproachAndAttack(Terrain.Position location)
+        => pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
+            .Then(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));
     
     private YieldInstruction Attack(Terrain.Position location) {
         if (location.grid != Terrain.Grid.Roof) {

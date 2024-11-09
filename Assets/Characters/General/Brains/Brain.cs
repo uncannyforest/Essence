@@ -111,7 +111,7 @@ public class Brain {
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
         true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
-    virtual public YieldInstruction UnblockSelf(Terrain.Position location) =>
+    virtual public IEnumerator UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
     public Habitat Habitat { get; protected set; } = null;
 
