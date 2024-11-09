@@ -19,6 +19,7 @@ public class Damage : MonoBehaviour {
         if (other.isTrigger) return;
         if (other.gameObject.layer == LayerMask.NameToLayer("Terrain")) {
             Destroy(gameObject);
+            return;
         }
         Health target = other.GetComponent<Health>();
         if (target == null) return;
