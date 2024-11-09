@@ -29,10 +29,8 @@ public class StipuleBrain : Brain {
         Actions = new List<CreatureAction>() {
             CreatureAction.WithCharacter(stipule.attackAction,
                 AttackBehavior,
-                (c) => 
-                    c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != teamId
-                )
+                (c) => Will.IsThreat(teamId, transform.position, c).NegLog(legalName + " cannot select " + c)
+            )
         };
 
         Habitat = Habitat.Feature(this, FeatureLibrary.P.jasmine);
@@ -44,10 +42,9 @@ public class StipuleBrain : Brain {
     
     private CharacterTargetedBehavior AttackBehavior {
         get => new CharacterTargetedBehavior((Transform focus) =>
-            pathfinding.Approach(focus.position, stipule.meleeReach).Else(
-                pathfinding.FaceAnd("Attack", focus.position, () => Attack(focus))
-            )
-        );
+            Optional.If(IsValidFocus(focus).NegLog(legalName + " focus " + focus + " no longer valid"),
+                pathfinding.ApproachIfFar(focus.position, stipule.meleeReach).Else(
+                    pathfinding.FaceAnd("Attack", focus.position, () => Attack(focus)))));
     }
 
     private void Attack(Transform target) {

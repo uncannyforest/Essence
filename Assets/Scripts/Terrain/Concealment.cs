@@ -23,7 +23,7 @@ public class Concealment {
     }
 
     // usage of currentCenter assumes seen is player. TODO: fix
-    public bool CanSee(Vector3 seerPosition, Character seen) {
+    public WhyNot CanSee(Vector3 seerPosition, Character seen) {
         Construction? expectedConstruction = terrain.Roof.Get(terrain.CellAt(seen.transform.position));
         if (expectedConstruction != null && expectedConstruction != Construction.None) {
             // expectedConstruction is the roof above seen
@@ -45,16 +45,16 @@ public class Concealment {
                 int distanceToSeer = cellDistance.CardinalMagnitude();
                 for (int j = 0; j < distanceToSeer; j++) {
                     Terrain.Position wall = Terrain.Position.Edge(currentCenter + j * Vct.Cardinals[i], i);
-                    if (terrain.GetConstruction(wall) == expectedConstruction) return false;
+                    if (terrain.GetConstruction(wall) == expectedConstruction) return "view_blocked_by_building_wall";
                     if (j < 2) continue; // per reasoning above
                     Vector2Int roof = currentCenter + j * Vct.Cardinals[i];
-                    if (terrain.Roof.Get(roof) != expectedConstruction) return false;
+                    if (terrain.Roof.Get(roof) != expectedConstruction) return "view_blocked_by_building_distant";
                 }
                 // There is an unbroken hallway containing the seen object and which the seer
                 // is either inside or just outside of.
                 return true;
             }
-            return false;
+            return "view_blocked_by_building_noncardinal";
         }
         Land? land = terrain.GetLand(terrain.CellAt(seen.transform.position));
         if (land?.PlantLevel() >= seen.height) {
@@ -63,7 +63,7 @@ public class Concealment {
             foreach (Land? adjLand in terrain.GetFourLandTilesAround(seen.transform.position))
                 if (adjLand == null || adjLand?.PlantLevel() < seen.height)
                     return true;
-            return false;
+            return "view_blocked_by_foliage(" + seen.height + ")";
         }
         return true;
     }

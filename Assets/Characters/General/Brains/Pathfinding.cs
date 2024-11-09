@@ -80,10 +80,10 @@ public class Pathfinding {
     public YieldInstruction TypicalWait { get => new WaitForSeconds(brain.creature.stats.ExeTime); }
 
     public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
-        return Approach(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
+        return ApproachIfFar(target, proximityToStop).Else(() => { movement.Idle(); return TypicalWait; });
     }
 
-    public Optional<YieldInstruction> Approach(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
+    public Optional<YieldInstruction> ApproachIfFar(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         if (CheckTargetForObstacles(target, proximityToStop).IsValue(out YieldInstruction unblockSelf))
             return Optional.Of(unblockSelf);
         float distance = Vector2.Distance(target, transform.position);
@@ -188,7 +188,7 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
                 yield return unblockSelf;
                 continue;
             }
-            Optional<YieldInstruction> approaching = brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance);
+            Optional<YieldInstruction> approaching = brain.pathfinding.ApproachIfFar(Terrain.I.CellCenter(location), interactDistance);
             Debug.Log(approaching);
             if (approaching.HasValue) yield return approaching.Value;
             else {

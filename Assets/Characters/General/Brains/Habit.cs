@@ -88,7 +88,11 @@ public struct Habit {
         private IEnumerator RunBehaviorEnumerator(CreatureState state, Brain brain, Action doneRunning) {
             yield return null;
             IEnumerator subBehavior = onRun(state, brain).enumerator(); // saved here, not reset unless RunBehavior() is called again
-            while (onRunCheck(state, brain) && subBehavior.MoveNext()) {
+            while (onRunCheck(state, brain)) {
+                if (!subBehavior.MoveNext()) {
+                    Debug.Log(brain.creature.gameObject.name + " stopping Behavior because enumerator ended");
+                    break;
+                }
                 yield return subBehavior.Current;
             }
             doneRunning();
@@ -145,11 +149,14 @@ public struct Habit {
                     state.focusIsPair.Value?.EndPairCommand(brain.transform);
                 }
             },
+            // TODO: once Focus & Execute have been standardized to use the same BehaviorNodes, simplify by removing this:
+            // all BehaviorNodes in an executeDirective will already run this step in onRun.
             onRunCheck = (state, brain) => {
                 if (state.characterFocus.HasValue)
                     return !state.characterFocus.IsDestroyed &&
-                        brain.IsValidFocus(state.characterFocus.Value);
-                else if (state.terrainFocus.HasValue)
+                        brain.IsValidFocus(state.characterFocus.Value)
+                            .NegLog(brain.legalName + " onRunCheck: focus " + state.characterFocus.Value + " no longer valid");
+                if (state.terrainFocus.HasValue)
                     return state.terrainFocus.Value.IsStillPresent;
                 else {
                     Debug.LogError("Neither characterFocus nor terrainFocus: " + state);

@@ -22,7 +22,6 @@ public class MooseMath {
         if (direction.x == 0) xt = 1; // skip
         if (direction.y == 0) yt = 1; // skip
         while (xt < 1 || yt < 1) { // queue up smallest of xt and yt
-            Debug.Log("xt: " + xt + " yt: " + yt);
             if (xt < yt) {
                 yield return new Terrain.Position(Terrain.Grid.YWalls, currentCell + xTransition);
                 currentCell += Vct.I(xDirection, 0);

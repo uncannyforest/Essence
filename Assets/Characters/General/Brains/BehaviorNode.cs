@@ -66,6 +66,9 @@ public class TargetedBehavior<T> {
     public TargetedBehavior(Func<T, YieldInstruction> singleLine) {
         this.enumeratorWithParam = (target) => FromSingleLine(singleLine, target);
     }
+    public TargetedBehavior(Func<T, Optional<YieldInstruction>> singleLine) {
+        this.enumeratorWithParam = (target) => FromSingleLine(singleLine, target);
+    }
 
     virtual public BehaviorNode WithTarget(T target) {
         return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
@@ -73,6 +76,13 @@ public class TargetedBehavior<T> {
 
     private IEnumerator FromSingleLine(Func<T, YieldInstruction> line, T target) {
         while (true) yield return line(target);
+    }
+    private IEnumerator FromSingleLine(Func<T, Optional<YieldInstruction>> line, T target) {
+        while (true) {
+            Optional<YieldInstruction> next = line(target);
+            if (next.HasValue) yield return next.Value;
+            else yield break;
+        }
     }
 
     private IEnumerator CheckNonNullTargetEnumerator(T target) {
@@ -95,6 +105,7 @@ public class TargetedBehavior<T> {
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
     public CharacterTargetedBehavior(Func<Transform, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
     public CharacterTargetedBehavior(Func<Transform, YieldInstruction> singleLine) : base(singleLine) {}
+    public CharacterTargetedBehavior(Func<Transform, Optional<YieldInstruction>> singleLine) : base(singleLine) {}
 
     // not currently used. See CreatureAction.WithCharacter()
     public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((Character)t).transform);

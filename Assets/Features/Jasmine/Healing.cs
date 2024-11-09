@@ -20,11 +20,11 @@ public class Healing : MonoBehaviour {
 
     private bool SameTeam(Transform character) => team?.SameTeam(character) != false;
 
-    public bool CanHeal(Transform character, float radius) {
-        return SameTeam(character) &&
-            !character.GetComponentStrict<Health>().IsFull() &&
-            Vector2.Distance(transform.position, character.position) <= radius;
-    }
+    public WhyNot CanHeal(Transform character, float radius) =>
+        !SameTeam(character) ? "different_team" :
+        character.GetComponentStrict<Health>().IsFull() ? "health_full" :
+        Vector2.Distance(transform.position, character.position) > radius ? "too_far" :
+        (WhyNot)true;
 
     // lower is higher priority
     public float HealPriority(Collider2D character) {
@@ -67,7 +67,7 @@ public class Healing : MonoBehaviour {
                 }
             }
             foreach (Collider2D character in charactersNearby) if (SameTeam(character.transform)) {
-                if (CanHeal(character.transform, healDistance)) ForceHeal(character.transform, healQuantity);
+                if ((bool)CanHeal(character.transform, healDistance)) ForceHeal(character.transform, healQuantity);
                 Creature creature = character.GetComponent<Creature>();
                 if (creature != null && !healAutoCreatures.Contains(creature) &&
                         HealPriority(character) < 1 && creature.CanPair()) {

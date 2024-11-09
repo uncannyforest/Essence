@@ -7,6 +7,9 @@ public class Optional {
     public static Optional<T> Empty<T>() {
         return Optional<T>.Empty();
     }
+    public static Optional<T> If<T>(bool condition, T value) {
+        return Optional<T>.If(condition, value);
+    }
 }
 
 // derived from https://stackoverflow.com/a/16199308 with modifications
@@ -37,6 +40,9 @@ public struct Optional<T> {
     }
     public static Optional<T> Empty() {
         return new Optional<T>();
+    }
+    public static Optional<T> If(bool condition, T value) {
+        return condition ? Of(value) : Empty();
     }
 
     public T Or(T defaultValue) {

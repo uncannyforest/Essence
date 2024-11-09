@@ -179,7 +179,7 @@ public class Will {
 
     public static OneOf<CreatureState, string> DesireAttack(BrainConfig config, Vector3 creaturePosition, CreatureState state, Transform target) {
         if (!config.hasAttack) return "No attack for desire";
-        bool canSee = CanSee(creaturePosition, target);
+        bool canSee = CanSee(creaturePosition, target).NegLog("Desire: investigating attack");
         if (canSee) return state.ClearFocus().WithCharacterFocus(target);
         else if (state.type != CreatureStateType.Investigate ||
                 Disp.FT(creaturePosition, target.position).sqrMagnitude <
@@ -188,24 +188,29 @@ public class Will {
         else return "Investigating something more important";
     }
 
-    public static bool CanSee(Vector3 seerPosition, Transform seen) {
+    public static WhyNot CanSee(Vector3 seerPosition, Transform seen) {
         if (Vector2.Distance(seerPosition, seen.position) > Creature.neighborhood)
-            return false;
+            return "view_too_far";
         Character seenSprite = seen.GetComponent<Character>();
         if (seenSprite == null)
             return true;
         else {
-            bool result = Terrain.I.concealment.CanSee(seerPosition, seenSprite);
-            if (!result && !TextDisplay.I.DisplayedYet("hiding")) TextDisplay.I.CheckpointInfo("hiding",
+            WhyNot result = Terrain.I.concealment.CanSee(seerPosition, seenSprite);
+            if (!(bool)result && !TextDisplay.I.DisplayedYet("hiding")) TextDisplay.I.CheckpointInfo("hiding",
                 "Nearby enemies cannot see you.  You are hidden from enemies when deep in trees and buildings, unless they get close.");
             return result;
         }
     }
 
+    public static bool Attackable(Transform possibleThreat)
+        => (possibleThreat.GetComponent<Health>()?.Level ?? 0) > 0;
+
     // Sanity check for NearestThreat to avoid contradiction
     // OverlapCircleAll may produce colliders with center slightly outside Creature.neighborhood
-    public static bool IsThreat(int team, Vector3 creaturePosition, Transform threat) =>
-        !Team.SameTeam(team, threat) && CanSee(creaturePosition, threat);
+    public static WhyNot IsThreat(int team, Vector3 creaturePosition, Transform threat) =>
+        Team.SameTeam(team, threat) ? "same_team" :
+        !Attackable(threat) ? "not_attackable" :
+        CanSee(creaturePosition, threat);
 
     public static Optional<Transform> NearestThreat(Brain brain) => NearestThreat(brain, null);
     public static Optional<Transform> NearestThreat(Brain brain, Func<Collider2D, bool> filter) {
@@ -215,7 +220,7 @@ public class Will {
             Physics2D.OverlapCircleAll(creaturePosition, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
         List<Transform> threats = new List<Transform>();
         foreach (Collider2D character in charactersNearby) {
-            if (IsThreat(team, creaturePosition, character.transform) && (filter?.Invoke(character) != false))
+            if ((bool)IsThreat(team, creaturePosition, character.transform) && (filter?.Invoke(character) != false))
                 if (character.GetComponent<Creature>()?.brainConfig?.hasAttack == true ||
                         character.GetComponent<PlayerCharacter>() != null)
                     threats.Add(character.transform);

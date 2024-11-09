@@ -52,6 +52,7 @@ public class Brain {
     public BrainConfig general;
     public Species species;
     public Creature creature;
+    public string legalName { get => creature.gameObject.name; }
     public Terrain terrain;
     protected Transform grid { get => terrain.transform; }
     public int teamId { get => GetComponentStrict<Team>().TeamId; }
@@ -104,9 +105,11 @@ public class Brain {
     private Func<bool> faintCondition = () => true;
 
     virtual public IEnumerator FocusedBehavior() { yield break; }
-    virtual public bool IsValidFocus(Transform characterFocus) =>
-        resource?.Has() != false &&
-        (general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) : true);
+    virtual public WhyNot IsValidFocus(Transform characterFocus) => 
+        characterFocus == null ? "null_focus" :
+        resource?.IsOut == true ? "insufficient_resource" :
+        general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
+        true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
     virtual public YieldInstruction UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
@@ -116,7 +119,7 @@ public class Brain {
     // STATE UPDATE FUNCTIONS
 
     public bool TryUpdateState(Senses input, int logLevel = 0) {
-        Debug.Log(creature.gameObject.name + " (team " + GetComponentStrict<Team>().TeamId + ") state change input: " + input);
+        Debug.Log(legalName + " (team " + GetComponentStrict<Team>().TeamId + ") state change input: " + input);
         OneOf<CreatureState, string> result = Will.Decide(state, input);
         if (result.Is(out CreatureState newState)) {
             CreatureState oldState = state;
@@ -124,9 +127,9 @@ public class Brain {
             TriggerStateChange(oldState);
             return true;
         } else if (result.Is(out string error)) {
-            if (logLevel == 0) Debug.Log(species.name + ": " + error);
-            else if (logLevel == 1) Debug.LogWarning(species.name + ": " + error);
-            else if (logLevel == 2) Debug.LogError(species.name + ": " + error);
+            if (logLevel == 0) Debug.Log(legalName + ": " + error);
+            else if (logLevel == 1) Debug.LogWarning(legalName + ": " + error);
+            else if (logLevel == 2) Debug.LogError(legalName + ": " + error);
             return false;
         }
         return false;
@@ -134,7 +137,7 @@ public class Brain {
 
     public void DebugLogStateChange(bool triggerOnly) {
         string stateChangeText = triggerOnly ? ") changed state to " : ") processed state change to ";
-        string result = creature.gameObject.name + " (team " + GetComponentStrict<Team>().TeamId + stateChangeText + state;
+        string result = legalName + " (team " + GetComponentStrict<Team>().TeamId + stateChangeText + state;
         Debug.Log(result);
     }
 
