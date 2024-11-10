@@ -115,6 +115,7 @@ MonoBehaviour:
   itemDropSize: 0
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+  ColorableSprites: []
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -393,7 +394,7 @@ PrefabInstance:
     - target: {fileID: 3573919262054155508, guid: 982ff8cb6c64846a98e163091c9ffa28, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 1365456587537952046, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
+      objectReference: {fileID: -7264097725937428021, guid: 8bb00e1d3c83141a8aa7a793af5a0dc9, type: 3}
     - target: {fileID: 3573919262054155508, guid: 982ff8cb6c64846a98e163091c9ffa28, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1

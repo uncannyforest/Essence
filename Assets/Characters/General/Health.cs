@@ -10,13 +10,15 @@ public class Health : StatusQuantity {
 
     private Transform grid;
 
+    private bool damageVisual = false;
     private float damageVisualStartTime;
-    private List<SpriteRenderer> damageVisualSprites = new List<SpriteRenderer>();
+    public List<SpriteRenderer> ColorableSprites = new List<SpriteRenderer>();
     
     override protected void Awake() {
         base.Awake();
         ReachedZero += HandleDeath;
         grid = Terrain.I.transform;
+        ColorableSprites = GetColorableSprites(this);
     }
 
     public void Decrease(int quantity, Transform blame) {
@@ -43,28 +45,22 @@ public class Health : StatusQuantity {
     }
 
     // This code is getting increasingly spaghettified because it is on its way out with the transition to 3D.
-    public static List<SpriteRenderer> GetColorableSprites(MonoBehaviour mb) {
-        Health health = mb.GetComponent<Health>();
-        if (health != null && health.damageVisualSprites.Count > 0) {
-            return health.damageVisualSprites;
-        }
+    private static List<SpriteRenderer> GetColorableSprites(MonoBehaviour mb) {
         List<SpriteRenderer> colorableSprites = new List<SpriteRenderer>();
         SpriteRenderer[] allSprites = mb.GetComponentsInChildren<SpriteRenderer>();
         foreach (SpriteRenderer sprite in allSprites)
-            if (sprite.color == Color.white || sprite.color == Color.grey)
+            if (sprite.color == Color.white)
                 colorableSprites.Add(sprite);
         return colorableSprites;
     }
 
     public void ResetDamageVisual() {
         if (level <= 0) {
-            damageVisualSprites.Clear();
+            damageVisual = false;
             return;
         }
-        if (damageVisualSprites.Count == 0) {
-            damageVisualSprites = GetColorableSprites(this);
-        }
-        foreach (SpriteRenderer sprite in damageVisualSprites) {
+        damageVisual = true;
+        foreach (SpriteRenderer sprite in ColorableSprites) {
             sprite.material = GeneralAssetLibrary.P.spriteSolidColor;
             sprite.color = Color.red;
         }
@@ -72,19 +68,19 @@ public class Health : StatusQuantity {
     }
 
     void Update() {
-        if (damageVisualSprites.Count > 0) {
+        if (damageVisual) {
             float timeSinceDamage = Time.time - damageVisualStartTime;
             if (timeSinceDamage >= damageVisual1Time) {
                 timeSinceDamage -= damageVisual1Time;
                 float fractionElapsed = Mathf.Clamp01(timeSinceDamage / damageVisual2Time);
-                foreach (SpriteRenderer sprite in damageVisualSprites) {
+                foreach (SpriteRenderer sprite in ColorableSprites) {
                     if (sprite != null) {
                         sprite.material = GeneralAssetLibrary.P.spriteDefault;
                         sprite.color = new Color(1, fractionElapsed, fractionElapsed);
                     }
                 }
                 if (fractionElapsed >= 1f)
-                    damageVisualSprites.Clear();
+                    damageVisual = false;
             }
         }
     }

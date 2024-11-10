@@ -107,7 +107,7 @@ public class CharacterController : MonoBehaviour {
 
     public CharacterController SetFainted(bool value) {
         // This code is getting increasingly spaghettified because it is on its way out with the transition to 3D.
-        foreach (SpriteRenderer sprite in Health.GetColorableSprites(this))
+        foreach (SpriteRenderer sprite in GetComponent<Health>().ColorableSprites)
             sprite.color = value ? Color.grey : Color.white;
         return SetBool("Fainted", value);
     }
