@@ -8,8 +8,8 @@ public enum CreatureStateType {
     Faint = 800,
     Execute = 600,
     Focus = 410,
-    Rest = 370,
-    Pair = 330,
+    Pair = 370,
+    Rest = 330,
     Investigate = 290,
     PassiveCommand = 100,
 }

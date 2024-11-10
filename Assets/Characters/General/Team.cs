@@ -35,9 +35,9 @@ public class Team : MonoBehaviour {
 
     private IEnumerable<Creature> BroadcastAudience() {
         Collider2D[] nearbyCreatures = Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Creature", "HealthCreature"));
-        return (from creature in nearbyCreatures
+        return from creature in nearbyCreatures
             where SameTeam(creature)
-            select creature.GetComponentStrict<Creature>()).AsEnumerable();
+            select creature.GetComponentStrict<Creature>();
     }
 
     public bool SameTeam(GameObject other) => teamId == other.GetComponentStrict<Team>().teamId;

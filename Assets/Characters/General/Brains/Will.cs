@@ -119,7 +119,7 @@ public class Will {
             }
 
         } else if (input.desireMessage is DesireMessage desireMessage) {
-            relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
+            relinquishedPriority = (int)CreatureStateType.Rest; // to another investigation, or stop resting
             if (desireMessage.assailant.HasValue)
                 return DesireAttack(input.knowledge.config, input.knowledge.position, state, desireMessage.assailant.Value);
             else if (desireMessage.obstacle is DesireMessage.Obstacle obstacle) {
@@ -129,7 +129,8 @@ public class Will {
         } else if (input.environment is Senses.Environment environment) {
             if (environment.characterFocus.IsAdd) {
                 CreatureState result = state.ClearFocus().WithCharacterFocus(environment.characterFocus.Value);
-                if (environment.focusIsPair.HasValue) result = result.WhereFocusIsPair(environment.focusIsPair.Value);
+                if (environment.focusIsPair.HasValue) result = result.WhereFocusIsPair(environment.focusIsPair.Value); // friend
+                else relinquishedPriority = (int)CreatureStateType.Rest; // stop resting to attack enemy
                 return result;
             } else if (environment.characterFocus.IsRemove) {
                 if (!state.characterFocus.HasValue)
