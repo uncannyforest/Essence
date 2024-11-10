@@ -139,7 +139,7 @@ public class Creature : MonoBehaviour {
 
     public bool ReceiveDesireMessage(DesireMessage desireMessage) => new Senses() {
         desireMessage = desireMessage
-    }.TryUpdateCreature(this);
+    }.TryUpdateCreature(this, -1);
 
     public void CommandRoam() => new Senses() {
         command = Command.Roam()

@@ -119,7 +119,7 @@ public class Brain {
     // STATE UPDATE FUNCTIONS
 
     public bool TryUpdateState(Senses input, int logLevel = 0) {
-        Debug.Log(legalName + " (team " + GetComponentStrict<Team>().TeamId + ") state change input: " + input);
+        if (logLevel >= 0) Debug.Log(legalName + " (team " + GetComponentStrict<Team>().TeamId + ") state change input: " + input);
         OneOf<CreatureState, string> result = Will.Decide(state, input);
         if (result.Is(out CreatureState newState)) {
             CreatureState oldState = state;

@@ -115,10 +115,10 @@ public struct Habit {
 
         public PassiveCommandNode(CommandType type) => this.type = type;
 
-        public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, BehaviorNode subBehavior) {
+        public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, Func<IEnumerator> behavior) {
             if (nearbyTracking.HasValue)
-                return new RestrictNearbyBehavior(subBehavior, brain.transform, () => nearbyTracking.Value(state), Creature.neighborhood);
-            else return subBehavior;
+                return new RestrictNearbyBehavior(behavior, brain.transform, () => nearbyTracking.Value(state), Creature.neighborhood);
+            else return new BehaviorNode(behavior);
         }
 
     }
@@ -163,8 +163,7 @@ public struct Habit {
                     return false;
                 }
             },
-            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                    new BehaviorNode(brain.FocusedBehavior)),
+            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain, brain.FocusedBehavior),
         },
 
         [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {
@@ -179,7 +178,7 @@ public struct Habit {
         [CreatureStateType.Rest] = new Node(CreatureStateType.Rest) {
             onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.shelter),
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                brain.Habitat.RestBehavior((Vector2Int)state.shelter)),
+                () => brain.Habitat.RestBehavior((Vector2Int)state.shelter)),
         },
 
         [CreatureStateType.Investigate] = new Node(CreatureStateType.Investigate) {
@@ -189,9 +188,9 @@ public struct Habit {
             onRunCheck = (state, brain) => ((Vector3)state.investigation - brain.transform.position).magnitude >
                                             brain.creature.stats.ExeTime * brain.movement.Speed,
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                new BehaviorNode(() => {
+                BehaviorNode.SingleLine(() => {
                     brain.pathfinding.MoveTowardWithoutClearingObstacles((Vector3)state.investigation);
-                    return new WaitForSeconds(brain.creature.stats.ExeTime);  
+                    return new WaitForSeconds(brain.creature.stats.ExeTime);
                 })),
         }.ExitAndEnterOnUpdate(),
 

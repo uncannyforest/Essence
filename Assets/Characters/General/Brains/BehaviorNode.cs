@@ -12,7 +12,7 @@ public class BehaviorNode {
         this.enumerator = enumerator;
     }
     public BehaviorNode(Func<YieldInstruction> singleLine) {
-        this.enumerator = () => FromSingleLine(singleLine);
+        this.enumerator = SingleLine(singleLine);
     }
     
     // By default, replace old behavior with new one.
@@ -21,19 +21,20 @@ public class BehaviorNode {
         return newNode;
     }
 
-    private static IEnumerator FromSingleLine(Func<YieldInstruction> line) {
+    public static Func<IEnumerator> SingleLine(Func<YieldInstruction> line) => () => SingleLineEnumerator(line);
+    public static IEnumerator SingleLineEnumerator(Func<YieldInstruction> line) {
         while (true) yield return line();
     }
 }
 
 // places condition on subBehavior to give up when target exceeds distance
 public class RestrictNearbyBehavior : BehaviorNode {
-    private BehaviorNode subBehavior;
+    private Func<IEnumerator> subBehavior;
     private Transform ai;
     private Func<Vector2> targetLocation;
     private float distance;
 
-    public RestrictNearbyBehavior(BehaviorNode subBehavior, Transform ai, Func<Vector2> targetLocation, float distance) {
+    public RestrictNearbyBehavior(Func<IEnumerator> subBehavior, Transform ai, Func<Vector2> targetLocation, float distance) {
         this.subBehavior = subBehavior;
         this.ai = ai;
         this.targetLocation = targetLocation;
@@ -42,7 +43,7 @@ public class RestrictNearbyBehavior : BehaviorNode {
     }
     
     public IEnumerator E() => 
-        from _ in Provisionally.Run(subBehavior.enumerator())
+        from _ in Provisionally.Run(subBehavior())
         where Vector3.Distance(ai.position, targetLocation()) < distance
         select _;
 }

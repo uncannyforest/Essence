@@ -111,8 +111,8 @@ MonoBehaviour:
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   statBarOffset: 0.125
   showOnHover: 1
-  itemDrop: {fileID: 8440607546541997000, guid: 9bf2d43b141734d31bee02099f0aa89e, type: 3}
-  itemDropSize: 1
+  itemDrop: {fileID: 0}
+  itemDropSize: 0
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
 --- !u!50 &4481103850635713295
