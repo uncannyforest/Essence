@@ -125,13 +125,13 @@ public class Pathfinding {
         return finalAction();
     };
 
-    public IEnumerator FaceAnd(string animationTrigger,
+    public YieldInstruction FaceAnd(string animationTrigger,
             Transform focus,
             Action<Transform> finalAction) {
         movement.IdleFacing(focus.position);
         if (animationTrigger != null) movement.Trigger(animationTrigger);
         finalAction(focus);
-        yield return TypicalWait;
+        return TypicalWait;
     }
 
     public IEnumerator CheckTargetForObstacles(Vector2 target, float exceptWithinRadius) {

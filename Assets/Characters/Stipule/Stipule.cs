@@ -44,7 +44,7 @@ public class StipuleBrain : Brain {
         from focus in Provisionally.For(f)
         where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
         select pathfinding.Approach(focus, stipule.meleeReach)
-            .Then(pathfinding.FaceAnd("Attack", focus, Attack));
+            .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));
 
     private void Attack(Transform target) {
         Health health = target.GetComponentStrict<Health>();

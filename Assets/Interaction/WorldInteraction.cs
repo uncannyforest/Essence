@@ -446,7 +446,7 @@ public class WorldInteraction : MonoBehaviour {
                     SignalOffensiveTarget(meleeSelect.InputVelocity,
                         signalMeleeRadius, signalFrontOfPlayer, 0);
                     Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, bag).transform;
-                    swordSwipe.position = meleeSelect.DamageCenter.WithZ(GlobalConfig.I.elevation.groundLevelHighlight);
+                    swordSwipe.position = meleeSelect.DamageCenter.WithZ(-GlobalConfig.I.elevation.groundLevelHighlight);
                     swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
                     yield return new WaitForSeconds(swordRate);
                 break;
