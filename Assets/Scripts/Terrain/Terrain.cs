@@ -61,7 +61,6 @@ public class Terrain : MonoBehaviour {
 
     public float validationUpdateTime = 0.5f;
     public GameObject collapsePrefab;
-    public Fountain spawnPrefab;
 
     public readonly TerrainValidator validator;
     public readonly Concealment concealment;
@@ -79,7 +78,7 @@ public class Terrain : MonoBehaviour {
     public ConstructionIndex Roof;
     public FeatureIndex Feature;
 
-    public MapRenderer3D mapRenderer;
+    [NonSerialized] public MapRenderer3D mapRenderer;
 
     private static Terrain instance;
     public static Terrain I { get => instance; }

@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  max: 100
+  max: 1
   startAtFraction: 1
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
@@ -257,6 +257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentExp: 0
   minDistanceFromOrigin: 0
+  resourceName: Poison
   minStr: 3
   minDef: 25
   minExe: 2

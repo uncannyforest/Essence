@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 public class StatusQuantity : MonoBehaviour {
-    public int max = 1;
+    protected int max = 1;
     public float startAtFraction = 1;
     public GameObject statBarPrefab;
     public Color statBarColor = new Color(.8f, 0, .2f);
@@ -24,7 +24,7 @@ public class StatusQuantity : MonoBehaviour {
     }
 
     virtual protected void Awake() {
-        level = Mathf.RoundToInt(max * startAtFraction);
+        level = 1; // since max == 1, start full before resetting inside stats.LeveledUp
         if (statBarPrefab != null) {
             statBar = StatBar.Instantiate(statBarPrefab, this, statBarColor);
             foreach (Transform child in statBar.gameObject.transform) {
@@ -87,9 +87,10 @@ public class StatusQuantity : MonoBehaviour {
 
     private void OnMaxChanged(Stats stats) {
         if (GetMaxFromStats(stats) is int newMax) {
+            Debug.Log(this + " changing max from " + max + " to " + newMax + " with prev level " + level + " increasing at " + startAtFraction);
             int diff = newMax - max;
-            level += Mathf.RoundToInt(diff * startAtFraction);
             max = newMax;
+            ResetTo(level + Mathf.RoundToInt(diff * startAtFraction));
         }
     }
 

@@ -274,6 +274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentExp: 0
   minDistanceFromOrigin: 0
+  resourceName: Potion
   minStr: 3
   minDef: 25
   minExe: 2

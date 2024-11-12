@@ -14,6 +14,9 @@ public class GlobalConfig : MonoBehaviour {
         get => instance;
     }
     
+    public int expToLevelUp = 10;
+    public int creatureStartLevelDistance = 24;
+
     private MapRenderer3D mapRenderer;
     public Elevation elevation { get => mapRenderer.elevation; }
     [Serializable] public class Elevation {

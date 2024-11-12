@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
+    public string resourceName = "Resource";
     public float minStr = 3;
     public float minDef = 25;
     public float minExe = 2;
@@ -27,7 +28,7 @@ public class Stats : MonoBehaviour {
             if (justLeveledUp) OnLevelUp(true);
         }
     }
-    public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / 10)); }
+    public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / GlobalConfig.I.expToLevelUp)); }
     public int Str { get => Mathf.FloorToInt(minStr * Level); }
     public int Def { get => Mathf.FloorToInt(minDef * Level); }
     public float Exe { get => (minExe + Mathf.Log(Level, exeIncrEvery)); }
@@ -53,8 +54,8 @@ public class Stats : MonoBehaviour {
     }
 
     public int GetInitLevel(Vector2Int position) =>
-        Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / 2304) + 1;
-    public int LevelToExp(int level) => level * level * 10;
+        Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / (GlobalConfig.I.creatureStartLevelDistance * GlobalConfig.I.creatureStartLevelDistance)) + 1;
+    public int LevelToExp(int level) => level * level * GlobalConfig.I.expToLevelUp;
 
     // for initialization situations where you're not just incrementing
     public void SetExp(int exp) {
