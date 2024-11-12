@@ -101,7 +101,7 @@ public class Brain {
     virtual protected void Initialize() {}
     public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
     virtual public bool CanTame(Transform player) => faintCondition() && (Habitat?.CanTame() ?? false);
-    virtual public bool ExtractTamingCost(Transform player) => faintCondition() && (Habitat?.CanTame() ?? false);
+    virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
     private Func<bool> faintCondition = () => true;
 
     virtual public IEnumerator FocusedBehavior() { yield break; }

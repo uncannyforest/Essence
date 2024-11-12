@@ -28,14 +28,16 @@ public class Creature : MonoBehaviour {
 
     [NonSerialized] public CharacterController controller;
     [NonSerialized] public Stats stats;
+    [NonSerialized] public Team team;
 
     [NonSerialized] public Creature.Data? serializedData;
     void Start() {
         controller = GetComponent<CharacterController>();
         stats = GetComponent<Stats>();
+        team = GetComponent<Team>();
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
-        GetComponent<Team>().changed += TeamChangedEventHandler;
+        team.changed += TeamChangedEventHandler;
 
         if (serializedData is Data data) DeserializeNow(data);
         else cMaybeDespawn = StartCoroutine(MaybeDespawn());
@@ -47,9 +49,8 @@ public class Creature : MonoBehaviour {
         action.AddRange(brain.Actions);
     }
 
-    private void TeamChangedEventHandler(int team) {
-        transform.Find("Cardboard/Heart").GetComponentStrict<SpriteRenderer>().color =
-            GetComponent<Team>().Color;
+    private void TeamChangedEventHandler(int newTeam) {
+        transform.Find("Cardboard/Heart").GetComponentStrict<SpriteRenderer>().color = team.Color;
     }
 
     public CharacterController OverrideControl(MonoBehaviour source) {
@@ -78,7 +79,7 @@ public class Creature : MonoBehaviour {
     }
     public void ForceTame(Transform player) { // bypasses ExtractTamingCost
         if (cMaybeDespawn != null) StopCoroutine(cMaybeDespawn);
-        GetComponent<Team>().TeamId = player.GetComponentStrict<Team>().TeamId;
+        team.TeamId = player.GetComponentStrict<Team>().TeamId;
         Follow(player);
     }
     public ExpandableInfo TamingInfo {
@@ -207,7 +208,7 @@ public class Creature : MonoBehaviour {
     public Data Serialize() {
         return new Data(Terrain.I.CellAt(transform.position),
             creatureName,
-            GetComponent<Team>().TeamId,
+            team.TeamId,
             brain.state.command?.type == CommandType.Station,
             gameObject.name,
             stats.Exp);
@@ -217,7 +218,7 @@ public class Creature : MonoBehaviour {
     }
     private void DeserializeNow(Data data) {
         gameObject.name = data.name;
-        GetComponent<Team>().TeamId = data.team;
+        team.TeamId = data.team;
         Debug.Log("Setting currentExp for saved creature " + gameObject.name);
         stats.SetExp(data.exp);
         if (data.stationed) Station(data.tile);

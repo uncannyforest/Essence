@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 
-public class DeStack<T> : List<T> { // borrowing all List functionality
+public class UniqueDeStack<T> : List<T> { // borrowing all List functionality
     public void Push(T item) {
+        if (Contains(item)) Remove(item);
         Add(item);
     }
 

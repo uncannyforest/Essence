@@ -6,12 +6,23 @@ using UnityEngine;
 
 public static class EnumeratorExtensions {
     public static YieldInstruction NextOrDefault(this IEnumerator e) {
-        if (e.MoveNext()) return (YieldInstruction)e.Current;
-        else return default;
+        if (e.MoveNext()) {
+            try {
+                return (YieldInstruction)e.Current;
+            } catch (InvalidCastException ex) {
+                Debug.LogError(e.Current);
+                throw ex;
+            }
+        } else return default;
     }
     public static bool MoveNext<T>(this IEnumerator e, out T next) {
         if (e.MoveNext()) {
-            next = (T)e.Current;
+            try {
+                next = (T)e.Current;
+            } catch (InvalidCastException ex) {
+                Debug.LogError(e.Current);
+                throw ex;
+            }
             return true;
         } else {
             next = default;
@@ -19,8 +30,14 @@ public static class EnumeratorExtensions {
         }
     }
     public static T NextOr<T>(this IEnumerator e, Func<T> provider) {
-        if (e.MoveNext()) return (T)e.Current;
-        else return provider();
+        if (e.MoveNext()) {
+            try {
+                return (T)e.Current;
+            } catch (InvalidCastException ex) {
+                Debug.LogError(e.Current);
+                throw ex;
+            }
+        } else return provider();
     }
 
     // Each step, tries first enumerator before trying second

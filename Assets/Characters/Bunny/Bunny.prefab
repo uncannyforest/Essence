@@ -91,7 +91,7 @@ MonoBehaviour:
   creatureShortName: Bun
   icon: {fileID: 1185625210376227553, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
   breastplate: {fileID: -1622973192143475964, guid: c61ca3b12bba84b3586228e757a36cee, type: 3}
-  tamingInfoShort: With carrot near, whistle song (press and hold) to tame
+  tamingInfoShort: With carrot near, press & hold to tame
   tamingInfoLong: To tame <creature/>, first you must place a Carrot nearby.  Then
     you must whistle a song for sufficient time.  Press and hold the left mouse button
     to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate
@@ -216,7 +216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af3c8e954424948abaa5ca9d0f189ab2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  max: 3000
   startAtFraction: 0
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
@@ -274,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentExp: 0
   minDistanceFromOrigin: 0
-  resourceName: Potion
+  resourceName: Medicine
   minStr: 3
   minDef: 25
   minExe: 2
@@ -293,11 +292,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4836c03255a314be1b33d0f57734c1a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  max: 1
   startAtFraction: 0.5
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
-  statBarOffset: 0.125
+  statBarOffset: 0.375
   showOnHover: 1
 --- !u!1 &6868019693913487994
 GameObject:

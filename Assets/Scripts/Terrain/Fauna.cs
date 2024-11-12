@@ -26,14 +26,15 @@ public class Fauna : MonoBehaviour {
 
     private float GetRepeatRate() {
         int numCreatures = GameObject.FindObjectsOfType<Creature>().Length;
+        Debug.Log("Added creature, waiting " + numCreatures * numCreatures * possibilityRate);
         return numCreatures * numCreatures * possibilityRate;
     }
 
     private Vector2Int RandomLocation() {
         Vector2 direction = Randoms.ChebyshevUnit();
         float rawMagnitude = Random.value;
-        Vector2 magnitude = new Vector2(PlayerCharacter.neighborhood + beyondPlayer.x * rawMagnitude,
-                                        PlayerCharacter.neighborhood + beyondPlayer.y * rawMagnitude);
+        Vector2 magnitude = new Vector2(PlayerCharacter.neighborhood + beyondPlayer.x * rawMagnitude * rawMagnitude, // square rawMagniture to bias closer to player
+                                        PlayerCharacter.neighborhood + beyondPlayer.y * rawMagnitude * rawMagnitude); // TODO: change that to include fountains
         Vector2 location = direction * magnitude;
         return terrain.Bounds.Wrap(terrain.CellAt(player.position) + location.FloorToInt());
     }

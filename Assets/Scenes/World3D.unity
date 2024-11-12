@@ -691,6 +691,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  expToLevelUp: 10
+  creatureStartLevelDistance: 24
 --- !u!1 &1753797727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1050,8 +1052,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   validationUpdateTime: 0.5
   collapsePrefab: {fileID: 2250385588179260924, guid: e98e27e1e5d164c27abe45a5c49b8197, type: 3}
-  spawnPrefab: {fileID: -269789415231399089, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
-  mapRenderer: {fileID: 0}
 --- !u!114 &2120764634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1093,6 +1093,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  expToLevelUp: 10
+  creatureStartLevelDistance: 24
 --- !u!114 &2120764640
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -139,7 +139,9 @@ public class Pathfinding {
             if (IdentifyObstacles(target) is DesireMessage.Obstacle obstacle &&
                     Disp.FT(target, Terrain.I.CellCenter(obstacle.location)) > exceptWithinRadius) {
                 if (Will.CanClearObstacleAt(brain.general, obstacle.location)) {
-                    yield return brain.UnblockSelf(obstacle.location);
+                    IEnumerator nextMove = brain.UnblockSelf(obstacle.location);
+                    nextMove.MoveNext();
+                    yield return nextMove.Current;
                 } else BroadcastObstacle(obstacle);
             }
             yield break;

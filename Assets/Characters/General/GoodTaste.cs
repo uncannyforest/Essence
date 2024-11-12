@@ -7,6 +7,7 @@ public class GoodTaste : StatusQuantity {
     public string insufficientTimeInfoShort = "Whistle song (press and hold) to tame";
     public string insufficientTimeInfoLong = "The <creature/> will not be tamed unless you whistle a song for sufficient time.  Press and hold the left mouse button to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate it can hear you; when the stat bar reaches the end the <creature/> will be tamed.";
 
+    private Creature creature;
     private Transform tamer;
     private Action Tamed;
     private ExpandableInfo? error = null;
@@ -27,6 +28,7 @@ public class GoodTaste : StatusQuantity {
     override protected void Awake() {
         base.Awake();
         ReachedMax += HandleTamed;
+        creature = GetComponent<Creature>();
     }
 
     public void StartTaming(Transform tamer, Action tamedHandler) {
@@ -49,25 +51,28 @@ public class GoodTaste : StatusQuantity {
 
     public void HandleTamerChanged(Transform oldTamer) {
         if (Tamer != null) {
-            CharacterController movement = GetComponent<Creature>().OverrideControl(this);
-            movement.IdleFacing(Tamer.position);
+            CharacterController movement = creature.OverrideControl(this);
+            if (creature.State.type != CreatureStateType.Faint) movement.IdleFacing(Tamer.position);
         } else {
             GetComponent<Creature>().ReleaseControl();
-            GetComponent<Creature>().Follow(oldTamer);
         }
     }
 
     public void HandleTamed() {
-        if (GetComponent<Creature>().TryTame(Tamer)) {
-            if (Tamed != null) Tamed();
-        } else error = GetComponent<Creature>().TamingInfo;
+        Transform oldTamer = Tamer;
         this.Tamer = null;
+        if (creature.team.SameTeam(oldTamer)) {
+            creature.ForceTame(oldTamer);
+            if (Tamed != null) Tamed();
+        } else if (creature.TryTame(oldTamer)) {
+            if (Tamed != null) Tamed();
+        } else error = creature.TamingInfo;
         Reset();
     }
     
     void Update() {
         if (Tamer != null) {
-            GetComponent<Team>()?.OnAttack(Tamer);
+            if (!creature.team.SameTeam(Tamer)) creature.team?.OnAttack(Tamer);
             Increase(1);
         }
     }

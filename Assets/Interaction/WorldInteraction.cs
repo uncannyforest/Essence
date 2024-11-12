@@ -97,7 +97,7 @@ public class WorldInteraction : MonoBehaviour {
     private bool lineStarterUpdate;
     private Character activeCharacter; // hover
     private MeshRenderer activeCharacterHighlight;
-    private DeStack<Character> followingCharacters = new DeStack<Character>();
+    private UniqueDeStack<Character> followingCharacters = new UniqueDeStack<Character>();
     private MeshRenderer followingCharacterHighlight;
 
     public Action<Interaction, Creature> interactionChanged;
@@ -236,12 +236,12 @@ public class WorldInteraction : MonoBehaviour {
     public Character PeekFollowingCharacter() {
         // TODO: check for death
         Character possCharacter = null;
-        while (possCharacter == null && followingCharacters.Count > 0) {
+        while (LooksBurntOrDead(possCharacter) && followingCharacters.Count > 0) {
             Debug.Log("Peeking top character from the stack.  If multiple in a row, some died");
             possCharacter = followingCharacters.Peek();
-            if (possCharacter == null) followingCharacters.Pop();
+            if (LooksBurntOrDead(possCharacter)) followingCharacters.Pop();
         } // loop if it died
-        if (possCharacter == null) // none left
+        if (LooksBurntOrDead(possCharacter)) // none left
             return null;
         return possCharacter;
     }
@@ -383,19 +383,23 @@ public class WorldInteraction : MonoBehaviour {
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;
-                if (activeCharacter == PeekFollowingCharacter()) {
+                if (activeCharacter == PeekFollowingCharacter())
                     TextDisplay.I.ShowFullOther(GameObject.FindObjectOfType<CreatureInfoUI>(true).gameObject);
-                } else if (activeCharacter.Team.SameTeam(player)) {
-                    activeCharacter.GetComponentStrict<Creature>().Follow(player);
-                    ActiveCharacterToFollowing();
+                GoodTaste taste = activeCharacter.GetComponent<GoodTaste>();
+                creature = activeCharacter.GetComponentStrict<Creature>();
+                if (activeCharacter.Team.SameTeam(player)) {
+                    if (creature.State.type == CreatureStateType.Faint && taste != null) {
+                        taste.StartTaming(player, ActiveCharacterToFollowing);
+                    } else {
+                        creature.Follow(player);
+                        ActiveCharacterToFollowing();
+                    }
                 } else {
-                    creature = activeCharacter.GetComponentStrict<Creature>();
                     if (freeTamingCheat) {
                         creature.ForceTame(player);
                         ActiveCharacterToFollowing();
                     } else if (creature.CanTame(player)) {
-                        GoodTaste taste = activeCharacter.GetComponent<GoodTaste>();
-                        if (taste != null && !freeTamingCheat) {
+                        if (taste != null) {
                             taste.StartTaming(player, ActiveCharacterToFollowing);
                         } else {
                             bool tamed = creature.TryTame(player);
@@ -486,12 +490,15 @@ public class WorldInteraction : MonoBehaviour {
         }
     }
 
+    private bool LooksBurntOrDead(Character c) {
+        return c == null || c.GetComponentStrict<Creature>().State.type == CreatureStateType.Faint;
+    }
     private void QuickCleanUpFollowingCharacters() {
-        followingCharacters.RemoveAll((c) => c == null);
+        followingCharacters.RemoveAll(LooksBurntOrDead);
     }
     private void ThroroughCleanUpTopFollowingCharacter() {
         bool displayNeedsUpdate = false;
-        while (followingCharacters.Count > 0 && followingCharacters.Peek() == null) {
+        while (followingCharacters.Count > 0 && LooksBurntOrDead(followingCharacters.Peek())) {
             displayNeedsUpdate = true;
             followingCharacters.Pop();
         }
