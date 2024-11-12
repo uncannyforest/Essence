@@ -72,13 +72,8 @@ public class TerrainGenerator {
         }
     }
     Land? tutorialIsland (float x, float y, float dim) {
-        if (x >= dim / 4 - 2 && x < dim / 4 + 2 && y >= dim / 4 - 2 && y < dim / 4 + 2) {
-            return Land.Grass;
-        } else if (x >= dim * 7 / 16 && x < dim * 9 / 16 && y >= dim * 7 / 16 && y < dim * 9 / 16) {
-            return Land.Grass;
-        } else if (x >= dim / 8 && x < dim * 7 / 8 && y >= dim / 8 && y < dim * 7 / 8
-            && (nearEdge(x - dim / 8, dim * 3 / 4, dim * 3 / 4) || nearEdge(y - dim / 8, dim * 3 / 4, dim * 3 / 4))) {
-            return Land.Hill;
+        if (x >= dim / 8 && x < dim * 7 / 8 && y >= dim / 8 && y < dim * 7 / 8 && Random.Range(0, 3) == 0) {
+            return Random.Range(0, 3) == 0 ? Land.Hill : Land.Grass;
         } else if (nearEdge(x, dim, dim) || nearEdge(y, dim, dim)) {
             return Land.Water;
         } else {
@@ -385,23 +380,6 @@ public class TerrainGenerator {
                     setPixel(idn, x+1, y+1, Land.Water);
                 }
             }
-        }
-        // add tutorial dirtpiles
-        var tdx = DIM * 3 / 32 - 1;
-        var tdy = DIM * 3 / 32;
-        for (var i = 0; i < DIM; i++) {
-            if (getPixel(id, tdx, tdy) != Land.Grass) break;
-            setPixel(idn, tdx, tdy, Land.Dirtpile);
-            tdy++;
-            if (Random.value < .5) tdx--;
-        }
-        tdx = DIM * 3 / 32;
-        tdy = DIM * 3 / 32 - 1;
-        for (var i = 0; i < DIM; i++) {
-            if (getPixel(id, tdx, tdy) != Land.Grass) break;
-            setPixel(idn, tdx, tdy, Land.Dirtpile);
-            tdx++;
-            if (Random.value < .5) tdy--;
         }
         id = idn;
 
