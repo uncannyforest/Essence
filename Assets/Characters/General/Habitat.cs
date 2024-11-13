@@ -14,7 +14,7 @@ public class Habitat {
         Nearby
     }
 
-    private HashSet<Vector2Int> recentlyVisited = new HashSet<Vector2Int>();
+    private HashSet<Vector2Int> recentlyVisited = new HashSet<Vector2Int>(); // not used yet
 
     public readonly InteractionMode restRadius;
     private readonly Brain brain;
@@ -62,7 +62,7 @@ public class Habitat {
         recentlyVisited.RemoveWhere((visited) =>
             Disp.FT(brain.transform.position, Terrain.I.CellCenter(visited)) > Creature.neighborhood);
         foreach (Vector2Int validShelterLocation in ValidShelterLocations(InteractionMode.Nearby))
-            if (!recentlyVisited.Contains(validShelterLocation) && IsShelter(validShelterLocation))
+            if (IsShelter(validShelterLocation))
                 return Optional.Of(validShelterLocation);
         return Optional<Vector2Int>.Empty();
     }
