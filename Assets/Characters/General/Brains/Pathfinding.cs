@@ -110,8 +110,6 @@ public class Pathfinding {
                 yield break;
             } else {
                 movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target.position)));
-                Debug.Log(brain.legalName + " approaching " + target.position + ", distance " + distance + " and speed " + movement.Speed
-                    + " and agility " + brain.creature.stats.ExeTime + " so are we close? " + (distance < movement.Speed * brain.creature.stats.ExeTime));
                 if (distance < movement.Speed * brain.creature.stats.ExeTime) yield return null; // adjust faster when we're close
                 else yield return TypicalWait;
             }

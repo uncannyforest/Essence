@@ -73,7 +73,7 @@ public class TerrainGenerator {
     }
     Land? tutorialIsland (float x, float y, float dim) {
         if (x >= dim / 8 && x < dim * 7 / 8 && y >= dim / 8 && y < dim * 7 / 8 && Random.Range(0, 3) == 0) {
-            return Random.Range(0, 3) == 0 ? Land.Hill : Land.Grass;
+            return Random.Range(0, 2) == 0 ? Land.Hill : Land.Grass;
         } else if (nearEdge(x, dim, dim) || nearEdge(y, dim, dim)) {
             return Land.Water;
         } else {
@@ -151,7 +151,6 @@ public class TerrainGenerator {
         for (var i = 0; i < maxTries; i++) {
             var x = Random.Range(0, DIM);
             var y = Random.Range(0, DIM);
-            if (y + x <= image.height / 3f) continue; // Tutorial Island
             if (neighborCount(image, x, y, check) < 8) continue;
             return new Vector2Int(x, y);
         }
