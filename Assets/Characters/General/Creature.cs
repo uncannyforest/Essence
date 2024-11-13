@@ -25,7 +25,7 @@ public class Creature : MonoBehaviour {
     public List<CreatureAction> action = new List<CreatureAction>();
 
     private const float despawnTime = 128f;
-    public const float neighborhood = 6.5f;
+    public const float neighborhood = 7.5f;
 
     [NonSerialized] public CharacterController controller;
     [NonSerialized] public Stats stats;
