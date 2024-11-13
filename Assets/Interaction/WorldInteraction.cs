@@ -135,15 +135,16 @@ public class WorldInteraction : MonoBehaviour {
         this.teleSelect.DynamicFilter = creature.action[action].dynamicFilter;
         CurrentAction = Interaction.Creature(creature, action);
     }
-    public void MaybeUseCreatureAction(int actionIndex) {
+    public bool MaybeUseCreatureAction(int actionIndex) {
         Creature creature = PeekFollowing();
-        if (creature == null || actionIndex >= creature.action.Count) return;
+        if (creature == null || actionIndex >= creature.action.Count) return false;
         CreatureAction action = creature.action[actionIndex];
         if (action.IsInstant) {
             ForcePopFollowing();
             action.instantDirective(creature);
         }
         else Direct(creature, actionIndex);
+        return true;
     }
     public List<Interaction> Actions() {
         List<Interaction> actions = new List<Interaction>();
@@ -420,7 +421,8 @@ public class WorldInteraction : MonoBehaviour {
                     CreatureAction creatureAction = CurrentAction.CreatureAction;
                     if (!creatureAction.canQueue) {
                         ForcePopFollowing();
-                        PlayerAction = Mode.Taming;
+                        if (!MaybeUseCreatureAction(CurrentAction.creatureAction))
+                            PlayerAction = Mode.Taming;
                     }
                     creatureAction.pendingDirective(creature, target);
                 }
