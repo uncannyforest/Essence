@@ -29,7 +29,7 @@ public class ArcherBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithCharacter(archer.attackAction,
-                new CharacterTargetedBehavior(ExecuteBehavior),
+                new CharacterTargetedBehavior(ExecuteBehavior, (t) => SufficientResource()),
                 (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != teamId; })

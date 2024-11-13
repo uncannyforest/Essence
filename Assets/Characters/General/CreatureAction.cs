@@ -29,26 +29,26 @@ public struct CreatureAction {
             TargetedBehavior<Target> executingBehavior,
             TeleFilter filter) =>
         new CreatureAction(icon, null,
-            (creature, target) => creature.Execute(executingBehavior.WithTarget(target)),
+            (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget(target)),
             filter, null, executingBehavior.canQueue, false, false);
     public static CreatureAction WithCharacter(Sprite icon,
             TargetedBehavior<Transform> executingBehavior,
             Func<Transform, bool> characterFilter) =>
         new CreatureAction(icon, null,
-            (creature, target) => creature.Execute(executingBehavior.WithTarget(((Character)target).transform)),
+            (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget(((Character)target).transform)),
             new TeleFilter(TeleFilter.Terrain.NONE, characterFilter),
             null, executingBehavior.canQueue, false, false);
     public static CreatureAction WithTerrain(Sprite icon,
             TargetedBehavior<Terrain.Position> executingBehavior,
             TeleFilter.Terrain terrainFilter) =>
         new CreatureAction(icon, null,
-            (creature, target) => creature.Execute(executingBehavior.WithTarget((Terrain.Position)target)),
+            (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget((Terrain.Position)target)),
             new TeleFilter(terrainFilter, null),
             null, executingBehavior.canQueue, false, false);
     public static CreatureAction WithFeature(Feature feature,
             TargetedBehavior<Vector2Int> executingBehavior) =>
         new CreatureAction(null, null,
-            (creature, target) => creature.Execute(executingBehavior.WithTarget(((Terrain.Position)target).Coord)),
+            (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget(((Terrain.Position)target).Coord)),
             new TeleFilter(TeleFilter.Terrain.TILES, null),
             feature, executingBehavior.canQueue, false, false);
     public static CreatureAction Roam =

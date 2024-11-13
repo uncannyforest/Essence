@@ -184,12 +184,13 @@ public class Pathfinding {
     }
 }
 
-public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
+public class ApproachThenInteract {
     private readonly Brain brain;
     private readonly float interactDistance;
     private readonly float interactTime;
     private readonly Action<Terrain.Position> interaction;
     private readonly bool rewardExp;
+    private readonly Func<Terrain.Position, IEnumerator<YieldInstruction>> enumeratorWithParam;
 
     public ApproachThenInteract (
             Brain brain,
@@ -218,10 +219,16 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
         yield break;
     }
 
-    public TargetedBehavior<Vector2Int> ForVector2Int() => new TargetedBehavior<Vector2Int>(
-        (target) => enumeratorWithParam(new Terrain.Position(Terrain.Grid.Roof, target))
+    public TargetedBehavior<Vector2Int> ForVector2Int(Func<Vector2Int, WhyNot> errorFilter) => new TargetedBehavior<Vector2Int>(
+        (target) => enumeratorWithParam(new Terrain.Position(Terrain.Grid.Roof, target)),
+        errorFilter
     );
-    public TargetedBehavior<Target> ForTarget() => new TargetedBehavior<Target>(
-        (target) => enumeratorWithParam((Terrain.Position)target)
+    public TargetedBehavior<Terrain.Position> ForPosition(Func<Terrain.Position, WhyNot> errorFilter) => new TargetedBehavior<Terrain.Position>(
+        enumeratorWithParam,
+        errorFilter
+    );
+    public TargetedBehavior<Target> ForTarget(Func<Target, WhyNot> errorFilter) => new TargetedBehavior<Target>(
+        (target) => enumeratorWithParam((Terrain.Position)target),
+        errorFilter
     );
 }

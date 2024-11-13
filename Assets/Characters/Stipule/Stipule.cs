@@ -27,7 +27,7 @@ public class StipuleBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithCharacter(stipule.attackAction,
-                new CharacterTargetedBehavior(AttackBehavior),
+                new CharacterTargetedBehavior(AttackBehavior, (t) => SufficientResource()),
                 (c) => Will.IsThreat(teamId, transform.position, c)     .NegLog(legalName + " cannot select " + c)
             )
         };

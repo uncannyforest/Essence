@@ -57,14 +57,18 @@ public class TargetedBehavior<T> {
     virtual public bool canQueue { get; protected set; } = false;
 
     public Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam;
+    public Func<T, WhyNot> errorFilter;
 
     protected TargetedBehavior() {}
-    public TargetedBehavior(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam) {
+    public TargetedBehavior(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam, Func<T, WhyNot> errorFilter) {
         this.enumeratorWithParam = enumeratorWithParam;
+        this.errorFilter = errorFilter;
     }
 
-    virtual public BehaviorNode WithTarget(T target) {
-        return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
+    virtual public OneOf<BehaviorNode, string> WithTarget(T target) {
+        WhyNot canTarget = errorFilter(target);
+        if (canTarget) return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
+        else return (string)canTarget;
     }
 
     private IEnumerator<YieldInstruction> CheckNonNullTargetEnumerator(T target) {
@@ -74,21 +78,16 @@ public class TargetedBehavior<T> {
         }
     }
 
-    // not currently used
-    public TargetedBehavior<U> For<U>(Func<U, T> func) => new TargetedBehavior<U>(
-        (target) =>enumeratorWithParam(func(target))
-    );
-
     public QueueOperator.Targeted<T> Queued() =>
-        new QueueOperator.Targeted<T>(enumeratorWithParam);
+        new QueueOperator.Targeted<T>(enumeratorWithParam, errorFilter);
 }
 
 // common TargetedBehavior use case, implementation simply specifies <Transform>
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
-    public CharacterTargetedBehavior(Func<Transform, IEnumerator<YieldInstruction>> enumeratorWithParam) : base(enumeratorWithParam) {}
-
-    // not currently used. See CreatureAction.WithCharacter()
-    public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((Character)t).transform);
+    public CharacterTargetedBehavior(
+        Func<Transform, IEnumerator<YieldInstruction>> enumeratorWithParam,
+        Func<Transform, WhyNot> errorFilter)
+        : base(enumeratorWithParam, errorFilter) {}
 }
 
 // queue multiple sub-behaviors
@@ -99,9 +98,11 @@ public class QueueOperator : BehaviorNode {
         this.enumerator = QueueEnumerator;
     }
 
-    public static QueueOperator Of(BehaviorNode node) {
+    public static OneOf<BehaviorNode, string> Of(OneOf<BehaviorNode, string> node) {
+        if (node.Is(out string error)) return error;
+
         QueueOperator queueNode = new QueueOperator();
-        queueNode.queue.Enqueue(node);
+        queueNode.queue.Enqueue((BehaviorNode)node);
         return queueNode;
     }
 
@@ -129,11 +130,11 @@ public class QueueOperator : BehaviorNode {
     }
     
     public class Targeted<T> : TargetedBehavior<T> {
-        public Targeted(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam) : base(enumeratorWithParam) {
+        public Targeted(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam, Func<T, WhyNot> errorFilter) : base(enumeratorWithParam, errorFilter) {
             this.canQueue = true;
         }
 
-        override public BehaviorNode WithTarget(T target) =>
+        override public OneOf<BehaviorNode, string> WithTarget(T target) =>
             QueueOperator.Of(base.WithTarget(target));
     }
 }

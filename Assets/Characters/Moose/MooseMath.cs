@@ -157,7 +157,7 @@ public class PathTracingBehavior : BehaviorNode {
             this.canQueue = true;
         }
 
-        override public BehaviorNode WithTarget(Target target) =>
+        override public OneOf<BehaviorNode, string> WithTarget(Target target) =>
             PathTracingBehavior.Of(Terrain.I.CellCenter((Terrain.Position)target), ai, positionFilter, positionAction);
     }
 }

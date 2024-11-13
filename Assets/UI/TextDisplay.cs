@@ -65,7 +65,7 @@ public class TextDisplay : MonoBehaviour {
         CancelInvoke();
         Invoke("HideMiniText", miniTextDuration);
     }
-
+    
     public void HideMiniText() {
         miniText.transform.parent.gameObject.SetActive(false);
     }

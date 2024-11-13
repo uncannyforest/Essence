@@ -104,12 +104,14 @@ public class Brain {
     virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
     private Func<bool> faintCondition = () => true;
 
+    public WhyNot SufficientResource(int quantityNeeded = 1) =>
+        resource?.Has(quantityNeeded) != false ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";
+
     virtual public IEnumerator<YieldInstruction> FocusedBehavior() { yield break; }
     virtual public WhyNot IsValidFocus(Transform characterFocus) => 
         characterFocus == null ? "null_focus" :
-        resource?.IsOut == true ? "insufficient_resource" :
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
-        true;
+        SufficientResource();
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
     virtual public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");

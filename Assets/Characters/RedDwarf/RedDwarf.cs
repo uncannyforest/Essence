@@ -26,12 +26,12 @@ public class RedDwarfBrain : Brain {
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
                 pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain[loc] = Construction.Wood).Queued(),
+                    (loc) => terrain[loc] = Construction.Wood).ForPosition((p) => true).Queued(),
                 TeleFilter.Terrain.WOODBUILDING),
             CreatureAction.WithFeature(FeatureLibrary.P.boat,
                 pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, redDwarf.buildTime,
-                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).ForVector2Int().Queued())
+                    (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).ForVector2Int((p) => true).Queued())
         };
 
         Habitat = Habitat.Land(this, Land.Woodpile, Habitat.InteractionMode.Inside);

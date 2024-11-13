@@ -27,7 +27,7 @@ public class BunnyBrain : Brain {
     }
 
     override public WhyNot IsValidFocus(Transform characterFocus) =>
-        resource.IsOut ? "insufficient_resource" :
+        SufficientResource() &&
         healing.CanHeal(characterFocus, Creature.neighborhood);
 
     override public Optional<Transform> FindFocus() {

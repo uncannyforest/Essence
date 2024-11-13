@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 [RequireComponent(typeof(Team))]
@@ -150,9 +151,21 @@ public class Creature : MonoBehaviour {
         command = Command.Station(Terrain.I.CellCenter(location))
     }.TryUpdateCreature(this);
 
-    public void Execute(BehaviorNode executingBehavior) => new Senses() {
-        command = Command.Execute(executingBehavior)
-    }.TryUpdateCreature(this);
+    public void ProcessDirective(OneOf<BehaviorNode, string> executingBehaviorOrError) {
+        if (executingBehaviorOrError.Is(out string error))
+            TextDisplay.I.ShowMiniText(UserFriendly(error));
+
+        else new Senses() {
+            command = Command.Execute((BehaviorNode)executingBehaviorOrError)
+        }.TryUpdateCreature(this);
+    }
+
+    private string UserFriendly(string error) {
+        if (error.StartsWith("insufficient_resource"))
+            return new Regex("(?<=insufficient_resource\\().*(?=\\))").Match(error).Value + " " + stats.resourceName + " needed to do that";
+        else
+            return "Error: " + error;
+    }
 
     private Coroutine cMaybeDespawn;
     private IEnumerator<YieldInstruction> MaybeDespawn() {
