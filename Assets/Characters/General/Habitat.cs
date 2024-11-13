@@ -72,7 +72,7 @@ public class Habitat {
         brain.resource?.Increase(1);
     }
 
-    virtual public IEnumerator RestBehavior(Vector2Int shelter) {
+    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) {
         switch (restRadius) {
             case InteractionMode.Inside:
                 return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), 1f / CharacterController.subGridUnit)

@@ -104,14 +104,14 @@ public class Brain {
     virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
     private Func<bool> faintCondition = () => true;
 
-    virtual public IEnumerator FocusedBehavior() { yield break; }
+    virtual public IEnumerator<YieldInstruction> FocusedBehavior() { yield break; }
     virtual public WhyNot IsValidFocus(Transform characterFocus) => 
         characterFocus == null ? "null_focus" :
         resource?.IsOut == true ? "insufficient_resource" :
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
         true;
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
-    virtual public IEnumerator UnblockSelf(Terrain.Position location) =>
+    virtual public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
     public Habitat Habitat { get; protected set; } = null;
 
@@ -180,7 +180,7 @@ public class Brain {
         endState = true
     }.TryUpdateCreature(creature);
 
-    private IEnumerator ScanningBehavior() {
+    private IEnumerator<YieldInstruction> ScanningBehavior() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);
             if (state.type == CreatureStateType.PassiveCommand && 

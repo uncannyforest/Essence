@@ -52,11 +52,11 @@ public class ArcherBrain : Brain {
     override public Optional<Transform> FindFocus() => Will.NearestThreat(this,
         (threat) => threat.GetComponent<Archer>() == null);
 
-    override public IEnumerator FocusedBehavior() {
+    override public IEnumerator<YieldInstruction> FocusedBehavior() {
         return ExecuteBehavior(state.characterFocus.Value);
     }
 
-    public IEnumerator ExecuteBehavior(Transform focus) {
+    public IEnumerator<YieldInstruction> ExecuteBehavior(Transform focus) {
         while (true) {
             yield return WatchForMovement(focus, out Vector2 pos0, out float time0);
             yield return Attack(focus, pos0, time0);

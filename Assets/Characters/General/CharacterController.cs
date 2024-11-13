@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -130,7 +130,7 @@ public class CharacterController : MonoBehaviour {
     }
 
     private Vector2Int currentTile = Vector2Int.zero;
-    private IEnumerator MoveCoroutineE() {
+    private IEnumerator<YieldInstruction> MoveCoroutineE() {
         yield return new WaitForFixedUpdate();
         while (true) {
             if (velocityChebyshevSubgridUnit != Displacement.zero) {

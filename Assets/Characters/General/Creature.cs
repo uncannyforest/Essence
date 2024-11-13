@@ -155,7 +155,7 @@ public class Creature : MonoBehaviour {
     }.TryUpdateCreature(this);
 
     private Coroutine cMaybeDespawn;
-    private IEnumerator MaybeDespawn() {
+    private IEnumerator<YieldInstruction> MaybeDespawn() {
         while (true) {
             yield return new WaitForSeconds(despawnTime);
             Collider2D[] playersNearby =

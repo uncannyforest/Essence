@@ -99,7 +99,7 @@ public class Pathfinding {
     public YieldInstruction ApproachThenIdle(Vector2 target, float proximityToStop = 1f / CharacterController.subGridUnit) =>
         Approach(target, proximityToStop).NextOr(() => { movement.Idle(); return TypicalWait; });
 
-    public IEnumerator Approach(PositionProvider target, float proximityToStop = 1f / CharacterController.subGridUnit) {
+    public IEnumerator<YieldInstruction> Approach(PositionProvider target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         while (true) {
             if (CheckTargetForObstacles(target.position, proximityToStop).MoveNext(out YieldInstruction unblockSelf))
                 yield return unblockSelf;
@@ -134,12 +134,12 @@ public class Pathfinding {
         return TypicalWait;
     }
 
-    public IEnumerator CheckTargetForObstacles(Vector2 target, float exceptWithinRadius) {
+    public IEnumerator<YieldInstruction> CheckTargetForObstacles(Vector2 target, float exceptWithinRadius) {
         while (true) {
             if (IdentifyObstacles(target) is DesireMessage.Obstacle obstacle &&
                     Disp.FT(target, Terrain.I.CellCenter(obstacle.location)) > exceptWithinRadius) {
                 if (Will.CanClearObstacleAt(brain.general, obstacle.location)) {
-                    IEnumerator nextMove = brain.UnblockSelf(obstacle.location);
+                    IEnumerator<YieldInstruction> nextMove = brain.UnblockSelf(obstacle.location);
                     nextMove.MoveNext();
                     yield return nextMove.Current;
                 } else BroadcastObstacle(obstacle);
@@ -203,12 +203,12 @@ public class ApproachThenInteract : TargetedBehavior<Terrain.Position> {
         this.enumeratorWithParam = E;
     }
 
-    public IEnumerator E(Terrain.Position location) =>
+    public IEnumerator<YieldInstruction> E(Terrain.Position location) =>
         brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location), interactDistance)
             .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance))
             .Then(Finish(location));
 
-    private IEnumerator Finish(Terrain.Position location) {
+    private IEnumerator<YieldInstruction> Finish(Terrain.Position location) {
         brain.movement.IdleFacing(Terrain.I.CellCenter(location));
         interaction(location);
         if (rewardExp) brain.creature.GenericExeSucceeded();

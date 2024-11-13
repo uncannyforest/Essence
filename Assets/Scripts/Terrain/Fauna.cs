@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Fauna : MonoBehaviour {
@@ -16,7 +16,7 @@ public class Fauna : MonoBehaviour {
         beyondPlayer = terrain.Bounds.Vector2.Map(c => c / 2f - PlayerCharacter.neighborhood);
     }
 
-    private IEnumerator Repeat() {
+    private IEnumerator<YieldInstruction> Repeat() {
         yield return null;
         while (true) {
             Populate();

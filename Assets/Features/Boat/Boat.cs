@@ -87,7 +87,7 @@ public class Boat : MonoBehaviour {
         }
     }
 
-    private IEnumerator CreatureExitE() {
+    private IEnumerator<YieldInstruction> CreatureExitE() {
         for (int i = 1; i < 4; i++) {
             CharacterController creature = passengers[i];
             if (creature == null) continue;

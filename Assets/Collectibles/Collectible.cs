@@ -33,7 +33,7 @@ public class Collectible : MonoBehaviour {
         } else return false;
     }
 
-    private IEnumerator CollectAnimation() {
+    private IEnumerator<YieldInstruction> CollectAnimation() {
         GetComponent<Collider2D>().enabled = false;
         float startTime = Time.time;
         float endTime = startTime + CollectibleLibrary.C.collectAnimationTime;

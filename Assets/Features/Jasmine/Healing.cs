@@ -54,7 +54,7 @@ public class Healing : MonoBehaviour {
         target.GetComponentStrict<Health>().Increase(healQuantity);
     }
 
-    private IEnumerator HealAutomatically() {
+    private IEnumerator<YieldInstruction> HealAutomatically() {
         while (true) {
             Collider2D[] charactersNearby =
                 Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));

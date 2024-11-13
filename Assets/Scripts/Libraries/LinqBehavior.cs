@@ -5,43 +5,26 @@ using System.Linq;
 using UnityEngine;
 
 public static class EnumeratorExtensions {
-    public static YieldInstruction NextOrDefault(this IEnumerator e) {
-        if (e.MoveNext()) {
-            try {
-                return (YieldInstruction)e.Current;
-            } catch (InvalidCastException ex) {
-                Debug.LogError(e.Current);
-                throw ex;
-            }
-        } else return default;
+    public static T NextOrDefault<T>(this IEnumerator<T> e) {
+        if (e.MoveNext()) return e.Current;
+        else return default;
     }
-    public static bool MoveNext<T>(this IEnumerator e, out T next) {
+    public static bool MoveNext<T>(this IEnumerator<T> e, out T next) {
         if (e.MoveNext()) {
-            try {
-                next = (T)e.Current;
-            } catch (InvalidCastException ex) {
-                Debug.LogError(e.Current);
-                throw ex;
-            }
+            next = e.Current;
             return true;
         } else {
             next = default;
             return false;
         }
     }
-    public static T NextOr<T>(this IEnumerator e, Func<T> provider) {
-        if (e.MoveNext()) {
-            try {
-                return (T)e.Current;
-            } catch (InvalidCastException ex) {
-                Debug.LogError(e.Current);
-                throw ex;
-            }
-        } else return provider();
+    public static T NextOr<T>(this IEnumerator<T> e, Func<T> provider) {
+        if (e.MoveNext()) return (T)e.Current;
+        else return provider();
     }
 
     // Each step, tries first enumerator before trying second
-    public static IEnumerator Then(this IEnumerator first, IEnumerator second) {
+    public static IEnumerator<T> Then<T>(this IEnumerator<T> first, IEnumerator<T> second) {
         while (true) {
             if (first.MoveNext()) yield return first.Current;
             else if (second.MoveNext()) yield return second.Current;
@@ -49,14 +32,14 @@ public static class EnumeratorExtensions {
         }
     }
 
-    public static IEnumerator Then(this IEnumerator first, Func<YieldInstruction> second) {
+    public static IEnumerator<T> Then<T>(this IEnumerator<T> first, Func<T> second) {
         while (true) {
             if (first.MoveNext()) yield return first.Current;
             else yield return second();
         }
     }
 
-    public static IEnumerator ThenEvery(this IEnumerator first, float seconds, Action second) {
+    public static IEnumerator<YieldInstruction> ThenEvery(this IEnumerator<YieldInstruction> first, float seconds, Action second) {
         while (true) {
             if (first.MoveNext()) yield return first.Current;
             else {
@@ -67,46 +50,64 @@ public static class EnumeratorExtensions {
     }
 }
 
-public class Provisionally : IEnumerator {
-    IEnumerator e;
+public static class Provisionally {
+    public static Provisionally<T> Run<T>(IEnumerator<T> e) {
+        return Provisionally<T>.Run(e);
+    }
+}
+
+public class Provisionally<T> : IEnumerator<T> {
+    IEnumerator<T> e;
     Func<object, bool> where;
 
-    private Provisionally(IEnumerator e, Func<object, bool> where) {
+    private Provisionally(IEnumerator<T> e, Func<object, bool> where) {
         this.e = e;
         this.where = where;
     }
 
-    public static Provisionally Run(IEnumerator e) => new Provisionally(e, null);
+    public static Provisionally<T> Run(IEnumerator<T> e) => new Provisionally<T>(e, null);
 
-    public Provisionally Where(Func<object, bool> where) => new Provisionally(e, where);
+    public Provisionally<T> Where(Func<object, bool> where) => new Provisionally<T>(e, where);
 
     public bool MoveNext() {
         if (where == null) throw new InvalidOperationException("Provisionally must be used with where clause");
         return where(null) ? e.MoveNext() : false;
     }
     public void Reset() => e.Reset();
-    public object Current => e.Current;
+    public T Current => e.Current;
+    object IEnumerator.Current => e.Current;
+    public void Dispose() {}
+}
 
-    public static Provisionally<T> For<T>(T target) {
-        return Provisionally<T>.For(target);
+public static class Continually {
+    public static Continually<T> For<T>(T target) {
+        return Continually<T>.For(target);
     }
 }
 
-public class Provisionally<T> {
+public class Continually<T> {
     T target;
     Func<T, bool> where;
 
-    private Provisionally(T target, Func<T, bool> where) {
+    private Continually(T target, Func<T, bool> where) {
         this.target = target;
         this.where = where;
     }
 
-    public static Provisionally<T> For(T target) => new Provisionally<T>(target, null);
+    public static Continually<T> For(T target) => new Continually<T>(target, null);
 
-    public Provisionally<T> Where(Func<T, bool> where) => new Provisionally<T>(target, where);
+    public Continually<T> Where(Func<T, bool> where) => new Continually<T>(target, where);
 
+    public IEnumerator<U> Select<U>(Func<T, IEnumerator<U>> selector) {
+        if (where == null) throw new InvalidOperationException("Repeat must be used with where clause");
+        while (where(target)) {
+            IEnumerator<U> enumerator = selector(target);
+            if (enumerator.MoveNext()) yield return enumerator.Current;
+            else yield break;
+        }
+    }
     public IEnumerator<U> Select<U>(Func<T, U> selector) {
-        if (where == null) throw new InvalidOperationException("Provisionally must be used with where clause");
+        if (where == null) throw new InvalidOperationException("Repeat must be used with where clause");
         while (where(target)) yield return selector(target);
     }
 }

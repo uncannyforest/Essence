@@ -112,7 +112,7 @@ public class PathTracingBehavior : BehaviorNode {
         return (destinations.Count > 0);
     }
 
-    private IEnumerator QueueEnumerator() {
+    private IEnumerator<YieldInstruction> QueueEnumerator() {
         previousDestination = ai.position;
         int i = 0;
         while (destinations.Count > 0) {

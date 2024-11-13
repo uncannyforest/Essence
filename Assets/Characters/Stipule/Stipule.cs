@@ -38,10 +38,10 @@ public class StipuleBrain : Brain {
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    override public IEnumerator FocusedBehavior() => AttackBehavior(state.characterFocus.Value);
+    override public IEnumerator<YieldInstruction> FocusedBehavior() => AttackBehavior(state.characterFocus.Value);
     
-    private IEnumerator AttackBehavior(Transform f) =>
-        from focus in Provisionally.For(f)
+    private IEnumerator<YieldInstruction> AttackBehavior(Transform f) =>
+        from focus in Continually.For(f)
         where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
         select pathfinding.Approach(focus, stipule.meleeReach)
             .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));

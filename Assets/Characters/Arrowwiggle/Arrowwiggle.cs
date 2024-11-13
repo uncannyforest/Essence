@@ -46,7 +46,7 @@ public class ArrowwiggleBrain : Brain {
             (WhyNot)true;
     }
 
-    override public IEnumerator FocusedBehavior() =>
+    override public IEnumerator<YieldInstruction> FocusedBehavior() =>
         pathfinding.Approach(state.characterFocus.Value, arrowwiggle.restockDistance)
             .ThenEvery(arrowwiggle.restockTime,
             () => state.characterFocus.Value.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity));

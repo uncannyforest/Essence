@@ -5,10 +5,10 @@ using UnityEngine;
 
 // usage: behaviorNode.enumerator()
 public class BehaviorNode {
-    virtual public Func<IEnumerator> enumerator { get; protected set; }
+    virtual public Func<IEnumerator<YieldInstruction>> enumerator { get; protected set; }
 
     protected BehaviorNode() {}
-    public BehaviorNode(Func<IEnumerator> enumerator) {
+    public BehaviorNode(Func<IEnumerator<YieldInstruction>> enumerator) {
         this.enumerator = enumerator;
     }
     public BehaviorNode(Func<YieldInstruction> singleLine) {
@@ -21,20 +21,20 @@ public class BehaviorNode {
         return newNode;
     }
 
-    public static Func<IEnumerator> SingleLine(Func<YieldInstruction> line) => () => SingleLineEnumerator(line);
-    public static IEnumerator SingleLineEnumerator(Func<YieldInstruction> line) {
+    public static Func<IEnumerator<YieldInstruction>> SingleLine(Func<YieldInstruction> line) => () => SingleLineEnumerator(line);
+    public static IEnumerator<YieldInstruction> SingleLineEnumerator(Func<YieldInstruction> line) {
         while (true) yield return line();
     }
 }
 
 // places condition on subBehavior to give up when target exceeds distance
 public class RestrictNearbyBehavior : BehaviorNode {
-    private Func<IEnumerator> subBehavior;
+    private Func<IEnumerator<YieldInstruction>> subBehavior;
     private Transform ai;
     private Func<Vector2> targetLocation;
     private float distance;
 
-    public RestrictNearbyBehavior(Func<IEnumerator> subBehavior, Transform ai, Func<Vector2> targetLocation, float distance) {
+    public RestrictNearbyBehavior(Func<IEnumerator<YieldInstruction>> subBehavior, Transform ai, Func<Vector2> targetLocation, float distance) {
         this.subBehavior = subBehavior;
         this.ai = ai;
         this.targetLocation = targetLocation;
@@ -42,7 +42,7 @@ public class RestrictNearbyBehavior : BehaviorNode {
         this.enumerator = E;
     }
     
-    public IEnumerator E() => 
+    public IEnumerator<YieldInstruction> E() => 
         from _ in Provisionally.Run(subBehavior())
         where Vector3.Distance(ai.position, targetLocation()) < distance
         select _;
@@ -56,10 +56,10 @@ public class RestrictNearbyBehavior : BehaviorNode {
 public class TargetedBehavior<T> {
     virtual public bool canQueue { get; protected set; } = false;
 
-    public Func<T, IEnumerator> enumeratorWithParam;
+    public Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam;
 
     protected TargetedBehavior() {}
-    public TargetedBehavior(Func<T, IEnumerator> enumeratorWithParam) {
+    public TargetedBehavior(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam) {
         this.enumeratorWithParam = enumeratorWithParam;
     }
 
@@ -67,8 +67,8 @@ public class TargetedBehavior<T> {
         return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
     }
 
-    private IEnumerator CheckNonNullTargetEnumerator(T target) {
-        IEnumerator task = enumeratorWithParam(target);
+    private IEnumerator<YieldInstruction> CheckNonNullTargetEnumerator(T target) {
+        IEnumerator<YieldInstruction> task = enumeratorWithParam(target);
         while (target != null && task.MoveNext()) {
             yield return task.Current;
         }
@@ -85,7 +85,7 @@ public class TargetedBehavior<T> {
 
 // common TargetedBehavior use case, implementation simply specifies <Transform>
 public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
-    public CharacterTargetedBehavior(Func<Transform, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {}
+    public CharacterTargetedBehavior(Func<Transform, IEnumerator<YieldInstruction>> enumeratorWithParam) : base(enumeratorWithParam) {}
 
     // not currently used. See CreatureAction.WithCharacter()
     public TargetedBehavior<Target> ForTarget() => For<Target>(t => ((Character)t).transform);
@@ -118,9 +118,9 @@ public class QueueOperator : BehaviorNode {
         return (queue.Count > 0);
     }
 
-    private IEnumerator QueueEnumerator() {
+    private IEnumerator<YieldInstruction> QueueEnumerator() {
         while (queue.Count > 0) {
-            IEnumerator subBehavior = queue.Peek().enumerator(); // saved here, not reset unless RunBehavior() is called again
+            IEnumerator<YieldInstruction> subBehavior = queue.Peek().enumerator(); // saved here, not reset unless RunBehavior() is called again
             while (subBehavior.MoveNext()) {
                 yield return subBehavior.Current;
             }
@@ -129,7 +129,7 @@ public class QueueOperator : BehaviorNode {
     }
     
     public class Targeted<T> : TargetedBehavior<T> {
-        public Targeted(Func<T, IEnumerator> enumeratorWithParam) : base(enumeratorWithParam) {
+        public Targeted(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam) : base(enumeratorWithParam) {
             this.canQueue = true;
         }
 

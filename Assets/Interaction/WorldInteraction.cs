@@ -429,7 +429,7 @@ public class WorldInteraction : MonoBehaviour {
     }
 
     private TaskRunner ConfirmOngoing;
-    private IEnumerator ConfirmOngoingE() {
+    private IEnumerator<YieldInstruction> ConfirmOngoingE() {
         bool toolChanged = false;
         int i = 0;
         for (i = 0; i < 100_000; i++) { // prevent infinite loop bugs

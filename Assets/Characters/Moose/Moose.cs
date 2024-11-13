@@ -45,11 +45,11 @@ public class MooseBrain : Brain {
     private bool IsDestroyable(Terrain.Position location) =>
         Will.CanClearObstacleAt(general, location);
 
-    override public IEnumerator FocusedBehavior() => ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
+    override public IEnumerator<YieldInstruction> FocusedBehavior() => ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
 
-    override public IEnumerator UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
+    override public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
 
-    private IEnumerator ApproachAndAttack(Terrain.Position location)
+    private IEnumerator<YieldInstruction> ApproachAndAttack(Terrain.Position location)
         => pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
             .Then(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));
     

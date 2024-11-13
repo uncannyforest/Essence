@@ -38,7 +38,7 @@ public struct Habit {
         this.brain = brain;
     }
     public bool HasRunBehavior { get => node.onRun != null || node.onRunStep != null; }
-    public IEnumerator RunBehavior(CreatureState state, Brain brain, Action doneRunning) =>
+    public IEnumerator<YieldInstruction> RunBehavior(CreatureState state, Brain brain, Action doneRunning) =>
         node.RunBehavior(state, brain, doneRunning);
     public void OnEnter() => node.onEnter(creatureState, brain);
     public void OnExit() => node.onExit(creatureState, brain);
@@ -77,7 +77,7 @@ public struct Habit {
             return this;
         }
 
-        public Func<CreatureState, Brain, Action, IEnumerator> RunBehavior {
+        public Func<CreatureState, Brain, Action, IEnumerator<YieldInstruction>> RunBehavior {
             get {
                 if (onRun != null) return RunBehaviorEnumerator;
                 else if (onRunStep != null) return RunBehaviorStep;
@@ -85,9 +85,9 @@ public struct Habit {
             }
         }
 
-        private IEnumerator RunBehaviorEnumerator(CreatureState state, Brain brain, Action doneRunning) {
+        private IEnumerator<YieldInstruction> RunBehaviorEnumerator(CreatureState state, Brain brain, Action doneRunning) {
             yield return null;
-            IEnumerator subBehavior = onRun(state, brain).enumerator(); // saved here, not reset unless RunBehavior() is called again
+            IEnumerator<YieldInstruction> subBehavior = onRun(state, brain).enumerator(); // saved here, not reset unless RunBehavior() is called again
             while (onRunCheck(state, brain)) {
                 if (!subBehavior.MoveNext()) {
                     Debug.Log(brain.creature.gameObject.name + " stopping Behavior because enumerator ended");
@@ -98,7 +98,7 @@ public struct Habit {
             doneRunning();
         }
 
-        private IEnumerator RunBehaviorStep(CreatureState state, Brain brain, Action doneRunning) {
+        private IEnumerator<YieldInstruction> RunBehaviorStep(CreatureState state, Brain brain, Action doneRunning) {
             yield return null;
             while (onRunCheck(state, brain)) {
                 yield return onRunStep(state, brain);
@@ -115,7 +115,7 @@ public struct Habit {
 
         public PassiveCommandNode(CommandType type) => this.type = type;
 
-        public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, Func<IEnumerator> behavior) {
+        public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, Func<IEnumerator<YieldInstruction>> behavior) {
             if (nearbyTracking.HasValue)
                 return new RestrictNearbyBehavior(behavior, brain.transform, () => nearbyTracking.Value(state), Creature.neighborhood);
             else return new BehaviorNode(behavior);
