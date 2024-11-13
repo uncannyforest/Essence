@@ -87,10 +87,15 @@ public class Habitat {
         }
     }
 
-    static public Habitat Feature(Brain brain, Feature feature) {
-        return new Habitat(brain, InteractionMode.Nearby) {
+    static public Habitat Feature(Brain brain, Feature feature) =>
+        new Habitat(brain, InteractionMode.Nearby) {
             IsShelter = (loc) => Terrain.I.Feature[loc]?.type == feature.type,
             MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.ForceBuildFeature(loc, feature) }
         };
-    }
+
+    static public Habitat Land(Brain brain, Land land, InteractionMode mode) =>
+        new Habitat(brain, mode) {
+            IsShelter = (loc) => Terrain.I.GetLand(loc) == land,
+            MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.SetLand(loc, land, true) }
+        };
 }

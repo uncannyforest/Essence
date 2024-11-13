@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 714092040806779719}
   - component: {fileID: 2407161138779641919}
   - component: {fileID: 2763505932110915963}
+  - component: {fileID: 71628518836826874}
   m_Layer: 0
   m_Name: GenericCreature
   m_TagString: Untagged
@@ -161,9 +162,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalBubble: 0.25
+  body3d: {fileID: 0}
   setAnimatorDirectionDirectly: 0
   snap: 0
-  defaultSpeed: 2
   waterSpeed: 0
 --- !u!114 &2763505932110915963
 MonoBehaviour:
@@ -199,6 +200,29 @@ MonoBehaviour:
   breastplate: {fileID: 0}
   tamingInfoShort: You cannot tame any
   tamingInfoLong: That creature cannot be tamed.
+--- !u!114 &71628518836826874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7775390753821550864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af3c8e954424948abaa5ca9d0f189ab2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max: 1
+  startAtFraction: 0
+  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
+  statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
+  statBarOffset: 0.25
+  showOnHover: 0
+  insufficientTimeInfoShort: Whistle song (press and hold) to tame
+  insufficientTimeInfoLong: The <creature/> will not be tamed unless you whistle
+    a song for sufficient time.  Press and hold the left mouse button to whistle
+    a song.  A blue stat bar will appear beneath the <creature/> to indicate it can
+    hear you; when the stat bar reaches the end the <creature/> will be tamed.
 --- !u!1 &8652825595509261789
 GameObject:
   m_ObjectHideFlags: 0

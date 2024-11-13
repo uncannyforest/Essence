@@ -16,7 +16,6 @@ MonoBehaviour:
     woodBuildAction: {fileID: 1659339631126922887, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     buildTime: 0.5
     buildDistance: 0.70710677
-    tamingCost: 1
 --- !u!1001 &7033450149092257649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -90,16 +89,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoLong
-      value: 'To tame a <creature/>, you must lure it with a gemstone.
+      value: 'To tame a <creature/>, it must be on a woodpile.
 
 
-        Gemstones
-        can sometimes be found in Windmills. Give a Windmill one tap of your praxel
-        (action #3) to look inside it.'
+        You can
+        build a woodpile after harvesting meadow, shrub, or forest.'
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoShort
-      value: You need one gemstone to tame a
+      value: When it's on a woodpile, tame
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureShortName

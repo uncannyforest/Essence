@@ -101,15 +101,19 @@ public class Pathfinding {
 
     public IEnumerator<YieldInstruction> Approach(PositionProvider target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         while (true) {
+            Debug.Log(brain.legalName + " approaching . . .");
             if (CheckTargetForObstacles(target.position, proximityToStop).MoveNext(out YieldInstruction unblockSelf))
                 yield return unblockSelf;
             float distance = Vector2.Distance(target.position, transform.position);
             if (distance <= proximityToStop) {
+                movement.Idle();
                 yield break;
             } else {
                 movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target.position)));
+                Debug.Log(brain.legalName + " approaching " + target.position + ", distance " + distance + " and speed " + movement.Speed
+                    + " and agility " + brain.creature.stats.ExeTime + " so are we close? " + (distance < movement.Speed * brain.creature.stats.ExeTime));
                 if (distance < movement.Speed * brain.creature.stats.ExeTime) yield return null; // adjust faster when we're close
-                yield return TypicalWait;
+                else yield return TypicalWait;
             }
         }
     }

@@ -7,7 +7,6 @@ using Random = UnityEngine.Random;
 [Serializable]
 public class StipuleConfig {
     public Sprite attackAction;
-    public int scaleCost;
     public float meleeReach;
 }
 

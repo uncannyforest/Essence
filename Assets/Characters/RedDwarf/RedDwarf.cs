@@ -8,7 +8,6 @@ public class RedDwarfConfig {
     public Sprite woodBuildAction;
     public float buildTime;
     public float buildDistance;
-    public int tamingCost = 1;
 }
 
 public class RedDwarf : Species<RedDwarfConfig> {
@@ -34,12 +33,7 @@ public class RedDwarfBrain : Brain {
                     redDwarf.buildDistance, redDwarf.buildTime,
                     (loc) => terrain.BuildFeature(loc.Coord, FeatureLibrary.P.boat)).ForVector2Int().Queued())
         };
+
+        Habitat = Habitat.Land(this, Land.Woodpile, Habitat.InteractionMode.Inside);
     }
-
-    override public bool CanTame(Transform player) =>
-        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Gemstone, redDwarf.tamingCost);
-
-    public override bool ExtractTamingCost(Transform player) =>
-        player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Gemstone, redDwarf.tamingCost);
-
 }
