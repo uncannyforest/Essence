@@ -1094,7 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expToLevelUp: 10
-  creatureStartLevelDistance: 24
+  creatureStartLevelDistance: 12
 --- !u!114 &2120764640
 MonoBehaviour:
   m_ObjectHideFlags: 0
