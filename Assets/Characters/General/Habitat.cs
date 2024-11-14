@@ -17,11 +17,25 @@ public class Habitat {
     private HashSet<Vector2Int> recentlyVisited = new HashSet<Vector2Int>(); // not used yet
 
     public readonly InteractionMode restRadius;
-    private readonly Brain brain;
+    protected readonly Brain brain;
 
     public Habitat(Brain brain, InteractionMode restRadius) {
         this.brain = brain;
         this.restRadius = restRadius;
+    }
+
+    static public Habitat Feature(Brain brain, Feature feature) => new Habitat(brain, feature);
+    public Habitat(Brain brain, Feature feature)
+        : this(brain, InteractionMode.Nearby) {
+        IsShelter = (loc) => Terrain.I.Feature[loc]?.type == feature.type;
+        MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.ForceBuildFeature(loc, feature) };
+    }
+
+    static public Habitat Land(Brain brain, Land land, InteractionMode mode) => new Habitat(brain, land, mode);
+    public Habitat(Brain brain, Land land, InteractionMode mode)
+        : this(brain, mode) {
+        IsShelter = (loc) => Terrain.I.GetLand(loc) == land;
+        MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.SetLand(loc, land, true) };
     }
 
     public Func<Vector2Int, bool> IsShelter;
@@ -87,15 +101,30 @@ public class Habitat {
         }
     }
 
-    static public Habitat Feature(Brain brain, Feature feature) =>
-        new Habitat(brain, InteractionMode.Nearby) {
-            IsShelter = (loc) => Terrain.I.Feature[loc]?.type == feature.type,
-            MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.ForceBuildFeature(loc, feature) }
-        };
+    public IEnumerator<YieldInstruction> RestBehaviorConsume(Vector2Int shelter, Func<float> consumeTime, Action consume) {
+        switch (restRadius) {
+            case InteractionMode.Inside:
+                return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), 1f / CharacterController.subGridUnit)
+                        .ThenOnce(consumeTime, consume);
+            case InteractionMode.Beside:
+            case InteractionMode.Nearby:
+            default:
+                return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), besideDistance)
+                        .ThenOnce(consumeTime, consume);
+        }
+    }
+}
 
-    static public Habitat Land(Brain brain, Land land, InteractionMode mode) =>
-        new Habitat(brain, mode) {
-            IsShelter = (loc) => Terrain.I.GetLand(loc) == land,
-            MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.SetLand(loc, land, true) }
-        };
+public class WoodpileHabitat : Habitat {
+    private Func<float> consumeTime;
+
+    public WoodpileHabitat(Brain brain, Func<float> consumeTime) : base(brain, global::Land.Woodpile, Habitat.InteractionMode.Inside) {
+        this.consumeTime = consumeTime;
+    }
+
+    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) =>
+        RestBehaviorConsume(shelter, consumeTime, () => {
+            Terrain.I.SetLand(shelter, global::Land.Grass, true);
+            brain.resource?.Increase(5);
+    });
 }

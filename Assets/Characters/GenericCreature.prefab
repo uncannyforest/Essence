@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 2407161138779641919}
   - component: {fileID: 2763505932110915963}
   - component: {fileID: 71628518836826874}
+  - component: {fileID: 4009513887018421729}
+  - component: {fileID: 2222550371208491110}
   m_Layer: 0
   m_Name: GenericCreature
   m_TagString: Untagged
@@ -223,6 +225,45 @@ MonoBehaviour:
     a song for sufficient time.  Press and hold the left mouse button to whistle
     a song.  A blue stat bar will appear beneath the <creature/> to indicate it can
     hear you; when the stat bar reaches the end the <creature/> will be tamed.
+--- !u!114 &4009513887018421729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7775390753821550864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80be25e51623e4d0a810db62c13bc763, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentExp: 0
+  minDistanceFromOrigin: 0
+  resourceName: Resource
+  minStr: 3
+  minDef: 25
+  minExe: 2
+  exeIncrEvery: 10
+  minSpd: 1
+  minRes: 10
+--- !u!114 &2222550371208491110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7775390753821550864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4836c03255a314be1b33d0f57734c1a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max: 1
+  startAtFraction: 0.5
+  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
+  statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
+  statBarOffset: 0.125
+  showOnHover: 1
 --- !u!1 &8652825595509261789
 GameObject:
   m_ObjectHideFlags: 0

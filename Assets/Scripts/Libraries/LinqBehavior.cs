@@ -48,6 +48,15 @@ public static class EnumeratorExtensions {
             }
         }
     }
+
+    public static IEnumerator<YieldInstruction> ThenOnce(this IEnumerator<YieldInstruction> first, Func<float> seconds, Action second) {
+        while (first.MoveNext()) {
+            yield return first.Current;
+        }
+        yield return new WaitForSeconds(seconds());
+        second();
+        yield break;
+    }
 }
 
 public static class Provisionally {

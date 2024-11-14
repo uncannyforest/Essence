@@ -159,6 +159,14 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: minRes
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: resourceName
+      value: Wood
+      objectReference: {fileID: 0}
     - target: {fileID: 4914513955349957905, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_IsActive
       value: 0
