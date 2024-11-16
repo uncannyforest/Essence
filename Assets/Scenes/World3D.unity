@@ -798,6 +798,7 @@ MonoBehaviour:
   boat: {fileID: 515407244984913832, guid: a176caffd352747409ffad0dba6806f6, type: 3}
   jasmine: {fileID: 4485684207470832518, guid: 74a580025ebe14410acde5939a72d8f1, type: 3}
   carrot: {fileID: 7481764238130470887, guid: a5898b24b3e6246d4b0cbbb849a2c712, type: 3}
+  arrowPile: {fileID: 6124574314353845736, guid: 9993a2f39391e4ebe8b44cb4adaef689, type: 3}
 --- !u!114 &1753797733
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -43,8 +43,8 @@ public static class EnumeratorExtensions {
         while (true) {
             if (first.MoveNext()) yield return first.Current;
             else {
-                second();
                 yield return new WaitForSeconds(seconds);
+                second();
             }
         }
     }

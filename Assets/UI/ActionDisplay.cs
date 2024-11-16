@@ -48,7 +48,7 @@ public class ActionDisplay : MonoBehaviour {
             Transform element = hotbar.GetChild(i);
             Transform creature = element.Find("Creature");
             if (i < actions.Count) {
-                UpdateSprite(element.GetComponentStrict<Image>(), actions[i]);
+                UpdateSprite(element.GetComponentStrict<Image>(), actions[i], false);
                 creature.gameObject.SetActive(actions[i].IsCreatureAction);
                 if (actions[i].IsCreatureAction) UpdateCreatureIcon(creature, actions[i].creature);
             } else {
@@ -68,7 +68,7 @@ public class ActionDisplay : MonoBehaviour {
     }
 
     private void InteractionChanged(Interaction action, Creature creature) {
-        UpdateSprite(currentAction, action);
+        UpdateSprite(currentAction, action, true);
 
         List<Interaction> actions = interaction.Actions();
         for (int i = 0; i < 10; i++) {
@@ -86,13 +86,21 @@ public class ActionDisplay : MonoBehaviour {
         InteractionChanged(action, creature);
     }
 
-    private void UpdateSprite(Image actionDisplay, Interaction action) {
+    private void UpdateSprite(Image actionDisplay, Interaction action, bool selectedArea) {
         actionDisplay.sprite = GetSprite(action);
         Transform featureDisplay = actionDisplay.transform.Find("Feature");
         foreach (Transform feature in featureDisplay) GameObject.Destroy(feature.gameObject);
         if (action.IsCreatureAction && action.CreatureAction.UsesFeature) {
             Feature feature = GameObject.Instantiate(action.CreatureAction.feature, featureDisplay);
             feature.transform.SetLayer(LayerMask.NameToLayer("UI"));
+            Cardboard cardboard = feature.transform.GetComponentInChildren<Cardboard>();
+            if (cardboard != null) cardboard.EmbedInUI();
+            else {
+                feature.transform.localPosition = new Vector3(0, .25f, -.5f);
+                feature.transform.localRotation = Quaternion.Euler(60, 0, -45);
+                feature.transform.localScale = Vector3.one * Mathf.Sqrt(.5f);
+                if (selectedArea) StartCoroutine(AnimateFeature(feature.transform));
+            }
         }
     }
 
@@ -123,6 +131,15 @@ public class ActionDisplay : MonoBehaviour {
                 else return action.CreatureAction.icon;
             default:
                 throw new InvalidOperationException("Bad WorldInteraction Mode");
+        }
+    }
+
+    private IEnumerator<YieldInstruction> AnimateFeature(Transform transform) {
+        float z = -45;
+        while (transform != null) {
+            z += Time.deltaTime * 90;
+            transform.localRotation = Quaternion.Euler(60, 0, z);
+            yield return null;
         }
     }
 }

@@ -289,7 +289,6 @@ MonoBehaviour:
   body3d: {fileID: 3153473203215434008}
   setAnimatorDirectionDirectly: 1
   snap: 0
-  defaultSpeed: 2
   waterSpeed: 2
 --- !u!114 &7488913179682336263
 MonoBehaviour:
@@ -406,9 +405,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1569223282405937614, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3770114758264755706, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4247972791260838206, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4995201664197146255, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
       propertyPath: m_RootOrder
@@ -468,7 +475,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8602869257538055994, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8834969526643243908, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
       propertyPath: roofValid

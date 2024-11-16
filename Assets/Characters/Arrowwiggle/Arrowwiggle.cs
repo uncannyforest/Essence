@@ -22,32 +22,12 @@ public class ArrowwiggleBrain : Brain {
 
     public ArrowwiggleBrain(Arrowwiggle species, BrainConfig general, ArrowwiggleConfig arrowwiggle) : base(species, general) {
         this.arrowwiggle = arrowwiggle;
+
+        Actions = new List<CreatureAction>() {
+            CreatureAction.WithFeature(FeatureLibrary.P.arrowPile,
+                pathfinding.BuildFeature(FeatureLibrary.P.arrowPile, this, () => creature.stats.ExeTime, 5))
+        };
+
+        Habitat = new WoodpileHabitat(this, () => creature.stats.ExeTime * 5);
     }
-    
-    override public bool CanTame(Transform player) =>
-        player.GetComponentStrict<Inventory>().CanRetrieve(Material.Type.Arrow, arrowwiggle.tamingCost);
-
-    override public bool ExtractTamingCost(Transform player) {
-        return player.GetComponentStrict<Inventory>().Retrieve(Material.Type.Arrow, arrowwiggle.tamingCost);
-    }
-
-    override public WhyNot IsValidFocus(Transform characterFocus) => ShouldRestockPlayer();
-
-    override public Optional<Transform> FindFocus() =>
-        (bool)ShouldRestockPlayer() ? Optional.Of(GameManager.I.AnyPlayer.transform)
-            : Optional<Transform>.Empty();
-
-    private WhyNot ShouldRestockPlayer() {
-        PlayerCharacter player = GameManager.I.AnyPlayer;
-        return
-            !team.SameTeam(player) ? "different_team" :
-            player.GetComponentStrict<Inventory>().materials[Material.Type.Arrow].IsFull ? "player_inv_full" :
-            Vector2.Distance(transform.position, player.transform.position) > Creature.neighborhood ? "too_far" :
-            (WhyNot)true;
-    }
-
-    override public IEnumerator<YieldInstruction> FocusedBehavior() =>
-        pathfinding.Approach(state.characterFocus.Value, arrowwiggle.restockDistance)
-            .ThenEvery(arrowwiggle.restockTime,
-            () => state.characterFocus.Value.GetComponentStrict<Inventory>().Add(Material.Type.Arrow, arrowwiggle.restockQuantity));
 }

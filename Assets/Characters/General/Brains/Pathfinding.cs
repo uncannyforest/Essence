@@ -116,8 +116,15 @@ public class Pathfinding {
         }
     }
 
-    public ApproachThenInteract ApproachThenInteract(float interactionDistance, float interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
+    public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
         => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
+
+    public QueueOperator.Targeted<Vector2Int> BuildFeature(Feature feature, Brain brain, Func<float> time, int cost)
+        => ApproachThenInteract(1.5f, time,
+            (loc) => {
+                brain.resource.Use(cost);
+                Terrain.I.BuildFeature(loc.Coord, feature);
+            }).ForVector2Int((p) => brain.resource.Has(cost)).Queued();
 
     public Func<YieldInstruction> FaceAnd(string animationTrigger,
             Vector2 location,
@@ -187,7 +194,7 @@ public class Pathfinding {
 public class ApproachThenInteract {
     private readonly Brain brain;
     private readonly float interactDistance;
-    private readonly float interactTime;
+    private readonly Func<float> interactTime;
     private readonly Action<Terrain.Position> interaction;
     private readonly bool rewardExp;
     private readonly Func<Terrain.Position, IEnumerator<YieldInstruction>> enumeratorWithParam;
@@ -195,7 +202,7 @@ public class ApproachThenInteract {
     public ApproachThenInteract (
             Brain brain,
             float interactDistance,
-            float interactTime,
+            Func<float> interactTime,
             Action<Terrain.Position> interaction,
             bool rewardExp) {
         this.brain = brain;
@@ -215,7 +222,7 @@ public class ApproachThenInteract {
         brain.movement.IdleFacing(Terrain.I.CellCenter(location));
         interaction(location);
         if (rewardExp) brain.creature.GenericExeSucceeded();
-        yield return new WaitForSeconds(interactTime);
+        yield return new WaitForSeconds(interactTime());
         yield break;
     }
 

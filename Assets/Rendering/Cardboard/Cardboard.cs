@@ -34,4 +34,14 @@ public class Cardboard : MonoBehaviour {
             cardboard.Orient();
         }
     }
+
+    public void EmbedInUI() {
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.one;
+        foreach (Transform child in transform) {
+            child.localRotation = Quaternion.identity;
+            child.localScale = Vector3.one;
+        }
+        this.enabled = false;
+    }
 }
