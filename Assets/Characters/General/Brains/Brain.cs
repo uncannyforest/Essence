@@ -194,7 +194,7 @@ public class Brain {
                 SetFocus(maybeFocus.Value);
                 continue;
             }
-            if (Habitat != null) {
+            if (state.command?.type != CommandType.Follow && Habitat != null) {
                 Optional<Vector2Int> maybeShelter = Habitat.FindShelter();
                 if (maybeShelter.HasValue) {
                     SetShelter(maybeShelter.Value);
