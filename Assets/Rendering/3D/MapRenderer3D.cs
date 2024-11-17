@@ -153,7 +153,7 @@ public class MapRenderer3D : MonoBehaviour {
     public Vector2 ShoreSlope(Vector2 position, float shorePushNoZone) {
         Vector2 shoreCorrection = Vector2.zero;
         Land?[] nearTiles = GetFourLandTilesAround(position);
-        Vector2 sub = PositionInCell(position + Vct.F(-.5f, -.5f));
+        Vector2 sub = 2 * PositionInCell(position + Vct.F(-.5f, -.5f)); // [-1, 1] - 0 means boat is on edge
         if ((1 - Mathf.Abs(sub.x)) + (1 - Mathf.Abs(sub.y)) < shorePushNoZone) return Vector2.zero; // if sub is near a corner
         if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(1, 1) * (1 - Mathf.Max(sub.x, sub.y));
         if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(-1, 1) * (1 - Mathf.Max(-sub.x, sub.y));
