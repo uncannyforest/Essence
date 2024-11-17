@@ -41,7 +41,7 @@ public struct Habit {
     public IEnumerator<YieldInstruction> RunBehavior(CreatureState state, Brain brain, Action doneRunning) =>
         node.RunBehavior(state, brain, doneRunning);
     public void OnEnter() => node.onEnter(creatureState, brain);
-    public void OnExit() => node.onExit(creatureState, brain);
+    public void OnExit(CreatureState newState) => node.onExit(creatureState, newState, brain);
     public bool OnUpdate() => node.onUpdate(creatureState, brain);
 
     // static methods
@@ -60,7 +60,7 @@ public struct Habit {
     public class Node {
         public CreatureStateType type;
         public Action<CreatureState, Brain> onEnter = (s, b) => {}; // run on transition from another CreatureStateType
-        public Action<CreatureState, Brain> onExit = (s, b) => {}; // run on transition to another CreatureStateType
+        public Action<CreatureState, CreatureState, Brain> onExit = (s, n, b) => {}; // run on transition to another CreatureStateType
         public Func<CreatureState, Brain, bool> onUpdate = (s, b) => false; // run on transition to same type, return false if illegal
         public Func<CreatureState, Brain, bool> onRunCheck = (s, b) => true; // while condition for run behavior
         public Func<CreatureState, Brain, BehaviorNode> onRun; // retrieved on the second frame of RunBehavior()
@@ -70,7 +70,7 @@ public struct Habit {
 
         public Node ExitAndEnterOnUpdate() {
             onUpdate = (state, brain) => {
-                onExit(state, brain);
+                onExit(state, state, brain);
                 onEnter(state, brain);
                 return true;
             };
@@ -135,7 +135,7 @@ public struct Habit {
                 brain.movement.Idle();
                 brain.movement.SetFainted(true);
             },
-            onExit = (_, brain) => brain.movement.SetFainted(false)
+            onExit = (_, __, brain) => brain.movement.SetFainted(false)
         },
 
         [CreatureStateType.Execute] = new Node(CreatureStateType.Execute) {
@@ -144,7 +144,7 @@ public struct Habit {
         },
 
         [CreatureStateType.Focus] = new Node(CreatureStateType.Focus) {
-            onExit = (state, brain) => {
+            onExit = (state, _, brain) => {
                 if (state.focusIsPair.HasValue) {
                     state.focusIsPair.Value?.EndPairCommand(brain.transform);
                 }
@@ -167,7 +167,7 @@ public struct Habit {
         },
 
         [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {
-            onExit = (state, _) => {
+            onExit = (state, _, __) => {
                 Creature master = state.pairDirective.Value.GetComponent<Creature>();
                 if (master != null) master.EndPairRequest();
             },
@@ -176,6 +176,10 @@ public struct Habit {
         },
 
         [CreatureStateType.Rest] = new Node(CreatureStateType.Rest) {
+            onExit = (_, newState, brain) => {
+                if (newState.type != CreatureStateType.PassiveCommand || newState.command?.type == CommandType.Follow) 
+                    brain.Habitat?.ClearRecentlyVisited();
+            },
             onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.shelter),
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
                 () => brain.Habitat.RestBehavior((Vector2Int)state.shelter)),
@@ -184,7 +188,7 @@ public struct Habit {
         [CreatureStateType.Investigate] = new Node(CreatureStateType.Investigate) {
             onEnter = (_, brain) => brain.investigationCancel =
                 RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
-            onExit = (_, brain) => brain.investigationCancel.Stop(),
+            onExit = (_, __, brain) => brain.investigationCancel.Stop(),
             onRunCheck = (state, brain) => ((Vector3)state.investigation - brain.transform.position).magnitude >
                                             brain.creature.stats.ExeTime * brain.movement.Speed,
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
@@ -197,6 +201,10 @@ public struct Habit {
         [CreatureStateType.PassiveCommand] = new Node(CreatureStateType.PassiveCommand) {
             onEnter = (state, brain) => {
                 if (state.followOffensive) brain.UpdateFollowOffensive();
+            },
+            onExit = (_, newState, brain) => {
+                if (newState.type != CreatureStateType.Rest) 
+                    brain.Habitat?.ClearRecentlyVisited();
             },
             onUpdate = (_, __) => true,
             onRunStep = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].passiveCommandRunStep(state, brain)

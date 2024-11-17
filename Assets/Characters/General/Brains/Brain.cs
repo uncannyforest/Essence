@@ -158,7 +158,7 @@ public class Brain {
             Habit oldHabit = Habit.Get(oldState, this);
             newHabit = Habit.Get(state, this);
             if (oldState.type != state.type) {
-                oldHabit.OnExit();
+                oldHabit.OnExit(state);
                 newHabit.OnEnter();
             } else {
                 newHabit.OnUpdate();
