@@ -189,7 +189,7 @@ public class Creature : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collider) {
         Boat boat = collider.transform.parent.GetComponent<Boat>();
-        if (boat != null && boat.player == brain.state.command?.followDirective.Or(null)?.GetComponent<PlayerCharacter>())
+        if (boat != null && boat.player != null && boat.player == brain.state.command?.followDirective.Or(null)?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
     }
 
