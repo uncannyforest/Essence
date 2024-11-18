@@ -91,7 +91,9 @@ public class Habitat {
             select Optional.Of(location)).FirstOrDefault();
     }
 
-    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) {
+    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorDefault(shelter);
+
+    private IEnumerator<YieldInstruction> RestBehaviorDefault(Vector2Int shelter) {
         IEnumerator<YieldInstruction> approach;
         switch (restRadius) {
             case InteractionMode.Inside:
@@ -116,7 +118,7 @@ public class Habitat {
         restDuration += 5;
     }
 
-    public IEnumerator<YieldInstruction> RestBehaviorConsume(Vector2Int shelter, Func<float> consumeTime, Action consume) {
+    private IEnumerator<YieldInstruction> RestBehaviorConsumeOnly(Vector2Int shelter, Func<float> consumeTime, Action consume) {
         switch (restRadius) {
             case InteractionMode.Inside:
                 return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), 1f / CharacterController.subGridUnit)
@@ -128,6 +130,11 @@ public class Habitat {
                         .ThenOnce(consumeTime, consume);
         }
     }
+
+    public IEnumerator<YieldInstruction> RestBehaviorConsume(Vector2Int shelter, Func<float> consumeTime, Action consume) =>
+        Provisionally.Run(RestBehaviorConsumeOnly(shelter, consumeTime, consume))
+        .Where(yi => brain.resource?.IsFull() != true)
+        .Then(RestBehaviorDefault(shelter));
 }
 
 public class WoodpileHabitat : Habitat {
