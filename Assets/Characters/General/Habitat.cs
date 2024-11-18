@@ -143,3 +143,20 @@ public class WoodpileHabitat : Habitat {
             brain.resource?.Increase(5);
     });
 }
+
+public class ConsumableFeatureHabitat : Habitat {
+    private Func<float> consumeTime;
+    private int consumeQuantity;
+
+    public ConsumableFeatureHabitat(Brain brain, Feature feature, Func<float> consumeTime, int consumeQuantity) : base(brain, feature) {
+        this.consumeTime = consumeTime;
+        this.consumeQuantity = consumeQuantity;
+    }
+
+    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) =>
+        RestBehaviorConsume(shelter, consumeTime, () => {
+            Terrain.I.DestroyFeature(shelter);
+            brain.resource?.Increase(consumeQuantity);
+    });
+
+}

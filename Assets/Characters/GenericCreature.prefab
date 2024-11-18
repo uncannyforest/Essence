@@ -262,7 +262,7 @@ MonoBehaviour:
   startAtFraction: 0.5
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
-  statBarOffset: 0.125
+  statBarOffset: 0.1875
   showOnHover: 1
 --- !u!1 &8652825595509261789
 GameObject:

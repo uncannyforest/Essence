@@ -125,11 +125,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoLong
-      value: <creature/> can be tamed after defeating if a ditch is nearby.
+      value: <creature/> can be tamed after defeating if a shrub is nearby.
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoShort
-      value: Defeat with ditch nearby to tame
+      value: Defeat with shrub nearby to tame
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureShortName
@@ -214,6 +214,10 @@ PrefabInstance:
     - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: resourceName
+      value: Energy
       objectReference: {fileID: 0}
     - target: {fileID: 4023649891087868684, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer

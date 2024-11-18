@@ -32,12 +32,9 @@ public class MooseBrain : Brain {
         };
 
         Habitat = new Habitat(this, Habitat.InteractionMode.Inside) {
-            IsShelter = (loc) => terrain.Land[loc] == Land.Ditch
+            IsShelter = (loc) => terrain.Land[loc] == Land.Shrub
         };
     }
-
-    override public bool ExtractTamingCost(Transform player) => CanTame(player);
-    override public bool CanTame(Transform player) => Habitat.CanTame();
 
     private List<Vector3> GetDestinationsForDisplay() => 
         (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;
@@ -49,19 +46,24 @@ public class MooseBrain : Brain {
 
     override public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
 
-    private IEnumerator<YieldInstruction> ApproachAndAttack(Terrain.Position location)
-        => pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
+    private IEnumerator<YieldInstruction> ApproachAndAttack(Terrain.Position l) =>
+        from location in Continually.For(l)
+        where resource.Has()
+        select pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
             .Then(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));
     
     private YieldInstruction Attack(Terrain.Position location) {
         if (location.grid != Terrain.Grid.Roof) {
             terrain[location] = Construction.None;
             creature.GenericExeSucceeded();
+            resource.Use();
         } else if (terrain.GetLand(location.Coord) == Land.Dirtpile) {
             terrain.Land[location.Coord] = Land.Grass;
             creature.GenericExeSucceeded();
+            resource.Use();
         } else if (terrain.Feature[location.Coord] != null) {
             terrain.Feature[location.Coord].Attack(transform, creature.stats.Str);
+            resource.Use();
         }
         return new WaitForSeconds(moose.destroyTime);
     }

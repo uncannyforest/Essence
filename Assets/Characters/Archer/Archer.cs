@@ -34,30 +34,18 @@ public class ArcherBrain : Brain {
                     c.GetComponent<Health>() != null &&
                     c.GetComponentStrict<Team>().TeamId != teamId; })
         };
+
+        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.P.arrowPile, () => creature.stats.ExeTime * 2, 20);
     }
 
-    override public bool CanTame(Transform player) {
-        return state.type == CreatureStateType.Faint // changed in CommandFollow not ExtractTamingCost
-            && HasBunnyNearby(player);
-    }
+    override public Optional<Transform> FindFocus() => resource.Has()
+        ? Will.NearestThreat(this, (threat) => threat.GetComponent<Archer>() == null)
+        : Optional<Transform>.Empty();
 
-    // Returns true if successful.
-    public override bool ExtractTamingCost(Transform player) {
-        if (CanTame(player)) {
-            GetComponentStrict<Health>().ResetTo(1);
-            return true;
-        } else return false;
-    }
-
-    override public Optional<Transform> FindFocus() => Will.NearestThreat(this,
-        (threat) => threat.GetComponent<Archer>() == null);
-
-    override public IEnumerator<YieldInstruction> FocusedBehavior() {
-        return ExecuteBehavior(state.characterFocus.Value);
-    }
+    override public IEnumerator<YieldInstruction> FocusedBehavior() => ExecuteBehavior(state.characterFocus.Value);
 
     public IEnumerator<YieldInstruction> ExecuteBehavior(Transform focus) {
-        while (true) {
+        while (IsValidFocus(focus)) {
             yield return WatchForMovement(focus, out Vector2 pos0, out float time0);
             yield return Attack(focus, pos0, time0);
         }
@@ -75,6 +63,7 @@ public class ArcherBrain : Brain {
         Debug.DrawLine(pos1, expectedFuturePosition, Color.red, 1f);
         if (Vector2.Distance(expectedFuturePosition, transform.position) < expectedArrowReach) {
             movement.IdleFacing(expectedFuturePosition);
+            resource.Use();
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition, creature.stats.Str);
         } else if (state.command?.type != CommandType.Station) {
             pathfinding.MoveTowardWithoutClearingObstacles(target.position);
@@ -94,15 +83,5 @@ public class ArcherBrain : Brain {
         new Senses() {
             faint = true
         }.TryUpdateCreature(creature);
-    }
-
-    private bool HasBunnyNearby(Transform player) {
-        Collider2D[] charactersNearby =
-            Physics2D.OverlapCircleAll(player.position, Creature.neighborhood, LayerMask.GetMask("Creature"));
-        foreach (Collider2D character in charactersNearby)
-            if (character.GetComponent<Bunny>() != null &&
-                    character.GetComponentStrict<Team>().SameTeam(player))
-                return true;
-        return false;
     }
 }

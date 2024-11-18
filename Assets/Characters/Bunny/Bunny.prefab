@@ -216,10 +216,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af3c8e954424948abaa5ca9d0f189ab2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  max: 1
   startAtFraction: 0
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}
-  statBarOffset: 0.125
+  statBarOffset: 0.1875
   showOnHover: 0
   insufficientTimeInfoShort: Whistle song (press and hold) to tame
   insufficientTimeInfoLong: The <creature/> will not be tamed unless you whistle
@@ -292,10 +293,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4836c03255a314be1b33d0f57734c1a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  max: 1
   startAtFraction: 0.5
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
-  statBarOffset: 0.375
+  statBarOffset: 0.125
   showOnHover: 1
 --- !u!1 &6868019693913487994
 GameObject:
