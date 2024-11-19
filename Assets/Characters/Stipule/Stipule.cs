@@ -25,19 +25,18 @@ public class StipuleBrain : Brain {
     public StipuleBrain(Stipule species, BrainConfig general, StipuleConfig stipule) : base(species, general) {
         this.stipule = stipule;
 
+        MainBehavior = new CharacterTargetedBehavior(AttackBehavior,
+            (c) => Will.IsThreat(teamId, transform.position, c).NegLog(legalName + " cannot select " + c),
+            (c) => SufficientResource());
+
         Actions = new List<CreatureAction>() {
-            CreatureAction.WithCharacter(stipule.attackAction,
-                new CharacterTargetedBehavior(AttackBehavior, (t) => SufficientResource()),
-                (c) => Will.IsThreat(teamId, transform.position, c)     .NegLog(legalName + " cannot select " + c)
-            )
+            MainBehavior.CreatureAction(stipule.attackAction)
         };
 
         Habitat = Habitat.Feature(this, FeatureLibrary.P.jasmine);
     }
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
-
-    override public IEnumerator<YieldInstruction> FocusedBehavior() => AttackBehavior(state.characterFocus.Value);
 
     private IEnumerator<YieldInstruction> AttackBehavior(Transform f) =>
         from focus in Continually.For(f)
@@ -47,18 +46,7 @@ public class StipuleBrain : Brain {
 
     private void Attack(Transform target) {
         Health health = target.GetComponentStrict<Health>();
-        if (target.GetComponent<Team>()?.TeamId == teamId) {
-            Debug.LogError("Unexpected state, target is same team");
-            return;
-        }
         health.Decrease(creature.stats.Str, transform);
         resource.Use();
-    }
-
-    // TODO move this to Brain
-    override protected void OnHealthReachedZero() {
-        new Senses() {
-            faint = true
-        }.TryUpdateCreature(creature);
     }
 }

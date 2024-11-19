@@ -48,48 +48,6 @@ public class RestrictNearbyBehavior : BehaviorNode {
         select _;
 }
 
-// behavior generator with unspecified target
-// 1. At construction:
-//        targetedBehavior = new TargetedBehavior(targetToEnumeratorFunction)
-// 2. When target is known:
-//        behaviorNode = targetedBehavior.WithTarget(target)
-public class TargetedBehavior<T> {
-    virtual public bool canQueue { get; protected set; } = false;
-
-    public Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam;
-    public Func<T, WhyNot> errorFilter;
-
-    protected TargetedBehavior() {}
-    public TargetedBehavior(Func<T, IEnumerator<YieldInstruction>> enumeratorWithParam, Func<T, WhyNot> errorFilter) {
-        this.enumeratorWithParam = enumeratorWithParam;
-        this.errorFilter = errorFilter;
-    }
-
-    virtual public OneOf<BehaviorNode, string> WithTarget(T target) {
-        WhyNot canTarget = errorFilter(target);
-        if (canTarget) return new BehaviorNode(() => CheckNonNullTargetEnumerator(target));
-        else return (string)canTarget;
-    }
-
-    private IEnumerator<YieldInstruction> CheckNonNullTargetEnumerator(T target) {
-        IEnumerator<YieldInstruction> task = enumeratorWithParam(target);
-        while (target != null && task.MoveNext()) {
-            yield return task.Current;
-        }
-    }
-
-    public QueueOperator.Targeted<T> Queued() =>
-        new QueueOperator.Targeted<T>(enumeratorWithParam, errorFilter);
-}
-
-// common TargetedBehavior use case, implementation simply specifies <Transform>
-public class CharacterTargetedBehavior : TargetedBehavior<Transform> {
-    public CharacterTargetedBehavior(
-        Func<Transform, IEnumerator<YieldInstruction>> enumeratorWithParam,
-        Func<Transform, WhyNot> errorFilter)
-        : base(enumeratorWithParam, errorFilter) {}
-}
-
 // queue multiple sub-behaviors
 public class QueueOperator : BehaviorNode {
     private Queue<BehaviorNode> queue = new Queue<BehaviorNode>();

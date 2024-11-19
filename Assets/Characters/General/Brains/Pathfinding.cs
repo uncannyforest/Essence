@@ -234,8 +234,4 @@ public class ApproachThenInteract {
         enumeratorWithParam,
         errorFilter
     );
-    public TargetedBehavior<Target> ForTarget(Func<Target, WhyNot> errorFilter) => new TargetedBehavior<Target>(
-        (target) => enumeratorWithParam((Terrain.Position)target),
-        errorFilter
-    );
 }

@@ -27,12 +27,13 @@ public class ArcherBrain : Brain {
         this.archer = archer;
         expectedArrowReach = archer.arrowPrefab.reach + archer.arrowPrefab.GetComponentStrict<CircleCollider2D>().radius;
 
+        MainBehavior = new CharacterTargetedBehavior(ExecuteBehavior,
+            (c) => c.GetComponent<Health>() != null &&
+                   c.GetComponentStrict<Team>().TeamId != teamId,
+            (c) => SufficientResource());
+
         Actions = new List<CreatureAction>() {
-            CreatureAction.WithCharacter(archer.attackAction,
-                new CharacterTargetedBehavior(ExecuteBehavior, (t) => SufficientResource()),
-                (c) => { Debug.Log(c.GetComponent<Health>() + " " + c.GetComponentStrict<Team>().TeamId); return
-                    c.GetComponent<Health>() != null &&
-                    c.GetComponentStrict<Team>().TeamId != teamId; })
+            MainBehavior.CreatureAction(archer.attackAction)
         };
 
         Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.P.arrowPile, () => creature.stats.ExeTime * 2, 20);
@@ -42,14 +43,13 @@ public class ArcherBrain : Brain {
         ? Will.NearestThreat(this, (threat) => threat.GetComponent<Archer>() == null)
         : Optional<Transform>.Empty();
 
-    override public IEnumerator<YieldInstruction> FocusedBehavior() => ExecuteBehavior(state.characterFocus.Value);
-
-    public IEnumerator<YieldInstruction> ExecuteBehavior(Transform focus) {
+    private IEnumerator<YieldInstruction> ExecuteBehavior(Transform focus) {
         while (IsValidFocus(focus)) {
             yield return WatchForMovement(focus, out Vector2 pos0, out float time0);
             yield return Attack(focus, pos0, time0);
         }
     }
+
     private WaitForSeconds WatchForMovement(Transform target, out Vector2 pos0, out float time0) {
         pos0 = target.position;
         time0 = Time.time;
@@ -76,12 +76,5 @@ public class ArcherBrain : Brain {
         float approxTimeToHit = Vector2.Distance(pos1, transform.position) / archer.arrowPrefab.speed;
         Debug.Log(velocity + " " + approxTimeToHit + " " + (pos1 + velocity * approxTimeToHit));
         return pos1 + velocity * (approxTimeToHit / 2f);
-    }
-
-    // TODO move this to Brain
-    override protected void OnHealthReachedZero() {
-        new Senses() {
-            faint = true
-        }.TryUpdateCreature(creature);
     }
 }

@@ -36,14 +36,7 @@ public class BunnyBrain : Brain {
         if ((bool)healing.CanHeal(player, Creature.neighborhood)) return Optional.Of(player);
         else return RequestPair(healing.FindOneCreatureToHeal());
     }
-
-    private bool ShouldHealPlayer() {
-        PlayerCharacter player = GameManager.I.AnyPlayer;
-        return player.GetComponentStrict<Team>().TeamId == teamId &&
-                !player.GetComponentStrict<Health>().IsFull() &&
-                Vector2.Distance(transform.position, player.transform.position) <= Creature.neighborhood;
-    }
-
+    
     override public IEnumerator<YieldInstruction> FocusedBehavior() =>
         pathfinding.Approach(state.characterFocus.Value, healing.healDistance).Then(() => {
                 state.characterFocus.Value.GetComponentStrict<Health>().Increase(creature.stats.Str);

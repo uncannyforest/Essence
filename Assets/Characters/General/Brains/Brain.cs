@@ -64,7 +64,7 @@ public class Brain {
 
     protected T GetComponent<T>() => species.GetComponent<T>();
     protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
-    virtual protected void OnHealthReachedZero() => GameObject.Destroy(creature.gameObject);
+    virtual protected void OnHealthReachedZero() => new Senses() { faint = true }.TryUpdateCreature(creature);
     public RunOnce investigationCancel = null;
 
     ///////////////////
@@ -107,7 +107,8 @@ public class Brain {
     public WhyNot SufficientResource(int quantityNeeded = 1) =>
         resource?.Has(quantityNeeded) != false ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";
 
-    virtual public IEnumerator<YieldInstruction> FocusedBehavior() { yield break; }
+    public FlexSourceBehavior MainBehavior { get; protected set; } = new NullSourceBehavior();
+    virtual public IEnumerator<YieldInstruction> FocusedBehavior() => MainBehavior.FocusedBehavior(this);
     virtual public WhyNot IsValidFocus(Transform characterFocus) => 
         characterFocus == null ? "null_focus" :
         general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
