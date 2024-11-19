@@ -21,7 +21,7 @@ public class Stats : MonoBehaviour {
         set {
             if (value < currentExp)
                 throw new ArgumentException("Cannot decrease Exp (" + currentExp + " -> " + value + ")");
-            if (value > currentExp)// + 2)
+            if (value > currentExp + 2)
                 Debug.Log(gameObject.name + " just gained " + (value - currentExp) + " EXP, reaching " + value + " EXP");
             currentExp = value;
             bool justLeveledUp = currentExp == LevelToExp(Level);
@@ -64,7 +64,7 @@ public class Stats : MonoBehaviour {
     }
 
     private void OnLevelUp(bool displayMessage) {
-        if (displayMessage) Debug.Log(gameObject.name + " just reached level " + Level);
+        if (displayMessage) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
         if (LeveledUp != null) LeveledUp(this);
     }
 
