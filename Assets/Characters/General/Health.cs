@@ -22,7 +22,10 @@ public class Health : StatusQuantity {
     }
 
     public void Decrease(int quantity, Transform blame) {
-        if (!Decrease(quantity)) return;
+        float fraction = (float) quantity / max;
+        float actualFraction = 1 - 1 / (fraction + 1f); // Approaches fraction as x approaches 0, but never surpasses 1
+        int actualQuantity = Mathf.FloorToInt(actualFraction * max);
+        if (!Decrease(actualQuantity)) return;
         GetComponent<Team>()?.OnAttack(blame);
         if (blame != null) blame.GetComponent<Creature>()?.AttackSucceeded(IsZero() ? max : (int?)null);
         ResetDamageVisual();

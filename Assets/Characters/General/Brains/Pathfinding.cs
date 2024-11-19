@@ -163,7 +163,7 @@ public class Pathfinding {
         foreach (Terrain.Position position in
                 MooseMath.GetPathPositions(brain.transform.position, target)) {
             if (position.grid == Terrain.Grid.XWalls || position.grid == Terrain.Grid.YWalls) {
-                if (Terrain.I[position] != Construction.None) {
+                if ((Terrain.I.GetConstruction(position) ?? Construction.None) != Construction.None) {
                     return new DesireMessage.Obstacle() {
                         requestor = brain.creature,
                         location = position,

@@ -64,7 +64,7 @@ public class Stats : MonoBehaviour {
     }
 
     private void OnLevelUp(bool displayMessage) {
-        if (displayMessage) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
+        if (displayMessage && GameManager.I.YourTeam.SameTeam(creature)) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
         if (LeveledUp != null) LeveledUp(this);
     }
 
