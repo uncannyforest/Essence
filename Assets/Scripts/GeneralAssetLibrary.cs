@@ -9,4 +9,5 @@ public class GeneralAssetLibrary : MonoBehaviour {
     
     public UnityEngine.Material spriteDefault;
     public UnityEngine.Material spriteSolidColor;
+    public GameObject levelDisplay;
 }

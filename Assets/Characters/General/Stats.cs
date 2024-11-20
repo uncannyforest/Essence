@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Creature))]
 public class Stats : MonoBehaviour {
@@ -43,7 +44,9 @@ public class Stats : MonoBehaviour {
 
     void Start() {
         creature = GetComponent<Creature>();
+        GameObject levelDisplay = GameObject.Instantiate(GeneralAssetLibrary.P.levelDisplay, transform);
         if (currentExp == 0) InitializeStats(); // if not deserialized from save
+        else gameObject.GetComponentInChildren<TextMesh>().text = "" + Level;
     }
 
     private void InitializeStats() {
@@ -66,6 +69,8 @@ public class Stats : MonoBehaviour {
     private void OnLevelUp(bool displayMessage) {
         if (displayMessage && GameManager.I.YourTeam.SameTeam(creature)) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
         if (LeveledUp != null) LeveledUp(this);
+        TextMesh levelDisplay = gameObject.GetComponentInChildren<TextMesh>();
+        if (levelDisplay != null) levelDisplay.text = "" + Level;
     }
 
     public static string GenerateName() {

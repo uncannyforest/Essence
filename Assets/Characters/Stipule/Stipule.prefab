@@ -37,7 +37,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4481103850635713290}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 55.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3912830005668749589}
@@ -106,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  max: 1
   startAtFraction: 1
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
@@ -205,7 +206,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
-    scaleCost: 3
     meleeReach: 1
 --- !u!95 &7051101361044908341
 Animator:
@@ -276,6 +276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4836c03255a314be1b33d0f57734c1a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  max: 1
   startAtFraction: 0.5
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
@@ -293,6 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af3c8e954424948abaa5ca9d0f189ab2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  max: 1
   startAtFraction: 0
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.6, g: 0.53333336, b: 1, a: 1}

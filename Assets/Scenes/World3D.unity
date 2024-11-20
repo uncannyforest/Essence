@@ -613,7 +613,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1500105217}
   - component: {fileID: 1500105216}
-  - component: {fileID: 1500105220}
   - component: {fileID: 1500105219}
   - component: {fileID: 1500105218}
   m_Layer: 0
@@ -679,20 +678,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteDefault: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   spriteSolidColor: {fileID: 2100000, guid: a7fdfcf1e36774c7c9ea78e33a63359f, type: 2}
---- !u!114 &1500105220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1500105215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  expToLevelUp: 10
-  creatureStartLevelDistance: 24
+  levelDisplay: {fileID: 1814457958464403419, guid: f45e2cec2c56941debc43d10850c01fe, type: 3}
 --- !u!1 &1753797727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,8 +997,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2120764631}
-  - component: {fileID: 2120764639}
   - component: {fileID: 2120764633}
+  - component: {fileID: 2120764630}
   - component: {fileID: 2120764644}
   - component: {fileID: 2120764636}
   - component: {fileID: 2120764640}
@@ -1025,6 +1011,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &2120764630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120764629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expToLevelUp: 10
+  creatureStartLevelDistance: 24
 --- !u!4 &2120764631
 Transform:
   m_ObjectHideFlags: 0
@@ -1082,20 +1082,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   temperate: {fileID: 11400000, guid: 942721d26aa544baf91813b2f47e90b8, type: 2}
---- !u!114 &2120764639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2120764629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88aeaba68bf1640108b93ff5248e152b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  expToLevelUp: 10
-  creatureStartLevelDistance: 12
 --- !u!114 &2120764640
 MonoBehaviour:
   m_ObjectHideFlags: 0
