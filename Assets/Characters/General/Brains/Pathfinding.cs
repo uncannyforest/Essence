@@ -101,7 +101,6 @@ public class Pathfinding {
 
     public IEnumerator<YieldInstruction> Approach(PositionProvider target, float proximityToStop = 1f / CharacterController.subGridUnit) {
         while (true) {
-            Debug.Log(brain.legalName + " approaching . . .");
             if (CheckTargetForObstacles(target.position, proximityToStop).MoveNext(out YieldInstruction unblockSelf))
                 yield return unblockSelf;
             float distance = Vector2.Distance(target.position, transform.position);

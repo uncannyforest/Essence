@@ -109,8 +109,7 @@ public class Will {
                     relinquishedPriority = (int)CreatureStateType.Pair; // end pair
                     return CreatureState.Unpair(state);
                 case CreatureMessage.Type.EndPairToMaster:
-                    if (state.type != CreatureStateType.Focus) {
-                        Debug.LogError("Why was there a pair when state " + state);
+                    if (state.type != CreatureStateType.Focus) { // we must have initiated
                         return "Can't remove pair focus when no focus";
                     } 
                     return state.ClearFocus();
