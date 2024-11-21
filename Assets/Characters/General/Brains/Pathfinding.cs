@@ -22,27 +22,6 @@ public class PositionProvider {
 }
 
 public class Pathfinding {
-    public enum AIDirections {
-        Infinite,
-        Four,
-        Eight,
-        Twelve
-    }
-    public static Dictionary<AIDirections, Displacement[]> AIDirectionVectors = new Dictionary<AIDirections, Displacement[]>() {
-        [AIDirections.Four] = new Displacement[] {
-            new Displacement(0.7071067812f, 0.7071067812f),
-        },
-        [AIDirections.Eight] = new Displacement[] {
-            new Displacement(1f, 0f),
-            new Displacement(0.7071067812f, 0.7071067812f),
-        },
-        [AIDirections.Twelve] = new Displacement[] {
-            new Displacement(1f, 0.2679491924f), // tan(15)
-            new Displacement(0.7071067812f, 0.7071067812f),
-            new Displacement(0.2679491924f, 1f)
-        }
-    };
-
     public readonly Brain brain;
     public Pathfinding(Brain brain) {
         this.brain = brain;
@@ -51,20 +30,9 @@ public class Pathfinding {
     private CharacterController movement { get => brain.movement; }
     private Transform transform { get => brain.transform; }
 
-    private Displacement[] aiDirections { get => AIDirectionVectors[general.numMovementDirections]; }
-
-    private Displacement RandomVelocity() {
-        Displacement randomFromList = aiDirections[Random.Range(0, aiDirections.Length)];
-        return Randoms.RightAngleRotation(randomFromList);
-    }
+    private Displacement RandomVelocity() => Randoms.Direction();
     
-    private Displacement IndexedVelocity(Displacement targetDirection) {
-        // round instead of floor if aiDirections.Length were even.
-        int index = Mathf.FloorToInt((targetDirection.angle + 360) % 360 / (90 / aiDirections.Length));
-        int rotation = index / aiDirections.Length;
-        int subIndex = index % aiDirections.Length;
-        return aiDirections[subIndex].RotateRightAngles(rotation);
-    }
+    private Displacement IndexedVelocity(Displacement targetDirection) => targetDirection.normalized;
 
     public void MoveTowardWithoutClearingObstacles(Vector3 target) {
         CheckTargetForObstacles(target, 0).MoveNext();

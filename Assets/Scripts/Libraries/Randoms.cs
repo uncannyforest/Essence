@@ -27,6 +27,8 @@ public class Randoms {
         return new Vector2Int(x / 2 + dx, y / 2 + dy);
     }
 
+    public static Displacement Direction() => Disp.FT(Vector2.zero, Quaternion.Euler(0, 0, Random.value * 360) * Vector2.right);
+
     public static Displacement RightAngleRotation(Displacement input) {
         int rotation = Random.Range(0, 4);
         switch(rotation) {

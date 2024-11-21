@@ -7,7 +7,6 @@ using Random = UnityEngine.Random;
 
 [Serializable]
 public class BrainConfig {
-    public Pathfinding.AIDirections numMovementDirections;
     public bool canFaint = false;
     public float lureMaxTime = 10f;
     public float roamRestingFraction = .5f;
