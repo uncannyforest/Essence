@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 public class Randoms {
     public static bool CoinFlip { get => Random.Range(0, 2) == 0; }
 
+    public static int Sign { get => Random.Range(0, 2) * 2 - 1; }
+
     public static T InArray<T>(T[] array) => array[Random.Range(0, array.Length)];
 
     public static Vector2Int Vector2Int(Vector2Int v0, Vector2Int v1) {

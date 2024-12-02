@@ -65,7 +65,7 @@ public class Terrain : MonoBehaviour {
     public readonly TerrainValidator validator;
     public readonly Concealment concealment;
 
-    public const int Dim = 128;
+    public const int Dim = 256;
     private Land[,] land = new Land[Dim, Dim];
     private Construction[,] xWalls = new Construction[Dim, Dim + 1];
     private Construction[,] yWalls = new Construction[Dim + 1, Dim];
@@ -116,7 +116,7 @@ public class Terrain : MonoBehaviour {
         get => new Bounds(Dim, Dim);
     }
     public Land Depths {
-        get => global::Land.Water;
+        get => global::Land.Hill;
     }
     public bool InBounds(Vector2 coord) => Bounds.Contains(coord.FloorToInt());
     public bool InBounds(Position pos) {

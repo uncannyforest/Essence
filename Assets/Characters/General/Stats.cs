@@ -56,8 +56,13 @@ public class Stats : MonoBehaviour {
         SetExp(LevelToExp(initLevel));
     }
 
-    public int GetInitLevel(Vector2Int position) =>
-        Mathf.Max(0, (position.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) / (GlobalConfig.I.creatureStartLevelDistance * GlobalConfig.I.creatureStartLevelDistance)) + 1;
+    public int GetInitLevel(Vector2Int position) {
+        Displacement distanceFromOrigin = Disp.FT(new Vector2Int(Terrain.Dim, Terrain.Dim) / 2, position);
+        return Mathf.Max(0,
+            ((int)distanceFromOrigin.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) /
+            (GlobalConfig.I.creatureStartLevelDistance * GlobalConfig.I.creatureStartLevelDistance))
+            + 1;
+    }
     public int LevelToExp(int level) => level * level * GlobalConfig.I.expToLevelUp;
 
     // for initialization situations where you're not just incrementing
