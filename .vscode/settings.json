@@ -1,6 +1,5 @@
 {
-    "files.exclude":
-    {
+    "files.exclude": {
         "**/.DS_Store": true,
         "**/.git": true,
         "**/.gitignore": true,
@@ -51,5 +50,6 @@
         "ProjectSettings/": true,
         "temp/": true,
         "Temp/": true
-    }
+    },
+    "dotnet.defaultSolution": "Essence.sln"
 }
