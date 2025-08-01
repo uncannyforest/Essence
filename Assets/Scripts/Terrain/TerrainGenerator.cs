@@ -601,10 +601,10 @@ public class TerrainGenerator {
                     continue;
                 }
                 terrain.Land[location] = Land.Grass;
-                Feature fountain = terrain.BuildFeature(location, FeatureLibrary.P.fountain);
+                Feature fountain = terrain.BuildFeature(location, FeatureLibrary.C.fountain);
                 if (x == gridInc && y == gridInc) {
                     startLocation = location;
-                    fountain.GetComponentStrict<Fountain>().Team = 1;
+                    fountain.hooks.GetComponentStrict<Fountain>().Team = 1;
                 }
                 break;
             }
@@ -620,7 +620,7 @@ public class TerrainGenerator {
                 if (terrain.Land[location] == Land.Water || terrain.Land[location] == Land.Hill
                     || terrain.Feature[location] != null) continue;
                 terrain.Land[location] = Land.Grass;
-            terrain.BuildFeature(location, FeatureLibrary.P.windmill);
+            terrain.BuildFeature(location, FeatureLibrary.C.windmill);
                 break;
             }
         }
@@ -654,6 +654,6 @@ public class TerrainGenerator {
                 Debug.Log(farthestShore);
             }
         }
-        terrain.BuildFeature(farthestShore, FeatureLibrary.P.boat);
+        terrain.BuildFeature(farthestShore, FeatureLibrary.C.boat);
     }
 }

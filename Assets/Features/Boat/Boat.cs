@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[RequireComponent(typeof(Feature))]
+[RequireComponent(typeof(FeatureHooks))]
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class Boat : MonoBehaviour {
@@ -17,7 +17,7 @@ public class Boat : MonoBehaviour {
 
     private Terrain terrain;
     private Transform worldBag;
-    private Feature feature;
+    private FeatureHooks feature;
     [NonSerialized] public CharacterController movement;
 
     private bool inUse;
@@ -36,7 +36,7 @@ public class Boat : MonoBehaviour {
         worldBag = FindObjectOfType<Fauna>().transform;
         movement = GetComponent<CharacterController>();
         movement.CrossingTile += HandleCrossingTile;
-        feature = GetComponent<Feature>();
+        feature = GetComponent<FeatureHooks>();
         feature.PlayerEntered += HandlePlayerEntered;
         CreatureExits = new TaskRunner(CreatureExitE, this);
     }
@@ -56,7 +56,7 @@ public class Boat : MonoBehaviour {
         inUse = false;
         movement.rigidbody.bodyType = RigidbodyType2D.Static;
         exitLocation = location * 2 - terrain.CellCenterAt(transform.position);
-        terrain.Feature[currentTile] = feature;
+        feature.Place(currentTile);
         movement.InDirection((Displacement)currentShoreCorrection).Idle();
         FaceDirection((Displacement)currentShoreCorrection);
         Debug.DrawLine(location, (Vector2)exitLocation, Color.magenta, 5);

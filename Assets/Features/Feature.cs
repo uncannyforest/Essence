@@ -1,57 +1,68 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Health))]
-public class Feature : MonoBehaviour {
-    [SerializeField] public LandFlags validLand = 0;
-    [SerializeField] public bool roofValid;
-    [SerializeField] public bool canHit = true;
+// Code relating to the construction of Features
 
-    public Vector2Int? tile;
-    public Func<PlayerCharacter, bool> PlayerEntered;
-    public Action<Transform> Attacked;
-    public Action Died; // if set, overrides Destroy() as response
+[Serializable]
+public class FeatureConfig {
+    [NonSerialized] public string type;
 
-    [HideInInspector] public string type;
-    [NonSerialized] public Func<int[]> SerializeFields;
-    [NonSerialized] public int[] serializedFields;
+    public LandFlags validLand = LandFlags.Grass & LandFlags.Dirtpile;
+    public bool roofValid = true;
+    public Sprite sprite;
+    public bool impassable = true;
+    public int strength = 5;  // min strength necessary to damage/destroy this. Player has 10
+    public int maxHealth = 10; // Player has ATK 10
+    public FeatureHooks prefab = null; // (optional) GameObject with further logic to spawn here
+    public string resourceName = "";  // resource name when destroyed
+    public int resourceQuantity = 0; // resource quantity when destroyed
+    public string replaceWhenDestroyedByPlayer = null; // replace with another feature when destroyed by player - or null
 
-    void Start() { GetComponent<Health>().ReachedZero += HandleDied; }
-
-    public bool IsValidTerrain(Land land) {
-        return ((int)validLand & 1 << (int)land) != 0;
+    private Feature Instantiate() {
+        if (prefab == null) return new Feature() { config = this, hooks = null };
+        FeatureHooks hooks = GameObject.Instantiate(prefab);
+        hooks.feature = new Feature() { config = this, hooks = hooks };
+        return hooks.feature;
     }
-    public bool IsValidTerrain(Construction construction) {
-        return construction == Construction.None || roofValid;
-    }
-    public Land GetSomeValidLand() {
-        int i = 0;
-        while (!IsValidTerrain((Land)i)) i++;
-        return (Land)i;
-    }
-    public void Uninstall() {
-        if (tile is Vector2Int realTile) {
-            Terrain.I.UninstallFeature(realTile);
-        } else Debug.LogError(this + " not installed");
-    }
-    public void Destroy() {
-        if (tile is Vector2Int realTile) {
-            Terrain.I.Feature[realTile] = null;
-        } else {
-            Debug.Log("Destroying loose feature " + this);
-            GameObject.Destroy(this.gameObject);
-        }
+    public Feature? MaybeInstantiate(Vector2Int pos) {
+        if (!IsValidTerrain(pos)) return null;
+        Feature feature = Instantiate();
+        if (feature.hooks != null) feature.hooks.Place(pos);
+        else Terrain.I.ForceSetFeature(pos, feature);
+        return feature;
     }
 
-    public void Attack(Transform blame, int quantity = 1) {
-        if (!canHit) return;
-        if (Attacked != null) Attacked(blame);
-        else GetComponent<Health>().Decrease(quantity, blame);
+    public bool IsValidTerrain(Land land) => ((int)validLand & 1 << (int)land) != 0;
+    public bool IsValidTerrain(Construction construction) => construction == Construction.None || roofValid;
+    public WhyNot IsValidTerrain(Vector2Int pos) {
+        if (!Terrain.I.InBounds(pos)) return "out of bounds";
+        if (Terrain.I.Feature[pos] != null) return "feature already present: " + Terrain.I.Feature[pos]?.config?.type;
+        if (!IsValidTerrain(Terrain.I.Land[pos]))
+            return "land: " + Terrain.I.Land[pos] + " / allowed: " + validLand;
+        if (!IsValidTerrain(Terrain.I.Roof[pos]))
+            return "roof: " + Terrain.I.Roof[pos] + " / allowed: " + validLand;
+        return true;
     }
-    void HandleDied() {
-        if (Died != null) Died();
-        else Destroy();
+
+    public override bool Equals(object obj) {
+        if (obj is FeatureConfig f) return this.type.Equals(f.type);
+        else return false;
     }
+    public override int GetHashCode() => type.GetHashCode();
+
+    public bool IsTypeOf(Feature? feature) => Equals(feature?.config);
+}
+
+public struct Feature {
+    public FeatureConfig config;
+    public FeatureHooks hooks;
+
+    public override bool Equals(object obj) {
+        if (obj is Feature f) return this.config.type.Equals(f.config.type);
+        else return false;
+    }
+    public override int GetHashCode() => config.type.GetHashCode();
 
     [Serializable] public struct Data {
         public int x;
@@ -61,24 +72,20 @@ public class Feature : MonoBehaviour {
 
         public Vector2Int tile { get => Vct.I(x, y); }
 
-        public Data(Vector2Int tile, string type, int[] customFields) {
-            this.x = tile.x;
-            this.y = tile.y;
+        public Data(int x, int y, string type, int[] customFields) {
+            this.x = x;
+            this.y = y;
             this.type = type;
             this.customFields = customFields;
         }
     }
-    public Data? Serialize() {
+    public Data? Serialize(int x, int y) {
         int[] customFields;
-        if (SerializeFields == null) customFields = new int[0];
-        else customFields = SerializeFields();
-        if (tile is Vector2Int actualTile) return new Data(actualTile, type, customFields);
-        else {
-            Debug.LogError("Feature not instantiated! Not writing it to data");
-            return null;
-        }
+        if (hooks == null || hooks.SerializeFields == null) customFields = new int[0];
+        else customFields = hooks.SerializeFields();
+        return new Data(x, y, config.type, customFields);
     }
     public void DeserializeUponStart(int[] customFields) {
-        serializedFields = customFields;
+        if (hooks != null) hooks.serializedFields = customFields;
     }
 }

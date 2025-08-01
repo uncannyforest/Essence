@@ -28,8 +28,8 @@ public class RedDwarfBrain : Brain {
                     redDwarf.buildDistance, () => creature.stats.ExeTime,
                     (loc) => { resource.Use(Cost(loc)); terrain[loc] = Construction.Wood; }).ForPosition((p) => SufficientResource(Cost(p))).Queued(),
                 TeleFilter.Terrain.WOODBUILDING),
-            CreatureAction.WithFeature(FeatureLibrary.P.boat,
-                pathfinding.BuildFeature(FeatureLibrary.P.boat, this, () => creature.stats.ExeTime, 60))
+            CreatureAction.WithFeature(FeatureLibrary.C.boat,
+                pathfinding.BuildFeature(FeatureLibrary.C.boat, this, () => creature.stats.ExeTime, 60))
         };
 
         Habitat = new WoodpileHabitat(this, () => creature.stats.ExeTime * 5);

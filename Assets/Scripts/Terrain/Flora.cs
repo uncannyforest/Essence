@@ -29,8 +29,8 @@ public class Flora : MonoBehaviour{
         return numFlora * numFlora * possibilityRate;
     }
 
-    private Feature IdentifyFeature() {
-        return Randoms.CoinFlip ? FeatureLibrary.P.jasmine : FeatureLibrary.P.carrot;
+    private FeatureConfig IdentifyFeature() {
+        return Randoms.CoinFlip ? FeatureLibrary.C.jasmine : FeatureLibrary.C.carrot;
     }
 
     private Vector2Int RandomLocation() {
@@ -42,10 +42,11 @@ public class Flora : MonoBehaviour{
         return terrain.Bounds.Wrap(terrain.CellAt(player.position) + location.FloorToInt());
     }
 
-    private Vector2Int? IdentifyLocation() {
+    private Vector2Int? IdentifyLocation(FeatureConfig feature) {
         for (int i = 0; i < 100; i++) {
             Vector2Int possLocation = RandomLocation();
             if (terrain.Land[possLocation] != Land.Meadow) continue;
+            if (!feature.IsValidTerrain(Terrain.I[new Terrain.Position(Terrain.Grid.Roof, possLocation)]) || Terrain.I.Feature[possLocation] != null) continue;
             if (Physics2D.OverlapCircleAll(terrain.CellCenter(possLocation), PlayerCharacter.neighborhood, LayerMask.GetMask("Player")).Length != 0) continue;
             Debug.Log("FAR ENOUGH FROM PLAYER!");
             return possLocation;
@@ -54,9 +55,9 @@ public class Flora : MonoBehaviour{
     }
 
     private void Populate() {
-        Vector2Int? possRandomTile = IdentifyLocation();
+        FeatureConfig prefab = IdentifyFeature();
+        Vector2Int? possRandomTile = IdentifyLocation(prefab);
         if (possRandomTile is Vector2Int randomTile) {
-            Feature prefab = IdentifyFeature();
             terrain.Land[randomTile] = Land.Grass;
             terrain.BuildFeature(randomTile, prefab);
             floraCount++;

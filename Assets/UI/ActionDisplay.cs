@@ -89,17 +89,20 @@ public class ActionDisplay : MonoBehaviour {
     private void UpdateSprite(Image actionDisplay, Interaction action, bool selectedArea) {
         actionDisplay.sprite = GetSprite(action);
         Transform featureDisplay = actionDisplay.transform.Find("Feature");
+        featureDisplay.GetComponentStrict<Image>().enabled = false;
         foreach (Transform feature in featureDisplay) GameObject.Destroy(feature.gameObject);
         if (action.IsCreatureAction && action.CreatureAction.UsesFeature) {
-            Feature feature = GameObject.Instantiate(action.CreatureAction.feature, featureDisplay);
-            feature.transform.SetLayer(LayerMask.NameToLayer("UI"));
-            Cardboard cardboard = feature.transform.GetComponentInChildren<Cardboard>();
-            if (cardboard != null) cardboard.EmbedInUI();
-            else {
-                feature.transform.localPosition = new Vector3(0, .25f, -.5f);
-                feature.transform.localRotation = Quaternion.Euler(60, 0, -45);
-                feature.transform.localScale = Vector3.one * Mathf.Sqrt(.5f);
-                if (selectedArea) StartCoroutine(AnimateFeature(feature.transform));
+            FeatureConfig feature = action.CreatureAction.feature;
+            if (feature.sprite != null) {
+                featureDisplay.GetComponentStrict<Image>().sprite = feature.sprite;
+                featureDisplay.GetComponentStrict<Image>().enabled = true;
+            } else {
+                FeatureHooks featureObject = GameObject.Instantiate(action.CreatureAction.feature.prefab, featureDisplay);
+                featureObject.transform.SetLayer(LayerMask.NameToLayer("UI"));
+                featureObject.transform.localPosition = new Vector3(0, -.25f, -.5f);
+                featureObject.transform.localRotation = Quaternion.Euler(60, 0, -45);
+                featureObject.transform.localScale = Vector3.one * Mathf.Sqrt(.5f);
+                if (selectedArea) StartCoroutine(AnimateFeature(featureObject.transform));
             }
         }
     }
@@ -107,6 +110,7 @@ public class ActionDisplay : MonoBehaviour {
     private void ClearSprite(Image actionDisplay) {
         actionDisplay.sprite = noAction;
         Transform featureDisplay = actionDisplay.transform.Find("Feature");
+        featureDisplay.GetComponentStrict<Image>().enabled = false;
         foreach (Transform feature in featureDisplay) GameObject.Destroy(feature.gameObject);
     }
 

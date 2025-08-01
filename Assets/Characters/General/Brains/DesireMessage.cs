@@ -7,7 +7,7 @@ public struct DesireMessage {
         public Terrain.Position location;
         public Land? landObstacle;
         public Construction? wallObstacle;
-        public Feature featureObstacle;
+        public Feature? featureObstacle;
 
         public bool IsStillPresent {
             get {
@@ -15,8 +15,8 @@ public struct DesireMessage {
                     return land == Terrain.I.Land[location.Coord];
                 } else if (wallObstacle is Construction wall) {
                     return wall == Terrain.I[location];
-                } else if (featureObstacle != null) {
-                    return featureObstacle == Terrain.I.Feature[location.Coord];
+                } else if (featureObstacle is Feature feature) {
+                    return feature.Equals(Terrain.I.Feature[location.Coord]);
                 } else throw new InvalidOperationException("Desire message must include obstacle");
             }
         }

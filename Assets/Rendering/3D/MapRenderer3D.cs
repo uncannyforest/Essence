@@ -104,6 +104,11 @@ public class MapRenderer3D : MonoBehaviour {
             cell.UpdateRoof();
         }
     }
+    public void UpdateFeature(Vector2Int pos) {
+        if (CellRendered(pos, out GridCell3D cell)) {
+            cell.UpdateFeature();
+        }
+    }
     public void Reset() {
         if (tilesParent != null) GameObject.Destroy(tilesParent.gameObject);
         tilesParent = new GameObject("Tiles").transform;

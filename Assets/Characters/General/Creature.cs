@@ -17,6 +17,7 @@ public class Creature : MonoBehaviour {
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";
     [TextArea(2, 12)] public string tamingInfoLong = "That creature cannot be tamed.";
+    public int terraformingPower = 5;
 
     public Brain brain;
     public CreatureState State {

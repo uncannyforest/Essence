@@ -49,14 +49,21 @@ public class Terrain : MonoBehaviour {
     public class FeatureIndex {
         Terrain terrain;
         public FeatureIndex(Terrain terrain) => this.terrain = terrain;
-        public Feature this[Vector2Int key] {
+        public Feature? this[Vector2Int key] {
             get => terrain.InBounds(key) ? terrain.features[key.x, key.y] : null;
-            set => terrain.PlaceFeature(key, value);
         }
-        public Feature this[int x, int y] {
+        public Feature? this[int x, int y] {
             get => terrain.InBounds(Vct.I(x, y)) ? terrain.features[x, y] : null;
-            set => terrain.PlaceFeature(Vct.I(x, y), value);
         }
+    }
+    struct Damage {
+        public int healthRemaining;
+        float expiryTime;
+        public Damage(int healthRemaining) {
+            this.healthRemaining = healthRemaining;
+            this.expiryTime = Time.time + 30;
+        }
+        public bool expired => expiryTime < Time.time;
     }
 
     public float validationUpdateTime = 0.5f;
@@ -70,13 +77,15 @@ public class Terrain : MonoBehaviour {
     private Construction[,] xWalls = new Construction[Dim, Dim + 1];
     private Construction[,] yWalls = new Construction[Dim + 1, Dim];
     private Construction[,] roofs = new Construction[Dim, Dim];
-    private Feature[,] features = new Feature[Dim, Dim];
+    private Feature?[,] features = new Feature?[Dim, Dim];
 
     public LandIndex Land;
     public ConstructionIndex XWall;
     public ConstructionIndex YWall;
     public ConstructionIndex Roof;
     public FeatureIndex Feature;
+
+    private Dictionary<Position, Damage> damageCache = new Dictionary<Position, Damage>();
 
     [NonSerialized] public MapRenderer3D mapRenderer;
 
@@ -152,37 +161,54 @@ public class Terrain : MonoBehaviour {
         set => SetConstruction(key, value);
     }
 
-    public bool PlaceFeature(Vector2Int pos, Feature feature) {
-        if (feature == null) return DestroyFeature(pos);
-        if (features[pos.x, pos.y] != null) return false;
-        if (!feature.IsValidTerrain(Land[pos]) || !feature.IsValidTerrain(Roof[pos])) return false;
-        feature.transform.position = CellCenter(pos).WithZ(GlobalConfig.I.elevation.features);
+    public void ForceSetFeature(Vector2Int pos, Feature feature) {
         features[pos.x, pos.y] = feature;
-        feature.tile = pos;
-        return true;
     }
-    public Feature BuildFeature(Vector2Int pos, Feature featurePrefab) {
-        if (!featurePrefab.IsValidTerrain(Land[pos]) || !featurePrefab.IsValidTerrain(Roof[pos])) return null;
-        Feature feature = GameObject.Instantiate(featurePrefab, mapRenderer.WorldParent);
-        PlaceFeature(pos, feature);
+    public Feature? MaybeBuildFeature(Vector2Int pos, FeatureConfig config) {
+        Feature? feature = config.MaybeInstantiate(pos);
+        if (feature != null) mapRenderer.UpdateFeature(pos);
         return feature;
     }
-    public Feature ForceBuildFeature(Vector2Int pos, Feature featurePrefab) {
-        DestroyFeature(pos);
-        if (!featurePrefab.IsValidTerrain(Land[pos])) SetLand(pos, featurePrefab.GetSomeValidLand());
-        if (!featurePrefab.IsValidTerrain(Roof[pos])) SetRoof(pos, Construction.None);
-        Feature feature = GameObject.Instantiate(featurePrefab, mapRenderer.WorldParent);
-        PlaceFeature(pos, feature);
-        return feature;
+    public Feature BuildFeature(Vector2Int pos, FeatureConfig config) {
+        WhyNot canBuild = config.IsValidTerrain(pos);
+        if (!canBuild) throw new InvalidOperationException("Invalid terrain at " + pos + ": " + canBuild);
+        return (Feature)MaybeBuildFeature(pos, config);
     }
-    public Feature UninstallFeature(Vector2Int pos) {
-        Feature feature = features[pos.x, pos.y];
+    // returns true if feature was destroyed
+    public bool AttackFeature(Vector2Int pos, int pow, int atk) {
+        Feature feature = (Feature)Feature[pos];
+        if (feature.config.strength > pow) return false;
+        bool attacking = feature.hooks == null || feature.hooks.Attack();
+        if (!attacking) return false;
+        return Attack(new Position(Grid.Roof, pos), atk, feature.config.maxHealth, (pos) => DestroyFeature(pos.Coord));
+    }
+    public bool Attack(Position pos, int atk, int maxHealth, Action<Position> destroy) {
+        bool destroyIt = false;
+        if (maxHealth <= atk) destroyIt = true;
+        else { // check the cache
+            foreach (Position cachePos in damageCache.Keys) if (damageCache[cachePos].expired) damageCache.Remove(cachePos); // update
+
+            if (damageCache.ContainsKey(pos)) {
+                if (damageCache[pos].healthRemaining <= atk) destroyIt = true;
+                else damageCache[pos] = new Damage(damageCache[pos].healthRemaining - atk);
+            } else {
+                damageCache[pos] = new Damage(maxHealth - atk);
+            }
+        }
+        if (destroyIt) {
+            damageCache.Remove(pos);
+            destroy(pos);
+        }
+        return destroyIt;
+    }
+    public FeatureHooks UninstallFeature(Vector2Int pos) {
+        FeatureHooks feature = features[pos.x, pos.y]?.hooks;
         features[pos.x, pos.y] = null;
         if (feature != null) feature.tile = null;
         return feature;
     }
     public bool DestroyFeature(Vector2Int pos) {
-        Feature feature = UninstallFeature(pos);
+        FeatureHooks feature = UninstallFeature(pos);
         if (feature != null) {
             GameObject.Destroy(feature.gameObject);
             return true;
@@ -250,9 +276,10 @@ public class Terrain : MonoBehaviour {
             SetYWall(x, y, mapData.yWalls[x, y], true);
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
             SetRoof(Vct.I(x, y), mapData.roofs[x, y], true);
-        foreach (Feature.Data featureData in mapData.features)
-            BuildFeature(featureData.tile, FeatureLibrary.P.ByTypeName(featureData.type))
+        foreach (Feature.Data featureData in mapData.features) {
+            BuildFeature(featureData.tile, FeatureLibrary.C.ByTypeName(featureData.type))
                 .DeserializeUponStart(featureData.customFields);
+        }
         I.Loaded();
     }
 

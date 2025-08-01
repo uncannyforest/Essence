@@ -9,10 +9,10 @@ public struct CreatureAction {
     public readonly bool canQueue;
     public readonly bool isRoam;
     public readonly bool isStation;
-    public readonly Feature feature;
+    public readonly FeatureConfig feature;
     private CreatureAction(Sprite icon, Action<Creature> instantDirective, 
             Action<Creature, Target> pendingDirective,
-            TeleFilter filter, Feature feature, bool canQueue, bool isRoam, bool isStation) {
+            TeleFilter filter, FeatureConfig feature, bool canQueue, bool isRoam, bool isStation) {
         this.icon = icon;
         this.instantDirective = instantDirective;
         this.pendingDirective = pendingDirective;
@@ -45,7 +45,7 @@ public struct CreatureAction {
             (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget((Terrain.Position)target)),
             new TeleFilter(terrainFilter, null),
             null, executingBehavior.canQueue, false, false);
-    public static CreatureAction WithFeature(Feature feature,
+    public static CreatureAction WithFeature(FeatureConfig feature,
             TargetedBehavior<Vector2Int> executingBehavior) =>
         new CreatureAction(null, null,
             (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget(((Terrain.Position)target).Coord)),

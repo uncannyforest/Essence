@@ -86,7 +86,7 @@ public class Pathfinding {
     public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
         => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
 
-    public QueueOperator.Targeted<Vector2Int> BuildFeature(Feature feature, Brain brain, Func<float> time, int cost)
+    public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, Brain brain, Func<float> time, int cost)
         => ApproachThenInteract(1.5f, time,
             (loc) => {
                 brain.resource.Use(cost);

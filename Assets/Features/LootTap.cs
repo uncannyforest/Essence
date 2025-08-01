@@ -7,9 +7,7 @@ using UnityEngine;
     public string name;
 }
 
-[RequireComponent(typeof(Feature))]
-// While not inherently required, all Features with LootTap will have Health
-[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(FeatureHooks))]
 public class LootTap : MonoBehaviour {
     public float reloadTime = 120;
     public float itemStartY = .5f;
@@ -20,16 +18,17 @@ public class LootTap : MonoBehaviour {
     private Transform grid;
 
     void Start() {
-        GetComponent<Feature>().Attacked += HandleAttacked;
+        GetComponent<FeatureHooks>().Attacked += HandleAttacked;
         grid = Terrain.I.transform;
     }
 
-    void HandleAttacked(Transform blame) {
-        if (Time.time > nextTapTime && blame.GetComponent<PlayerCharacter>() != null) {
-            Tap(blame.GetComponent<PlayerCharacter>());
+    bool HandleAttacked() {
+        if (Time.time > nextTapTime) {
+            Tap(GameManager.I.AnyPlayer);
             nextTapTime = Time.time + reloadTime;
+            return false;
         }
-        else GetComponent<Health>().Decrease(1, blame);
+        else return true;
     }
 
     private void Tap(PlayerCharacter player) {

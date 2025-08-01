@@ -346,8 +346,8 @@ public class WorldInteraction : MonoBehaviour {
                         terrain.Land[coord] = Land.Woodpile;
                         terrain.Roof[coord] = Construction.None;
                     }
-                } else if (terrain.Feature[coord] != null) {
-                    terrain.Feature[coord].Attack(player);
+                } else if (terrain.Feature[coord] is Feature feature) {
+                    terrain.AttackFeature(coord, 10, 10);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
                     Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);

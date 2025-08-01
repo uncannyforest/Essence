@@ -158,7 +158,7 @@ public class Will {
             else return "Cannot clear wall of " + wall;
         } else if (obstacle.featureObstacle != null) {
             if (!config.canClearFeatures) return "Cannot clear obstacles";
-            else if (obstacle.featureObstacle.GetComponent<Fountain>() != null) return "Cannot clear fountains";
+            else if (FeatureLibrary.C.fountain.IsTypeOf(obstacle.featureObstacle)) return "Cannot clear fountains";
             else return state.ClearFocus().WithTerrainFocus(obstacle);
         } else if (obstacle.landObstacle is Land land) {
             if (config.canClearObstacles.includes(land)) return state.ClearFocus().WithTerrainFocus(obstacle);
@@ -173,7 +173,7 @@ public class Will {
         else if (Terrain.I.Land[location.Coord] == Land.Dirtpile
             && config.canClearObstacles.includes(Land.Dirtpile)) return true;
         else if (Terrain.I.Feature[location.Coord] != null)
-            return config.canClearFeatures && Terrain.I.Feature[location.Coord].GetComponent<Fountain>() == null;
+            return config.canClearFeatures && !FeatureLibrary.C.fountain.IsTypeOf(Terrain.I.Feature[location.Coord]);
         else return config.canClearObstacles.includes(Terrain.I.Land[location.Coord]);
     }
 

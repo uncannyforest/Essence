@@ -33,7 +33,7 @@ public class StipuleBrain : Brain {
             MainBehavior.CreatureAction(stipule.attackAction)
         };
 
-        Habitat = Habitat.Feature(this, FeatureLibrary.P.jasmine);
+        Habitat = Habitat.Feature(this, FeatureLibrary.C.jasmine);
     }
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();

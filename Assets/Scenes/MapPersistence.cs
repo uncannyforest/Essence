@@ -29,7 +29,7 @@ public class MapPersistence : MonoBehaviour {
         List<Feature.Data> features = new List<Feature.Data>();
         for (int x = 0; x < terrain.Bounds.x; x++) for (int y = 0; y < terrain.Bounds.y; y++) {
             if (terrain.Feature[x, y] != null) {
-                Feature.Data? maybeFeatureData = terrain.Feature[x, y].Serialize();
+                Feature.Data? maybeFeatureData = terrain.Feature[x, y]?.Serialize(x, y);
                 if (maybeFeatureData is Feature.Data featureData) features.Add(featureData);
             }
         }

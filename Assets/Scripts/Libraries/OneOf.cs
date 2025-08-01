@@ -107,6 +107,5 @@ public class OneOfTest {
         } else if (b1 != null) {
             // do stuff
         }
-
     }
 }

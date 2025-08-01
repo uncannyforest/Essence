@@ -19,6 +19,7 @@ public class GridCell3D : MonoBehaviour {
     private GridSubCell3D roof1;
     private GridSubCell3D roof2;
     private GridSubCell3D roof3;
+    private Transform feature;
 
     void Awake() {
         pos = Vector2Int.RoundToInt(transform.position);
@@ -44,6 +45,7 @@ public class GridCell3D : MonoBehaviour {
         UpdateXWall();
         UpdateYWall();
         UpdateRoof();
+        UpdateFeature();
     }
 
     public void HideRoof(bool hide) {
@@ -58,6 +60,7 @@ public class GridCell3D : MonoBehaviour {
     private Construction GetXWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.XWalls, x, y)) ?? Construction.None;
     private Construction GetYWall(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.YWalls, x, y)) ?? Construction.None;
     private Construction GetRoof(int x, int y) => Terrain.I.GetConstruction(new Terrain.Position(Terrain.Grid.Roof, x, y)) ?? Construction.None;
+    private Feature? GetFeature(int x, int y) => Terrain.I.Feature[x, y];
 
     public void UpdateLand() {
         land = GetLand(x, y);
@@ -158,5 +161,14 @@ public class GridCell3D : MonoBehaviour {
                 GetXWall(x, y + 1),
                 GetYWall(x + 1, y),
                 GetXWall(x, y));
+    }
+    public void UpdateFeature() {
+        if (feature != null) GameObject.Destroy(feature.gameObject);
+        if (GetFeature(x, y) is Feature featureData) {
+            feature = GameObject.Instantiate(FeatureLibrary.C.renderPrefab,
+                Terrain.I.CellCenter(Vct.I(x, y)), Quaternion.identity, transform).transform;
+            feature.GetComponentInChildren<SpriteRenderer>().sprite = featureData.config.sprite;
+            feature.GetComponent<BoxCollider2D>().enabled = featureData.config.impassable;
+        }
     }
 }

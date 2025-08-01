@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class FeatureLibrary : MonoBehaviour {
     private static FeatureLibrary instance;
-    public static FeatureLibrary P {
+    public static FeatureLibrary C {
         get => instance;
     }
     void Awake() {
         if (instance == null) instance = this;
 
         foreach (FieldInfo field in this.GetType().GetFields())
-            if (field.GetValue(this) is Feature feature)
+            if (field.GetValue(this) is FeatureConfig feature)
                 feature.type = field.Name;
     }
-    public Feature ByTypeName(string type) {
-        return (Feature)this.GetType().GetField(type).GetValue(this);
+    public FeatureConfig ByTypeName(string type) {
+        return (FeatureConfig)this.GetType().GetField(type).GetValue(this);
     }
 
-    public Feature fountain;
-    public Feature windmill;
-    public Feature boat;
-    public Feature jasmine;
-    public Feature carrot;
-    public Feature arrowPile;
+    public GameObject renderPrefab;
+    public FeatureConfig fountain;
+    public FeatureConfig windmill;
+    public FeatureConfig boat;
+    public FeatureConfig jasmine;
+    public FeatureConfig carrot;
+    public FeatureConfig arrowPile;
 }

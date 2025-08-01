@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Feature))]
+[RequireComponent(typeof(FeatureHooks))]
 public class Fountain : MonoBehaviour {
     public float timeToCapture = 5f;
     public float timeToTeleport = 2f;
@@ -9,7 +9,7 @@ public class Fountain : MonoBehaviour {
     public float ringMaxSize = Mathf.Sqrt(10);
     public Transform ring;
 
-    private Feature feature;
+    private FeatureHooks feature;
     private Terrain terrain;
 
     private int team = 0;
@@ -31,7 +31,7 @@ public class Fountain : MonoBehaviour {
     }
 
     void Start() {
-        feature = GetComponent<Feature>();
+        feature = GetComponent<FeatureHooks>();
         if (feature.serializedFields != null) Deserialize(feature.serializedFields);
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;

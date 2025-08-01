@@ -21,6 +21,7 @@ public class WhyNot {
         return new WhyNot(null);
     } 
 
+    override public string ToString() => (string)this;
     public static explicit operator string(WhyNot whyNot) => whyNot.reason;       // might return null
     public static explicit operator bool(WhyNot whyNot) => whyNot.reason == null; // explicitly specify we don't want to log
 
@@ -32,6 +33,7 @@ public class WhyNot {
 
     public static bool operator true(WhyNot wn) => (bool)wn;
     public static bool operator false(WhyNot wn) => !(bool)wn;
+    public static bool operator !(WhyNot wn) => !(bool)wn;
     public static WhyNot operator &(WhyNot a, WhyNot b) {
         if ((bool)a) {
             if ((bool)b) return true;
@@ -42,4 +44,5 @@ public class WhyNot {
         }
     }
     public static WhyNot operator |(WhyNot a, WhyNot b) => (bool)a | (bool)b ? (WhyNot)true : a + "&" + b;
+
 }

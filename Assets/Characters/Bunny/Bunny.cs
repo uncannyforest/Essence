@@ -23,7 +23,7 @@ public class BunnyBrain : Brain {
         this.bunny = bunny;
         this.healing = species.GetComponentStrict<Healing>();
 
-        Habitat = Habitat.Feature(this, FeatureLibrary.P.carrot);
+        Habitat = Habitat.Feature(this, FeatureLibrary.C.carrot);
     }
 
     override public WhyNot IsValidFocus(Transform characterFocus) =>

@@ -31,23 +31,19 @@ public class Habitat {
         this.restRadius = restRadius;
     }
 
-    static public Habitat Feature(Brain brain, Feature feature) => new Habitat(brain, feature);
-    public Habitat(Brain brain, Feature feature)
+    static public Habitat Feature(Brain brain, FeatureConfig feature) => new Habitat(brain, feature);
+    public Habitat(Brain brain, FeatureConfig feature)
         : this(brain, InteractionMode.Nearby) {
-        IsShelter = (loc) => Terrain.I.Feature[loc]?.type == feature.type;
-        MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.ForceBuildFeature(loc, feature) };
+        IsShelter = (loc) => feature.IsTypeOf(Terrain.I.Feature[loc]);
     }
 
     static public Habitat Land(Brain brain, Land land, InteractionMode mode) => new Habitat(brain, land, mode);
     public Habitat(Brain brain, Land land, InteractionMode mode)
         : this(brain, mode) {
         IsShelter = (loc) => Terrain.I.GetLand(loc) == land;
-        MakeShelter = new List<Action<Vector2Int>>() { (loc) => Terrain.I.SetLand(loc, land, true) };
     }
 
     public Func<Vector2Int, bool> IsShelter;
-
-    public List<Action<Vector2Int>> MakeShelter; // return list of steps for IEnumerable
 
     private IEnumerable<Vector2Int> ValidShelterLocations(InteractionMode mode) {
         Vector2Int center;
@@ -155,7 +151,7 @@ public class ConsumableFeatureHabitat : Habitat {
     private Func<float> consumeTime;
     private int consumeQuantity;
 
-    public ConsumableFeatureHabitat(Brain brain, Feature feature, Func<float> consumeTime, int consumeQuantity) : base(brain, feature) {
+    public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime, int consumeQuantity) : base(brain, feature) {
         this.consumeTime = consumeTime;
         this.consumeQuantity = consumeQuantity;
     }
