@@ -36,7 +36,7 @@ public class ArcherBrain : Brain {
             MainBehavior.CreatureAction(archer.attackAction)
         };
 
-        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.arrowPile, () => creature.stats.ExeTime * 2, 20);
+        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.arrowPile, () => creature.stats.ExeTime * 2);
     }
 
     override public Optional<Transform> FindFocus() => resource.Has()

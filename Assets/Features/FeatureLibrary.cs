@@ -25,4 +25,5 @@ public class FeatureLibrary : MonoBehaviour {
     public FeatureConfig jasmine;
     public FeatureConfig carrot;
     public FeatureConfig arrowPile;
+    public FeatureConfig woodPile;
 }

@@ -31,9 +31,9 @@ public class Habitat {
         this.restRadius = restRadius;
     }
 
-    static public Habitat Feature(Brain brain, FeatureConfig feature) => new Habitat(brain, feature);
-    public Habitat(Brain brain, FeatureConfig feature)
-        : this(brain, InteractionMode.Nearby) {
+    static public Habitat Feature(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby) => new Habitat(brain, feature, mode);
+    public Habitat(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby)
+        : this(brain, mode) {
         IsShelter = (loc) => feature.IsTypeOf(Terrain.I.Feature[loc]);
     }
 
@@ -133,33 +133,17 @@ public class Habitat {
         .Then(RestBehaviorDefault(shelter));
 }
 
-public class WoodpileHabitat : Habitat {
-    private Func<float> consumeTime;
-
-    public WoodpileHabitat(Brain brain, Func<float> consumeTime) : base(brain, global::Land.Woodpile, Habitat.InteractionMode.Inside) {
-        this.consumeTime = consumeTime;
-    }
-
-    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) =>
-        RestBehaviorConsume(shelter, consumeTime, () => {
-            Terrain.I.SetLand(shelter, global::Land.Grass, true);
-            brain.resource?.Increase(5);
-    });
-}
-
 public class ConsumableFeatureHabitat : Habitat {
     private Func<float> consumeTime;
-    private int consumeQuantity;
 
-    public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime, int consumeQuantity) : base(brain, feature) {
+    public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime) : base(brain, feature) {
         this.consumeTime = consumeTime;
-        this.consumeQuantity = consumeQuantity;
     }
 
     override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) =>
         RestBehaviorConsume(shelter, consumeTime, () => {
+            brain.resource?.Increase(Terrain.I.Feature[shelter]?.config?.resourceQuantity ?? 1);
             Terrain.I.DestroyFeature(shelter);
-            brain.resource?.Increase(consumeQuantity);
     });
 
 }

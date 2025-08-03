@@ -58,9 +58,8 @@ public class TerrainValidator {
     }
 
     public void StabilizeConstruction(Terrain.Position pos) {
-        if (!IsStableConstruction(pos, terrain[pos])) {
-            terrain[pos] = Construction.None;
-            terrain.Land[pos.Coord] = Land.Woodpile;
+        if (terrain.Roof[pos.Coord] != Construction.None && !IsStableConstruction(pos, terrain[pos])) {
+            terrain.SetUpFeature(pos.Coord, Land.Grass, FeatureLibrary.C.woodPile);
         }
     }
 

@@ -32,7 +32,7 @@ public class RedDwarfBrain : Brain {
                 pathfinding.BuildFeature(FeatureLibrary.C.boat, this, () => creature.stats.ExeTime, 60))
         };
 
-        Habitat = new WoodpileHabitat(this, () => creature.stats.ExeTime * 5);
+        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5);
     }
 
     public int Cost(Terrain.Position pos) => pos.grid == Terrain.Grid.Roof ? 4 : 1;

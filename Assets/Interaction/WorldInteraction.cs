@@ -337,14 +337,12 @@ public class WorldInteraction : MonoBehaviour {
                 if (relativeToPlayer.x != 0 && terrain.YWall[Math.Max(coord.x, playerSquare.x), coord.y] == Construction.Wood) {
                     terrain.YWall[Math.Max(coord.x, playerSquare.x), coord.y] = Construction.None;
                     if (terrain.Roof[coord] == Construction.Wood) {
-                        terrain.Land[coord] = Land.Woodpile;
-                        terrain.Roof[coord] = Construction.None;
+                        terrain.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, 5);
                     }
                 } else if (relativeToPlayer.y != 0 && terrain.XWall[coord.x, Math.Max(coord.y, playerSquare.y)] == Construction.Wood) {
                     terrain.XWall[coord.x, Math.Max(coord.y, playerSquare.y)] = Construction.None;
                     if (terrain.Roof[coord] == Construction.Wood) {
-                        terrain.Land[coord] = Land.Woodpile;
-                        terrain.Roof[coord] = Construction.None;
+                        terrain.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, 5);
                     }
                 } else if (terrain.Feature[coord] is Feature feature) {
                     terrain.AttackFeature(coord, 10, 10);
@@ -356,9 +354,8 @@ public class WorldInteraction : MonoBehaviour {
                     Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), dirtPileCost);
                 } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
                     int woodQuantity = terrain.GetLand(coord) == Land.Meadow ? 1 :
-                        terrain.GetLand(coord) == Land.Shrub ? 3 : 6;
-                    terrain.Land[coord] = Land.Woodpile;
-                    Collectible.Instantiate(wood, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
+                        terrain.GetLand(coord) == Land.Shrub ? 3 : 5;
+                    Feature wood = terrain.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, woodQuantity);
                 }
             break;
             case Mode.WoodBuilding:

@@ -490,6 +490,17 @@ MonoBehaviour:
     resourceName: arrows
     resourceQuantity: 20
     replaceWhenDestroyedByPlayer: 
+  woodPile:
+    validLand: 1
+    roofValid: 1
+    sprite: {fileID: 21300000, guid: af11ea0a5d6d6427f9710eb364e2ae4d, type: 3}
+    impassable: 0
+    strength: 5
+    maxHealth: 10
+    prefab: {fileID: 0}
+    resourceName: wood
+    resourceQuantity: 5
+    replaceWhenDestroyedByPlayer: 
 --- !u!114 &8377938587873387450
 MonoBehaviour:
   m_ObjectHideFlags: 0

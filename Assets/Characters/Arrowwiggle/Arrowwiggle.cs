@@ -28,6 +28,6 @@ public class ArrowwiggleBrain : Brain {
                 pathfinding.BuildFeature(FeatureLibrary.C.arrowPile, this, () => creature.stats.ExeTime, 5))
         };
 
-        Habitat = new WoodpileHabitat(this, () => creature.stats.ExeTime * 5);
+        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5);
     }
 }
