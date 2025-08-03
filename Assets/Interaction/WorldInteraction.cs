@@ -357,7 +357,7 @@ public class WorldInteraction : MonoBehaviour {
                 } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
                     int woodQuantity = terrain.GetLand(coord) == Land.Meadow ? 1 :
                         terrain.GetLand(coord) == Land.Shrub ? 3 : 6;
-                    terrain.Land[coord] = Land.Grass;
+                    terrain.Land[coord] = Land.Woodpile;
                     Collectible.Instantiate(wood, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), woodQuantity);
                 }
             break;
