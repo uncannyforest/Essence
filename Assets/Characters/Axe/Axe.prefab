@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &5357554545647578300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834752958641954757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba681bbcb0d44b6db11bdc08ea00bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max: 1
+  startAtFraction: 1
+  statBarPrefab: {fileID: 0}
+  statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
+  statBarOffset: 0.125
+  showOnHover: 1
+  itemDrop: {fileID: 0}
+  itemDropSize: 0
+  damageVisual1Time: 0.1
+  damageVisual2Time: 0.4
+  ColorableSprites: []
+--- !u!114 &6863355497371697762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834752958641954757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 491f2b40b867148e69bcc92b90ff3a06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speciesConfig:
+    attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
+    meleeReach: 1
+--- !u!1001 &6949652176694982357
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 6674386295937086461, guid: f269b79c5ab534e1f8dfbe2c192420de, type: 3}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: species
+      value: 
+      objectReference: {fileID: 6863355497371697762}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: breastplate
+      value: 
+      objectReference: {fileID: 6674386295937086461, guid: f269b79c5ab534e1f8dfbe2c192420de, type: 3}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureName
+      value: Axe
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoLong
+      value: To tame any <creature/>, you must defeat it.  Then, with a 3x3 square
+        of woodpiles nearby, whistle a song to tame it.
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoShort
+      value: Defeat with 3x3 woodpile square nearby to tame
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureShortName
+      value: Axe
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 6674386295937086461, guid: f269b79c5ab534e1f8dfbe2c192420de, type: 3}
+    - target: {fileID: 3285387599797646433, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.x
+      value: 0.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -2936497657700248757, guid: 6e19fb6c63c994a6d898ebe75920d8d4, type: 3}
+    - target: {fileID: 3285387601099666761, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: resourceName
+      value: Wood
+      objectReference: {fileID: 0}
+    - target: {fileID: 4957690152975860324, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: height
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6572608233696125373, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Name
+      value: Axe
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+--- !u!1 &834752958641954757 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+  m_PrefabInstance: {fileID: 6949652176694982357}
+  m_PrefabAsset: {fileID: 0}

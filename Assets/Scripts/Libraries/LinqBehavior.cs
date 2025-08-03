@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public class Enumerators {
+    public static IEnumerator<YieldInstruction> AfterWait(Func<float> seconds, Action action) {
+        yield return new WaitForSeconds(seconds());
+        action();
+    }
+}
+
 public static class EnumeratorExtensions {
     public static T NextOrDefault<T>(this IEnumerator<T> e) {
         if (e.MoveNext()) return e.Current;

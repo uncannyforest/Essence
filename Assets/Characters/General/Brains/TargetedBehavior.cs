@@ -63,3 +63,27 @@ public class CharacterTargetedBehavior : TargetedBehavior<Transform>, FlexSource
 
     public IEnumerator<YieldInstruction> FocusedBehavior(Brain brain) => enumeratorWithParam(brain.state.characterFocus.Value);
 }
+
+public class FlexTargetedBehavior : TargetedBehavior<Target>, FlexSourceBehavior {
+    public TeleFilter silentFilter;
+
+    public FlexTargetedBehavior(
+            Func<Target, IEnumerator<YieldInstruction>> enumeratorWithParam,
+            TeleFilter silentFilter,
+            Func<Target, WhyNot> errorFilter)
+            : base(enumeratorWithParam, errorFilter) {
+        this.silentFilter = silentFilter;
+    }
+
+    public CreatureAction CreatureAction(Sprite sprite) => global::CreatureAction.WithObject(sprite, this, silentFilter);
+
+    public IEnumerator<YieldInstruction> FocusedBehavior(Brain brain) => MuxFocus(brain.state);
+
+    private IEnumerator<YieldInstruction> MuxFocus(CreatureState state) {
+        if (state.characterFocus.IsValue(out Transform character)) 
+            return enumeratorWithParam(new Target(character.GetComponentStrict<Character>()));
+        if (state.terrainFocus is DesireMessage.Obstacle obstacle)
+            return enumeratorWithParam(new Target(obstacle.location));
+        throw new InvalidOperationException("Tried to build focused behavior without a focus");
+    }
+}

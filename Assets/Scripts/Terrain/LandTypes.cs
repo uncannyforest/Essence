@@ -19,7 +19,6 @@ public enum Land {
     DirtTunnel,
 }
 
-// Use only for serialized attributes for Unity UI: not internal code
 [System.Flags]
 public enum LandFlags {
     Grass = 1,
@@ -43,6 +42,12 @@ public enum Construction {
     None = 0,
     Wood,
     Stone
+}
+[System.Flags]
+public enum ConstructionFlags {
+    None = 1,
+    Wood = 1 << 1,
+    Stone = 1 << 2
 }
 
 [Serializable] public class TileMaterial {
@@ -92,7 +97,7 @@ public enum Construction {
     }
 }
 
-public static class LandExtensions {
+public static class LandCats {
     public static bool IsPassable(this Land land) {
         return land != Land.Dirtpile && land != Land.Rockpile && land != Land.Hill;
     }
@@ -101,6 +106,7 @@ public static class LandExtensions {
         return land >= Land.Hill;
     }
 
+    public static LandFlags WATERY = LandFlags.Water | LandFlags.WaterTunnel;
     public static bool IsWatery(this Land land) {
         return land == Land.Water || land == Land.WaterTunnel;
     }
@@ -109,6 +115,7 @@ public static class LandExtensions {
         return land == Land.Ditch || land == Land.DirtTunnel;
     }
 
+    public static LandFlags PLANTY = LandFlags.Meadow | LandFlags.Shrub | LandFlags.Forest;
     public static bool IsPlanty(this Land land) {
         return land == Land.Meadow || land == Land.Shrub || land == Land.Forest;
     }

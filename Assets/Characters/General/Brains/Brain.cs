@@ -76,7 +76,7 @@ public class Brain {
     protected TaskRunner ScanningBehaviorTask;
 
     /////////////////////////////////////////////
-    // INITIALIZATION AND VIRTUAL METHODS
+    // INITIALIZATION, VIRTUAL, AND UTILITY METHODS FOR DERIVED CLASSES
 
     public Brain(Species species, BrainConfig general) {
         this.species = species;
@@ -90,7 +90,6 @@ public class Brain {
         Health health = GetComponent<Health>();
         if (health != null) {
             health.ReachedZero += OnHealthReachedZero;
-            faintCondition = () => state.type == CreatureStateType.Faint;
         }
         ScanningBehaviorTask = new TaskRunner(ScanningBehavior, species);
         OnStateChange();
@@ -99,12 +98,16 @@ public class Brain {
     }
     virtual protected void Initialize() {}
     public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
-    virtual public bool CanTame(Transform player) => faintCondition() && (Habitat?.CanTame() ?? false);
+    virtual public bool CanTame(Transform player) {
+        if (GetComponent<Health>() == null) return Habitat?.CanTame() ?? false;
+        else return state.type == CreatureStateType.Faint && (Habitat?.IsPresent(Habitat.InteractionMode.Nearby) ?? false);
+    }
     virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
-    private Func<bool> faintCondition = () => true;
 
     public WhyNot SufficientResource(int quantityNeeded = 1) =>
         resource?.Has(quantityNeeded) != false ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";
+    public WhyNot IsValidIfTerrain(Target t, LandFlags? land = null, ConstructionFlags? construction = null) =>
+        t.WhichType == typeof(Character) ? true : terrain.IsValid((Terrain.Position)t, land, construction);
 
     public FlexSourceBehavior MainBehavior { get; protected set; } = new NullSourceBehavior();
     virtual public IEnumerator<YieldInstruction> FocusedBehavior() => MainBehavior.FocusedBehavior(this);
@@ -116,6 +119,12 @@ public class Brain {
     virtual public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
     public Habitat Habitat { get; protected set; } = null;
+
+    virtual public void Melee(Transform target) {
+        Health health = target.GetComponentStrict<Health>();
+        health.Decrease(creature.stats.Str, transform);
+        resource.Use();
+    }
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS

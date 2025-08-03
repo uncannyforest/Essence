@@ -34,7 +34,7 @@ public class Habitat {
     static public Habitat Feature(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby) => new Habitat(brain, feature, mode);
     public Habitat(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby)
         : this(brain, mode) {
-        IsShelter = (loc) => feature.IsTypeOf(Terrain.I.Feature[loc]);
+        IsShelter = (loc) => feature == Terrain.I.Feature[loc]?.config; // okay??
     }
 
     static public Habitat Land(Brain brain, Land land, InteractionMode mode) => new Habitat(brain, land, mode);
@@ -71,25 +71,26 @@ public class Habitat {
 
     private float SqrDistance(Vector2Int loc) => Disp.FT(brain.transform.position, Terrain.I.CellCenter(loc)).sqrMagnitude;
 
-    virtual public bool CanTame() {
-        foreach (Vector2Int validShelterLocation in ValidShelterLocations(restRadius))
+    public bool IsPresent(InteractionMode radius) {
+        foreach (Vector2Int validShelterLocation in ValidShelterLocations(radius))
             if (IsShelter(validShelterLocation)) return true;
         return false;
     }
+    virtual public bool CanTame() => IsPresent(restRadius);
 
     public Optional<Vector2Int> FindShelter() {
         if (Time.time < restAgainTime) return Optional<Vector2Int>.Empty();
         recentlyVisited.RemoveWhere((visited) =>
             Disp.FT(brain.transform.position, Terrain.I.CellCenter(visited)) > Creature.neighborhood);
-        return (from location in ValidShelterLocations(InteractionMode.Nearby)
+        Optional<Vector2Int> result = (from location in ValidShelterLocations(InteractionMode.Nearby)
             where !recentlyVisited.Contains(location) && IsShelter(location)
             orderby SqrDistance(location)
             select Optional.Of(location)).FirstOrDefault();
+        if (brain.teamId != 0) Debug.Log(brain.legalName + " searched for shelter nearby, result: " + result);
+        return result;
     }
 
-    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorDefault(shelter);
-
-    private IEnumerator<YieldInstruction> RestBehaviorDefault(Vector2Int shelter) {
+    public IEnumerator<YieldInstruction> ApproachAndRestBehavior(Vector2Int shelter) {
         IEnumerator<YieldInstruction> approach;
         switch (restRadius) {
             case InteractionMode.Inside:
@@ -103,10 +104,17 @@ public class Habitat {
         }
 
         while (approach.MoveNext()) yield return approach.Current;
+        IEnumerator<YieldInstruction> restBehavior = RestBehavior(shelter);
+        while (restBehavior.MoveNext()) yield return restBehavior.Current;
+    }
+
+    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorDefault(shelter);
+
+    private IEnumerator<YieldInstruction> RestBehaviorDefault(Vector2Int shelter) {
         recentlyVisited.Add(shelter);
         float transitionTime = Time.time + restDuration;
         restDuration += 5;
-        while (Time.time < transitionTime) {
+        while (Time.time < transitionTime || brain.resource?.IsFull() == false) {
             brain.resource?.Increase(1);
             yield return new WaitForSeconds(brain.creature.stats.ExeTime);
         }
@@ -114,23 +122,17 @@ public class Habitat {
         restDuration += 5;
     }
 
-    private IEnumerator<YieldInstruction> RestBehaviorConsumeOnly(Vector2Int shelter, Func<float> consumeTime, Action consume) {
-        switch (restRadius) {
-            case InteractionMode.Inside:
-                return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), 1f / CharacterController.subGridUnit)
-                        .ThenOnce(consumeTime, consume);
-            case InteractionMode.Beside:
-            case InteractionMode.Nearby:
-            default:
-                return brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), besideDistance)
-                        .ThenOnce(consumeTime, consume);
+    public IEnumerator<YieldInstruction> RestBehaviorSleep() {
+        while (true) {
+            brain.resource?.Increase(1);
+            yield return new WaitForSeconds(brain.creature.stats.ExeTime);
         }
     }
 
     public IEnumerator<YieldInstruction> RestBehaviorConsume(Vector2Int shelter, Func<float> consumeTime, Action consume) =>
-        Provisionally.Run(RestBehaviorConsumeOnly(shelter, consumeTime, consume))
-        .Where(yi => brain.resource?.IsFull() != true)
-        .Then(RestBehaviorDefault(shelter));
+        Provisionally.Run(Enumerators.AfterWait(consumeTime, consume))
+            .Where(yi => brain.resource?.IsFull() != true)
+            .Then(RestBehaviorDefault(shelter));
 }
 
 public class ConsumableFeatureHabitat : Habitat {
@@ -145,5 +147,10 @@ public class ConsumableFeatureHabitat : Habitat {
             brain.resource?.Increase(Terrain.I.Feature[shelter]?.config?.resourceQuantity ?? 1);
             Terrain.I.DestroyFeature(shelter);
     });
+}
 
+public class SleepHabitat : Habitat {
+    public SleepHabitat(Brain brain, InteractionMode restRadius) : base(brain, restRadius) {}
+
+    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorSleep();
 }

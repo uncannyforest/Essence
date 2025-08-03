@@ -144,7 +144,7 @@ public class Terrain : MonoBehaviour {
     public Vector2 CellCenterAt(Vector3 screenPosition) => mapRenderer.CellCenterAt(screenPosition);
 
     public Land? GetLand(int x, int y) => GetLand(new Vector2Int(x, y));
-    public Land? GetLand(Vector2Int coord) => InBounds(coord) ? (Land?)Land[coord] : null;
+    public Land? GetLand(Vector2Int coord) => InBounds(coord) ? Land[coord] : (Land?)null;
 
     public bool SetLand(Vector2Int pos, Land terrain, bool force = false) {
         if (!force && !validator.IsValidLand(pos, terrain)) return false;
@@ -190,9 +190,8 @@ public class Terrain : MonoBehaviour {
         return Attack(new Position(Grid.Roof, pos), atk, feature.config.maxHealth, (pos) => DestroyFeature(pos.Coord));
     }
     public bool Attack(Position pos, int atk, int maxHealth, Action<Position> destroy) {
-        bool destroyIt = false;
-        if (maxHealth <= atk) destroyIt = true;
-        else { // check the cache
+        bool destroyIt = maxHealth <= atk;
+        if (!destroyIt) { // check the cache
             foreach (Position cachePos in damageCache.Keys) if (damageCache[cachePos].expired) damageCache.Remove(cachePos); // update
 
             if (damageCache.ContainsKey(pos)) {
@@ -209,17 +208,16 @@ public class Terrain : MonoBehaviour {
         return destroyIt;
     }
     public FeatureHooks UninstallFeature(Vector2Int pos) {
-        FeatureHooks feature = features[pos.x, pos.y]?.hooks;
+        Feature? feature = features[pos.x, pos.y];
+        FeatureHooks hooks = feature?.hooks;
         features[pos.x, pos.y] = null;
-        if (feature != null) feature.tile = null;
-        return feature;
+        if (feature != null) mapRenderer.UpdateFeature(pos);
+        if (hooks != null) hooks.tile = null;
+        return hooks;
     }
-    public bool DestroyFeature(Vector2Int pos) {
+    public void DestroyFeature(Vector2Int pos) {
         FeatureHooks feature = UninstallFeature(pos);
-        if (feature != null) {
-            GameObject.Destroy(feature.gameObject);
-            return true;
-        } else return false;
+        if (feature != null) GameObject.Destroy(feature.gameObject);
     }
 
     private void SetXWall(int x, int y, Construction construction, bool force = false) {
@@ -274,6 +272,21 @@ public class Terrain : MonoBehaviour {
     public Construction[,] AllYWallTiles => yWalls;
     public Construction[,] AllRoofTiles => roofs;
 
+    public WhyNot IsValidLand(Vector2Int coord, LandFlags validLand) =>
+        !InBounds(coord) ? "out_of_bounds"
+        : ((int)validLand & 1 << (int)Land[coord]) == 0 ? Land[coord].ToString()
+        : (WhyNot) true;
+    public WhyNot IsValidConstruction(Position pos, ConstructionFlags validConstruction) =>
+        !InBounds(pos) ? "out_of_bounds"
+        : ((int)validConstruction & 1 << (int)this[pos]) == 0 ? this[pos].ToString()
+        : (WhyNot) true;
+    public WhyNot IsValid(Position pos, LandFlags? land = null, ConstructionFlags? construction = null) =>
+        !InBounds(pos) ? "out_of_bounds" :
+        (land == null | pos.grid != Grid.Roof | IsValidLand(pos.Coord, (LandFlags)land)
+            .Clarify("invalid_land(", ")")) &&
+        (construction == null | IsValidConstruction(pos, (ConstructionFlags)construction)
+            .Clarify("invalid_roof(", ")"));
+
     public void PopulateTerrainFromData(MapData mapData) {
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
             SetLand(Vct.I(x, y), mapData.land[x, y], true);
@@ -284,6 +297,7 @@ public class Terrain : MonoBehaviour {
         for (int x = 0 ; x < Dim; x++) for (int y = 0; y < Dim; y++)
             SetRoof(Vct.I(x, y), mapData.roofs[x, y], true);
         foreach (Feature.Data featureData in mapData.features) {
+            // Debug.Log("Reading saved " + featureData);
             BuildFeature(featureData.tile, FeatureLibrary.C.ByTypeName(featureData.type))
                 .DeserializeUponStart(featureData.customFields);
         }

@@ -30,7 +30,10 @@ public class MapPersistence : MonoBehaviour {
         for (int x = 0; x < terrain.Bounds.x; x++) for (int y = 0; y < terrain.Bounds.y; y++) {
             if (terrain.Feature[x, y] != null) {
                 Feature.Data? maybeFeatureData = terrain.Feature[x, y]?.Serialize(x, y);
-                if (maybeFeatureData is Feature.Data featureData) features.Add(featureData);
+                if (maybeFeatureData is Feature.Data featureData) {
+                    // Debug.Log("Saving feature " + featureData);
+                    features.Add(featureData);
+                }
             }
         }
         mapData.features = features.ToArray();

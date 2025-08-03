@@ -30,6 +30,10 @@ public class WhyNot {
             Debug.Log(prefix + ": " + reason);
         return (bool)this;
     }
+    public WhyNot Clarify(string prefix, string postfix) {
+        if (reason != null) return prefix + reason + postfix;
+        else return this;
+    }
 
     public static bool operator true(WhyNot wn) => (bool)wn;
     public static bool operator false(WhyNot wn) => !(bool)wn;

@@ -411,6 +411,7 @@ MonoBehaviour:
   archer: {fileID: 6284982019010971546, guid: 26df01214dee747cfb7dd9018982f07c, type: 3}
   redDwarf: {fileID: 5170738914887468554, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
   moose: {fileID: 9085166757081951501, guid: 589a3cf3c5b784847963621b5a7f3166, type: 3}
+  axe: {fileID: 5056396508191743918, guid: 46c61f227d76342c3a7455eaa228c78b, type: 3}
 --- !u!114 &8377938587873387453
 MonoBehaviour:
   m_ObjectHideFlags: 0

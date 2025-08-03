@@ -20,8 +20,6 @@ public class Stipule : Species<StipuleConfig> {
 public class StipuleBrain : Brain {
     private StipuleConfig stipule;
 
-    private float expectedArrowReach;
-
     public StipuleBrain(Stipule species, BrainConfig general, StipuleConfig stipule) : base(species, general) {
         this.stipule = stipule;
 
@@ -42,11 +40,5 @@ public class StipuleBrain : Brain {
         from focus in Continually.For(f)
         where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
         select pathfinding.Approach(focus, stipule.meleeReach)
-            .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));
-
-    private void Attack(Transform target) {
-        Health health = target.GetComponentStrict<Health>();
-        health.Decrease(creature.stats.Str, transform);
-        resource.Use();
-    }
+            .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
 }

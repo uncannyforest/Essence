@@ -182,7 +182,7 @@ public struct Habit {
             },
             onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.shelter),
             onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                () => brain.Habitat.RestBehavior((Vector2Int)state.shelter)),
+                () => brain.Habitat.ApproachAndRestBehavior((Vector2Int)state.shelter)),
         },
 
         [CreatureStateType.Investigate] = new Node(CreatureStateType.Investigate) {

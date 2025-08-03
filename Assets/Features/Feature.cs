@@ -45,6 +45,8 @@ public class FeatureConfig {
         return true;
     }
 
+    public static bool operator==(FeatureConfig a, FeatureConfig b) => a is null ? b is null : a.Equals(b);
+    public static bool operator!=(FeatureConfig a, FeatureConfig b) => a is null ? !(b is null) : !a.Equals(b);
     public override bool Equals(object obj) {
         if (obj is FeatureConfig f) return this.type.Equals(f.type);
         else return false;
@@ -58,6 +60,8 @@ public struct Feature {
     public FeatureConfig config;
     public FeatureHooks hooks;
 
+    public static bool operator==(Feature a, Feature b) => a.Equals(b);
+    public static bool operator!=(Feature a, Feature b) => !a.Equals(b);
     public override bool Equals(object obj) {
         if (obj is Feature f) return this.config.type.Equals(f.config.type);
         else return false;
@@ -77,6 +81,10 @@ public struct Feature {
             this.y = y;
             this.type = type;
             this.customFields = customFields;
+        }
+
+        override public string ToString() {
+            return type + ": " + tile;
         }
     }
     public Data? Serialize(int x, int y) {
