@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Flexibly handle player-assigned targets and creature-found focuses using the same code.
-// Implementation classes use Target from Tele.cs
-// - see comment at the top of Tele.cs for type discrepancy pitfalls
+// Implementation classes use Target class
+// - see comment at the top of Target.cs for type discrepancy pitfalls
 // which may need to be cleaned up eventually.
 // 
 // Note: if this were designed from scratch, CreatureActions (CreatureState.Execute),

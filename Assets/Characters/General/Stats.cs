@@ -32,7 +32,7 @@ public class Stats : MonoBehaviour {
     public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / GlobalConfig.I.expToLevelUp)); }
     public int Str { get => Mathf.FloorToInt(minStr * Level); }
     public int Def { get => Mathf.FloorToInt(minDef * Level); }
-    public float Exe { get => (minExe + Mathf.Log(Level, exeIncrEvery)); }
+    public float Exe { get => minExe + Mathf.Log(Level, exeIncrEvery); }
     public float ExeTime { get => 1 / Exe; }
     public float Spd { get => minSpd + Mathf.Log(Level, 1000); }
     public int Res { get => Mathf.FloorToInt(minRes * Level); }
