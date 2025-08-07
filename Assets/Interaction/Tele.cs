@@ -3,23 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Target : OneOf<Terrain.Position, Character> {
-    private Target() : base() {}
-    public Target(Terrain.Position t) : base(t) {}
-    public Target(Character u) : base(u) {}
-    new public static Target Neither { get => new Target(); }
-
-    public Vector3 Position {
-        get {
-            if (this.Is(out Terrain.Position position))
-                return Terrain.I.CellCenter(position);
-            else if (this.Is(out Character character))
-                return character.transform.position;
-            else throw new InvalidOperationException("Neither");
-        }
-    }
-}
-
 public class TeleFilter {
     public enum Terrain {
         NONE,
@@ -28,11 +11,11 @@ public class TeleFilter {
     }
 
     public Terrain terrainSelection;
-    public Func<Transform, bool> characterFilter;
+    public Func<Transform, WhyNot> characterFilter;
     public Func<List<Vector3>> line { get; private set; } = null;
 
     public TeleFilter(Terrain terrainSelection,
-            Func<Transform, bool> characterFilter) {
+            Func<Transform, WhyNot> characterFilter) {
         this.terrainSelection = terrainSelection;
         this.characterFilter = characterFilter;
     }
@@ -89,12 +72,12 @@ public class Tele {
         return null;
     }
 
-    public Character SelectCharacterWithFilter(Vector2 point, Func<Transform, bool> characterFilter) {
+    public Character SelectCharacterWithFilter(Vector2 point, Func<Transform, WhyNot> characterFilter) {
         Collider2D[] colliders = Physics2D.OverlapPointAll(point, LayerMask.GetMask("Clickable"));
         if (colliders.Length == 0) return null;
         IEnumerable<Transform> charactersFiltered = colliders
                 .Select(collider => collider.transform.parent)
-                .Where(characterFilter);
+                .Where((t) => characterFilter(t).NegLog("cannot select"));
         if (charactersFiltered.Count() == 0) return null;
         return charactersFiltered
                 .MinBy(transform => Vector2.Distance((Vector2)transform.position, point))

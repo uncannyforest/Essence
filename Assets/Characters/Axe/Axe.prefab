@@ -107,6 +107,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: minExe
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: exeIncrEvery
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009513887018421729, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: resourceName
       value: Wood
       objectReference: {fileID: 0}

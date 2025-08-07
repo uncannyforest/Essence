@@ -100,7 +100,7 @@ public class Brain {
     public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
     virtual public bool CanTame(Transform player) {
         if (GetComponent<Health>() == null) return Habitat?.CanTame() ?? false;
-        else return state.type == CreatureStateType.Faint && (Habitat?.IsPresent(Habitat.InteractionMode.Nearby) ?? false);
+        else return state.type == CreatureStateType.Faint && (Habitat?.IsPresent(Radius.Nearby) ?? false);
     }
     virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
 
@@ -110,15 +110,14 @@ public class Brain {
         t.WhichType == typeof(Character) ? true : terrain.IsValid((Terrain.Position)t, land, construction);
 
     public FlexSourceBehavior MainBehavior { get; protected set; } = new NullSourceBehavior();
-    virtual public IEnumerator<YieldInstruction> FocusedBehavior() => MainBehavior.FocusedBehavior(this);
+    virtual public IEnumerator<YieldInstruction> FocusedBehavior() => MainBehavior.FocusedBehavior();
     virtual public WhyNot IsValidFocus(Transform characterFocus) => 
-        characterFocus == null ? "null_focus" :
-        general.hasAttack ? Will.IsThreat(teamId, transform.position, characterFocus) :
-        SufficientResource();
+        characterFocus == null ? "null_focus" : MainBehavior.IsValidFocus(characterFocus);
     virtual public Optional<Transform> FindFocus() => Optional<Transform>.Empty();
     virtual public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) =>
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
     public Habitat Habitat { get; protected set; } = null;
+    public Lark Lark { get; protected set; } = Lark.None();
 
     virtual public void Melee(Transform target) {
         Health health = target.GetComponentStrict<Health>();

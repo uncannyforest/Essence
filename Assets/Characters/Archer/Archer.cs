@@ -27,10 +27,10 @@ public class ArcherBrain : Brain {
         this.archer = archer;
         expectedArrowReach = archer.arrowPrefab.reach + archer.arrowPrefab.GetComponentStrict<CircleCollider2D>().radius;
 
-        MainBehavior = new CharacterTargetedBehavior(ExecuteBehavior,
-            (c) => c.GetComponent<Health>() != null &&
-                   c.GetComponentStrict<Team>().TeamId != teamId,
-            (c) => SufficientResource());
+        MainBehavior = new CharacterTargetedBehavior(this,
+            ExecuteBehavior,
+            (c) => Will.IsThreat(teamId, c).NegLog(legalName + " cannot select " + c),
+            (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
         Actions = new List<CreatureAction>() {
             MainBehavior.CreatureAction(archer.attackAction)

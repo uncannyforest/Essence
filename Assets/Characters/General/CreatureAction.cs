@@ -33,7 +33,7 @@ public struct CreatureAction {
             filter, null, executingBehavior.canQueue, false, false);
     public static CreatureAction WithCharacter(Sprite icon,
             TargetedBehavior<Transform> executingBehavior,
-            Func<Transform, bool> characterFilter) =>
+            Func<Transform, WhyNot> characterFilter) =>
         new CreatureAction(icon, null,
             (creature, target) => creature.ProcessDirective(executingBehavior.WithTarget(((Character)target).transform)),
             new TeleFilter(TeleFilter.Terrain.NONE, characterFilter),

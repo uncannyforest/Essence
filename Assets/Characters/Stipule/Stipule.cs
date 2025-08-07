@@ -23,9 +23,10 @@ public class StipuleBrain : Brain {
     public StipuleBrain(Stipule species, BrainConfig general, StipuleConfig stipule) : base(species, general) {
         this.stipule = stipule;
 
-        MainBehavior = new CharacterTargetedBehavior(AttackBehavior,
-            (c) => Will.IsThreat(teamId, transform.position, c).NegLog(legalName + " cannot select " + c),
-            (c) => SufficientResource());
+        MainBehavior = new CharacterTargetedBehavior(this,
+            AttackBehavior,
+            (c) => Will.IsThreat(teamId, c).NegLog(legalName + " cannot select " + c),
+            (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
         Actions = new List<CreatureAction>() {
             MainBehavior.CreatureAction(stipule.attackAction)

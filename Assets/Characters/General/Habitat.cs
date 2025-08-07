@@ -8,12 +8,6 @@ public class Habitat {
 
     public const float besideDistance = 1; // close enough to 1.5 * sqrt(0.5)
 
-    public enum InteractionMode {
-        Inside,
-        Beside,
-        Nearby
-    }
-
     private HashSet<Vector2Int> recentlyVisited = new HashSet<Vector2Int>();
     private float restAgainTime = 0;
     private float restDuration = 10;
@@ -23,69 +17,43 @@ public class Habitat {
         restDuration = 10;
     }
 
-    public readonly InteractionMode restRadius;
+    public readonly Radius restRadius;
     protected readonly Brain brain;
 
-    public Habitat(Brain brain, InteractionMode restRadius) {
+    public Habitat(Brain brain, Radius restRadius) {
         this.brain = brain;
         this.restRadius = restRadius;
     }
 
-    static public Habitat Feature(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby) => new Habitat(brain, feature, mode);
-    public Habitat(Brain brain, FeatureConfig feature, InteractionMode mode = InteractionMode.Nearby)
+    static public Habitat Feature(Brain brain, FeatureConfig feature, Radius mode = Radius.Nearby) => new Habitat(brain, feature, mode);
+    public Habitat(Brain brain, FeatureConfig feature, Radius mode = Radius.Nearby)
         : this(brain, mode) {
         IsShelter = (loc) => feature == Terrain.I.Feature[loc]?.config; // okay??
     }
 
-    static public Habitat Land(Brain brain, Land land, InteractionMode mode) => new Habitat(brain, land, mode);
-    public Habitat(Brain brain, Land land, InteractionMode mode)
+    static public Habitat Land(Brain brain, Land land, Radius mode) => new Habitat(brain, land, mode);
+    public Habitat(Brain brain, Land land, Radius mode)
         : this(brain, mode) {
         IsShelter = (loc) => Terrain.I.GetLand(loc) == land;
     }
 
     public Func<Vector2Int, bool> IsShelter;
 
-    private IEnumerable<Vector2Int> ValidShelterLocations(InteractionMode mode) {
-        Vector2Int center;
-        switch (mode) {
-            case InteractionMode.Inside:
-                center = Terrain.I.CellAt(brain.transform.position);
-                if (Terrain.I.InBounds(center)) yield return center;
-                yield break;
-            case InteractionMode.Beside:
-                center = Terrain.I.CellAt(brain.transform.position);
-                for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++)
-                    if (Terrain.I.InBounds(center + Vct.I(x, y))) yield return center + Vct.I(x, y);
-                yield break;
-            case InteractionMode.Nearby:
-                center = Terrain.I.CellAt(brain.transform.position);
-                for (int x = -7; x <= 7; x++) for (int y = -7; y <= 7; y++) {
-                    Vector2Int possShelterLocation = center + Vct.I(x, y);
-                    if (Terrain.I.InBounds(possShelterLocation) &&
-                            Disp.FT(brain.transform.position, Terrain.I.CellCenter(possShelterLocation)) <= Creature.neighborhood)
-                        yield return possShelterLocation;
-                }
-                yield break;
-        }
-    }
+    private IEnumerable<Vector2Int> ValidShelterLocations(Radius radius) => radius.Center(brain.transform.position);
 
-    private float SqrDistance(Vector2Int loc) => Disp.FT(brain.transform.position, Terrain.I.CellCenter(loc)).sqrMagnitude;
-
-    public bool IsPresent(InteractionMode radius) {
+    public bool IsPresent(Radius radius) {
         foreach (Vector2Int validShelterLocation in ValidShelterLocations(radius))
             if (IsShelter(validShelterLocation)) return true;
         return false;
     }
-    virtual public bool CanTame() => IsPresent(restRadius);
+    public bool IsPresent() => IsPresent(restRadius);
+    virtual public bool CanTame() => IsPresent();
 
     public Optional<Vector2Int> FindShelter() {
         if (Time.time < restAgainTime) return Optional<Vector2Int>.Empty();
         recentlyVisited.RemoveWhere((visited) =>
             Disp.FT(brain.transform.position, Terrain.I.CellCenter(visited)) > Creature.neighborhood);
-        Optional<Vector2Int> result = (from location in ValidShelterLocations(InteractionMode.Nearby)
-            where !recentlyVisited.Contains(location) && IsShelter(location)
-            orderby SqrDistance(location)
-            select Optional.Of(location)).FirstOrDefault();
+        Optional<Vector2Int> result = Radius.Nearby.ClosestTo(brain.transform.position, (loc) => !recentlyVisited.Contains(loc) && IsShelter(loc));
         if (brain.teamId != 0) Debug.Log(brain.legalName + " searched for shelter nearby, result: " + result);
         return result;
     }
@@ -93,11 +61,11 @@ public class Habitat {
     public IEnumerator<YieldInstruction> ApproachAndRestBehavior(Vector2Int shelter) {
         IEnumerator<YieldInstruction> approach;
         switch (restRadius) {
-            case InteractionMode.Inside:
+            case Radius.Inside:
                 approach = brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), 1f / CharacterController.subGridUnit);
                 break;
-            case InteractionMode.Beside:
-            case InteractionMode.Nearby:
+            case Radius.Beside:
+            case Radius.Nearby:
             default:
                 approach = brain.pathfinding.Approach(Terrain.I.CellCenter(shelter), besideDistance);
                 break;
@@ -150,7 +118,7 @@ public class ConsumableFeatureHabitat : Habitat {
 }
 
 public class SleepHabitat : Habitat {
-    public SleepHabitat(Brain brain, InteractionMode restRadius) : base(brain, restRadius) {}
+    public SleepHabitat(Brain brain, Radius restRadius) : base(brain, restRadius) {}
 
     override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorSleep();
 }

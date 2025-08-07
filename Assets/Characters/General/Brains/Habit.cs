@@ -110,7 +110,7 @@ public struct Habit {
 
     public class PassiveCommandNode {
         public CommandType type;
-        public Func<CreatureState, Brain, YieldInstruction> passiveCommandRunStep;
+        public Func<CreatureState, Brain, IEnumerator<YieldInstruction>> passiveCommandRun;
         public Optional<Func<CreatureState, Vector2>> nearbyTracking;
 
         public PassiveCommandNode(CommandType type) => this.type = type;
@@ -121,6 +121,7 @@ public struct Habit {
             else return new BehaviorNode(behavior);
         }
 
+        public BehaviorNode Run(CreatureState state, Brain brain) => new BehaviorNode(() => passiveCommandRun(state, brain));
     }
 
     // all state specs
@@ -207,23 +208,23 @@ public struct Habit {
                     brain.Habitat?.ClearRecentlyVisited();
             },
             onUpdate = (_, __) => true,
-            onRunStep = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].passiveCommandRunStep(state, brain)
+            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].Run(state, brain)
         },
     };
 
     private static Dictionary<CommandType, PassiveCommandNode> PassiveCommandNodes = new Dictionary<CommandType, PassiveCommandNode>() {
         [CommandType.Roam] = new PassiveCommandNode(CommandType.Roam) {
             nearbyTracking = Optional<Func<CreatureState, Vector2>>.Empty(),
-            passiveCommandRunStep = (state, brain) => brain.pathfinding.Roam()
+            passiveCommandRun = (state, brain) => brain.pathfinding.Roam()
         },
         [CommandType.Follow] = new PassiveCommandNode(CommandType.Follow) {
             nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.followDirective.Value.position),
-            passiveCommandRunStep = (state, brain) => brain.pathfinding.Follow(state.command?.followDirective.Value)
+            passiveCommandRun = (state, brain) => Enumerators.Continually(() => brain.pathfinding.Follow(state.command?.followDirective.Value))
         },
         [CommandType.Station] = new PassiveCommandNode(CommandType.Station) {
             nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.stationDirective),
-            passiveCommandRunStep = (state, brain) => brain.pathfinding
-                .ApproachThenIdle((Vector3)state.command?.stationDirective)
+            passiveCommandRun = (state, brain) => Enumerators.Continually(() => brain.pathfinding
+                .ApproachThenIdle((Vector3)state.command?.stationDirective))
         },
     };
 }

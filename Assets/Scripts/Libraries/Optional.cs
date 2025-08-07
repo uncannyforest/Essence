@@ -55,6 +55,15 @@ public struct Optional<T> {
         else return fallback();
     }
 
+    // Can be used with Linq
+    // to apply function Transformation() to the value inside the Optional:
+    //    from value in optional
+    //    select Transformation(value)
+    public Optional<U> Select<U>(Func<T, U> selector) {
+        if (HasValue) return Optional.Of(selector(value));
+        else return Optional<U>.Empty();
+    }
+
     public static explicit operator T(Optional<T> optional) {
         return optional.Value;
     }

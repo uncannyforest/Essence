@@ -282,9 +282,9 @@ public class Terrain : MonoBehaviour {
         : (WhyNot) true;
     public WhyNot IsValid(Position pos, LandFlags? land = null, ConstructionFlags? construction = null) =>
         !InBounds(pos) ? "out_of_bounds" :
-        (land == null | pos.grid != Grid.Roof | IsValidLand(pos.Coord, (LandFlags)land)
+        (land == null || pos.grid != Grid.Roof ? true : IsValidLand(pos.Coord, (LandFlags)land)
             .Clarify("invalid_land(", ")")) &&
-        (construction == null | IsValidConstruction(pos, (ConstructionFlags)construction)
+        (construction == null ? true : IsValidConstruction(pos, (ConstructionFlags)construction)
             .Clarify("invalid_roof(", ")"));
 
     public void PopulateTerrainFromData(MapData mapData) {

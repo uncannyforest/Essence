@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -39,10 +38,22 @@ public class Pathfinding {
         movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
     }
 
-    public YieldInstruction Roam() {
-        if (Random.value < general.roamRestingFraction) movement.Idle();
-        else movement.InDirection(RandomVelocity());
-        return new WaitForSeconds(Random.value * general.reconsiderMaxRateRoam);
+    public IEnumerator<YieldInstruction> Roam() {
+        while (true) {
+            IEnumerator<YieldInstruction> larkStep;
+            while (true) {
+                if (brain.Lark.ScanForLark().IsValue(out IEnumerator<YieldInstruction> step)) {
+                    larkStep = step;
+                    break;
+                }
+                if (Random.value < general.roamRestingFraction) movement.Idle();
+                else movement.InDirection(RandomVelocity());
+                yield return new WaitForSeconds(Random.value * general.reconsiderMaxRateRoam);
+            }
+            while (larkStep.MoveNext()) {
+                yield return larkStep.Current;
+            }
+        }
     }
 
     private Displacement FollowTargetDirection(Vector3 targetPosition) {
@@ -85,6 +96,13 @@ public class Pathfinding {
 
     public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
         => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
+
+    public IEnumerator<YieldInstruction> ApproachThenTerraform(Terrain.Position pos, float interactionDistance, Action<Terrain.Position> action)
+        => ApproachThenInteract(interactionDistance, () => brain.creature.stats.ExeTime,
+            (loc) => {
+                brain.resource.Use(1);
+                action(loc);
+            }).E(pos);
 
     public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, Brain brain, Func<float> time, int cost)
         => ApproachThenInteract(1.5f, time,
@@ -132,7 +150,7 @@ public class Pathfinding {
             if (position.grid == Terrain.Grid.XWalls || position.grid == Terrain.Grid.YWalls) {
                 if ((Terrain.I.GetConstruction(position) ?? Construction.None) != Construction.None) {
                     return new DesireMessage.Obstacle() {
-                        requestor = brain.creature,
+                        requestor = brain.creature.GetComponentStrict<Character>(),
                         location = position,
                         wallObstacle = Terrain.I[position]
                     };
@@ -141,7 +159,7 @@ public class Pathfinding {
                 Land? land = Terrain.I.GetLand(position.Coord);
                 if (land?.IsPassable() == false || (movement.waterSpeed == 0 && land?.IsWatery() == true)) {
                     return new DesireMessage.Obstacle() {
-                        requestor = brain.creature,
+                        requestor = brain.creature.GetComponentStrict<Character>(),
                         location = position,
                         landObstacle = land
                     };

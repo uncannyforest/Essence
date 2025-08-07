@@ -22,6 +22,11 @@ public class Axe : Species<AxeConfig> {
         int woodQuantity = land == Land.Meadow ? 1 : land == Land.Shrub ? 3 : 5;
         return Terrain.I.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, woodQuantity);
     }
+
+    public static Feature ChopWood(Terrain.Position pos) {
+        if (pos.grid != Terrain.Grid.Roof) throw new NotSupportedException("Do not call ChopWood on a wall");
+        return ChopWood(pos.Coord);
+    }
 }
 
 public class AxeBrain : Brain {
@@ -30,17 +35,23 @@ public class AxeBrain : Brain {
     public AxeBrain(Species species, BrainConfig general, AxeConfig axe) : base(species, general) {
         this.axe = axe;
 
-        MainBehavior = new FlexTargetedBehavior(AttackBehavior,
-            new TeleFilter(
+        MainBehavior = new FlexTargetedBehavior(this,
+            characterBehavior: AttackBehavior,
+            terrainAction: (pos) => Axe.ChopWood(pos),
+            silentFilter: new TeleFilter(
                 TeleFilter.Terrain.TILES,
-                (c) => Will.IsThreat(teamId, transform.position, c).NegLog(legalName + " cannot select " + c)),
-            (c) => IsValidIfTerrain(c, LandCats.PLANTY) && SufficientResource());
+                (c) => Will.IsThreat(teamId, c)),
+            errorFilter: (target) => SufficientResource()
+                && target.IfCharacter((c) => Will.CanSee(transform.position, c.transform))
+                && IsValidIfTerrain(target, LandCats.PLANTY));
+
+        Lark = MainBehavior.Lark(() => Habitat?.IsPresent(Radius.Nearby) != true,  Radius.Nearby);
 
         Actions = new List<CreatureAction>() {
             MainBehavior.CreatureAction(axe.attackAction)
         };
 
-        Habitat = new SleepHabitat(this, Habitat.InteractionMode.Inside) {
+        Habitat = new SleepHabitat(this, Radius.Inside) {
             IsShelter = (coord) =>
                 terrain.Feature[coord + new Vector2Int(-1, -1)]?.config == FeatureLibrary.C.woodPile &&
                 terrain.Feature[coord + new Vector2Int(-1, 0)]?.config == FeatureLibrary.C.woodPile &&
@@ -56,24 +67,11 @@ public class AxeBrain : Brain {
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    private IEnumerator<YieldInstruction> AttackBehavior(Target f) {
-        if (f.Is(out Character c)) {
-            return
-                from focus in Continually.For(c.transform)
-                where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
-                select pathfinding.Approach(focus, axe.meleeReach)
-                    .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));
-        } else if (f.Is(out Terrain.Position pos)) {
-            return
-                pathfinding.ApproachThenInteract(1.5f, () => creature.stats.ExeTime,
-                    (loc) => {
-                        resource.Use(1);
-                        Axe.ChopWood(loc.Coord);
-                    }).E(pos);
-        } else {
-            throw new ArgumentException("Called AttackBehavior with empty target");
-        }
-    }
+    private IEnumerator<YieldInstruction> AttackBehavior(Character c) 
+        => from focus in Continually.For(c.transform)
+            where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
+            select pathfinding.Approach(focus, axe.meleeReach)
+                .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));
 
     private void Attack(Transform target) {
         Melee(target);

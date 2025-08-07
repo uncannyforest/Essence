@@ -207,10 +207,12 @@ public class Will {
 
     // Sanity check for NearestThreat to avoid contradiction
     // OverlapCircleAll may produce colliders with center slightly outside Creature.neighborhood
-    public static WhyNot IsThreat(int team, Vector3 creaturePosition, Transform threat) =>
+    public static WhyNot IsVisibleThreat(int team, Vector3 creaturePosition, Transform threat) =>
+        IsThreat(team, threat) && CanSee(creaturePosition, threat);
+
+    public static WhyNot IsThreat(int team, Transform threat) =>
         Team.SameTeam(team, threat) ? "same_team" :
-        !Attackable(threat) ? "not_attackable" :
-        CanSee(creaturePosition, threat);
+        !Attackable(threat) ? "not_attackable" : (WhyNot)true;
 
     public static Optional<Transform> NearestThreat(Brain brain) => NearestThreat(brain, null);
     public static Optional<Transform> NearestThreat(Brain brain, Func<Collider2D, bool> filter) {
@@ -220,7 +222,7 @@ public class Will {
             Physics2D.OverlapCircleAll(creaturePosition, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
         List<Transform> threats = new List<Transform>();
         foreach (Collider2D character in charactersNearby) {
-            if ((bool)IsThreat(team, creaturePosition, character.transform) && (filter?.Invoke(character) != false))
+            if ((bool)IsVisibleThreat(team, creaturePosition, character.transform) && (filter?.Invoke(character) != false))
                 if (character.GetComponent<Creature>()?.brainConfig?.hasAttack == true ||
                         character.GetComponent<PlayerCharacter>() != null)
                     threats.Add(character.transform);

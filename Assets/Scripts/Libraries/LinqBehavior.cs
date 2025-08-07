@@ -5,6 +5,12 @@ using System.Linq;
 using UnityEngine;
 
 public class Enumerators {
+    public static IEnumerator<YieldInstruction> Continually(Func<YieldInstruction> action) {
+        while (true) {
+            yield return action();
+        }
+    }
+
     public static IEnumerator<YieldInstruction> AfterWait(Func<float> seconds, Action action) {
         yield return new WaitForSeconds(seconds());
         action();

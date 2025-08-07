@@ -38,7 +38,8 @@ public class WhyNot {
     public static bool operator true(WhyNot wn) => (bool)wn;
     public static bool operator false(WhyNot wn) => !(bool)wn;
     public static bool operator !(WhyNot wn) => !(bool)wn;
-    public static WhyNot operator &(WhyNot a, WhyNot b) {
+    // Note: "a" & "b" returns "a+b" but "a" && "b" returns "a"
+    public static WhyNot operator &(WhyNot a, WhyNot b) { 
         if ((bool)a) {
             if ((bool)b) return true;
             else return b;
@@ -47,6 +48,8 @@ public class WhyNot {
             else return a + "+" + b;
         }
     }
+    // Note: "a" | "b" and "a" || "b" both return "a&b"
     public static WhyNot operator |(WhyNot a, WhyNot b) => (bool)a | (bool)b ? (WhyNot)true : a + "&" + b;
 
+    public static WhyNot operator |(bool a, WhyNot b) => a ? (WhyNot)true : b;
 }

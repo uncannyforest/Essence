@@ -3,7 +3,7 @@ using UnityEngine;
 
 public struct DesireMessage {
     public struct Obstacle {
-        public Creature requestor;
+        public Character requestor;
         public Terrain.Position location;
         public Land? landObstacle;
         public Construction? wallObstacle;

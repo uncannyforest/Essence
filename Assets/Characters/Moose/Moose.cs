@@ -31,7 +31,7 @@ public class MooseBrain : Brain {
                     .WithLine(GetDestinationsForDisplay))
         };
 
-        Habitat = new Habitat(this, Habitat.InteractionMode.Inside) {
+        Habitat = new Habitat(this, Radius.Inside) {
             IsShelter = (loc) => terrain.Land[loc] == Land.Shrub
         };
     }
