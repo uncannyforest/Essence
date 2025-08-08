@@ -6,8 +6,10 @@ using UnityEngine;
 [Serializable]
 public class MooseConfig {
     public Sprite attackAction;
+    public Sprite destroyAction;
     public float destroyDistance;
     public float destroyTime;
+    public float meleeReach;
     public int attack;
 }
 
@@ -24,11 +26,17 @@ public class MooseBrain : Brain {
     public MooseBrain(Moose species, BrainConfig general, MooseConfig moose) : base(species, general) {
         this.moose = moose;
 
+        MainBehavior = new CharacterTargetedBehavior(this,
+            AttackCharacterBehavior,
+            (c) => Will.IsThreat(teamId, c),
+            (c) => SufficientResource() && Will.CanSee(transform.position, c));
+
         Actions = new List<CreatureAction>() {
-            CreatureAction.WithObject(moose.attackAction,
-                new PathTracingBehavior.Targeted(transform, IsDestroyable, (pos) => ApproachAndAttack(pos).NextOrDefault()),
+            CreatureAction.WithObject(moose.destroyAction,
+                new PathTracingBehavior.Targeted(transform, IsDestroyable, (pos) => ApproachAndDestroy(pos).NextOrDefault()),
                 new TeleFilter(TeleFilter.Terrain.TILES, null)
-                    .WithLine(GetDestinationsForDisplay))
+                    .WithLine(GetDestinationsForDisplay)),
+            MainBehavior.CreatureAction(moose.attackAction)
         };
 
         Habitat = new Habitat(this, Radius.Inside) {
@@ -42,17 +50,26 @@ public class MooseBrain : Brain {
     private bool IsDestroyable(Terrain.Position location) =>
         Will.CanClearObstacleAt(general, location);
 
-    override public IEnumerator<YieldInstruction> FocusedBehavior() => ApproachAndAttack((Terrain.Position)state.terrainFocus?.location);
+    override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    override public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) => ApproachAndAttack(location);
+    override public IEnumerator<YieldInstruction> FocusedBehavior() =>
+        FlexTargetedBehavior.MuxFocus(state, AttackCharacterBehavior, ApproachAndDestroy);
 
-    private IEnumerator<YieldInstruction> ApproachAndAttack(Terrain.Position l) =>
+    override public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) => ApproachAndDestroy(location);
+
+    private IEnumerator<YieldInstruction> AttackCharacterBehavior(Transform f) =>
+        from focus in Continually.For(f)
+        where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
+        select pathfinding.Approach(focus, moose.meleeReach)
+            .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
+
+    private IEnumerator<YieldInstruction> ApproachAndDestroy(Terrain.Position l) =>
         from location in Continually.For(l)
         where resource.Has()
         select pathfinding.Approach(terrain.CellCenter(location), moose.destroyDistance)
-            .Then(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => Attack(location)));
+            .Then(pathfinding.FaceAnd("Attack", terrain.CellCenter(location), () => DestroyTerrain(location)));
     
-    private YieldInstruction Attack(Terrain.Position location) {
+    private YieldInstruction DestroyTerrain(Terrain.Position location) {
         if (location.grid != Terrain.Grid.Roof) {
             terrain[location] = Construction.None;
             creature.GenericExeSucceeded();

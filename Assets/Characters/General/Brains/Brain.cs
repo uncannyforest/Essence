@@ -102,7 +102,6 @@ public class Brain {
         if (GetComponent<Health>() == null) return Habitat?.CanTame() ?? false;
         else return state.type == CreatureStateType.Faint && (Habitat?.IsPresent(Radius.Nearby) ?? false);
     }
-    virtual public bool ExtractTamingCost(Transform player) => Habitat?.CanTame() ?? false;
 
     public WhyNot SufficientResource(int quantityNeeded = 1) =>
         resource?.Has(quantityNeeded) != false ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";

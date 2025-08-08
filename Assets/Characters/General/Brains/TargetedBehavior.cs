@@ -130,11 +130,16 @@ public class FlexTargetedBehavior : TargetedBehavior<Target>, FlexSourceBehavior
         throw new ArgumentException("Empty target");
     }
 
-    private IEnumerator<YieldInstruction> MuxFocus(CreatureState state) {
-        if (state.characterFocus.IsValue(out Transform character)) 
-            return enumeratorWithParam(new Target(character.GetComponentStrict<Character>()));
-        if (state.terrainFocus is DesireMessage.Obstacle obstacle)
-            return enumeratorWithParam(new Target(obstacle.location));
+    private IEnumerator<YieldInstruction> MuxFocus(CreatureState state) =>
+        MuxFocus(state,
+            (c) => enumeratorWithParam(new Target(c.GetComponentStrict<Character>())),
+            (pos) => enumeratorWithParam(new Target(pos)));
+
+    public static IEnumerator<YieldInstruction> MuxFocus(CreatureState state,
+            Func<Transform, IEnumerator<YieldInstruction>> characterBehavior,
+            Func<Terrain.Position, IEnumerator<YieldInstruction>> terrainBehavior) {
+        if (state.characterFocus.IsValue(out Transform character)) return characterBehavior(character);
+        if (state.terrainFocus is DesireMessage.Obstacle obstacle) return terrainBehavior(obstacle.location);
         throw new InvalidOperationException("Tried to build focused behavior without a focus");
     }
 }

@@ -20,6 +20,4 @@ public class BuggeBrain : Brain {
     }
 
     override public bool CanTame(Transform player) => false;
-
-    public override bool ExtractTamingCost(Transform player) => false;
 }

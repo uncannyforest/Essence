@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   max: 1
   startAtFraction: 1
-  statBarPrefab: {fileID: 0}
+  statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
   statBarOffset: 0.125
   showOnHover: 1

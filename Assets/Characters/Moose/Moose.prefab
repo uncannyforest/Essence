@@ -37,8 +37,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesConfig:
     attackAction: {fileID: 9056798433723235567, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
+    destroyAction: {fileID: -285889112722792646, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     destroyDistance: 1
     destroyTime: 0.5
+    meleeReach: 1
     attack: 1
 --- !u!1001 &6362756172984435830
 PrefabInstance:

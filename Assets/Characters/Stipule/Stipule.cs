@@ -25,7 +25,7 @@ public class StipuleBrain : Brain {
 
         MainBehavior = new CharacterTargetedBehavior(this,
             AttackBehavior,
-            (c) => Will.IsThreat(teamId, c).NegLog(legalName + " cannot select " + c),
+            (c) => Will.IsThreat(teamId, c),
             (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
         Actions = new List<CreatureAction>() {

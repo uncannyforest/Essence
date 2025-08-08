@@ -71,7 +71,7 @@ public class Creature : MonoBehaviour {
     // Can call without calling CanTame() first; result will indicate whether it succeeded
     // If false, get TamingInfo for error
     public bool TryTame(Transform player) {
-        if (brain.ExtractTamingCost(player)) {
+        if (brain.CanTame(player)) {
             ForceTame(player);
             return true;
         } else return false;
