@@ -9,7 +9,6 @@ public class MooseConfig {
     public Sprite destroyAction;
     public float destroyDistance;
     public float destroyTime;
-    public float meleeReach;
     public int attack;
 }
 
@@ -60,7 +59,7 @@ public class MooseBrain : Brain {
     private IEnumerator<YieldInstruction> AttackCharacterBehavior(Transform f) =>
         from focus in Continually.For(f)
         where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
-        select pathfinding.Approach(focus, moose.meleeReach)
+        select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
             .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
 
     private IEnumerator<YieldInstruction> ApproachAndDestroy(Terrain.Position l) =>

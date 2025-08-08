@@ -16,6 +16,8 @@ public class GlobalConfig : MonoBehaviour {
     
     public int expToLevelUp = 10;
     public int creatureStartLevelDistance = 24;
+    public float defaultMeleeReach = 1;
+    public float defaultTerraformingReach = 1.5f;
 
     private MapRenderer3D mapRenderer;
     public Elevation elevation { get => mapRenderer.elevation; }

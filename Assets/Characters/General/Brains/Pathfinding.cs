@@ -105,7 +105,7 @@ public class Pathfinding {
             }).E(pos);
 
     public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, Brain brain, Func<float> time, int cost)
-        => ApproachThenInteract(1.5f, time,
+        => ApproachThenInteract(GlobalConfig.I.defaultTerraformingReach, time,
             (loc) => {
                 brain.resource.Use(cost);
                 Terrain.I.BuildFeature(loc.Coord, feature);

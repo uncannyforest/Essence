@@ -120,13 +120,13 @@ public class FlexTargetedBehavior : TargetedBehavior<Target>, FlexSourceBehavior
     public IEnumerator<YieldInstruction> FocusedBehavior() => MuxFocus(brain.state);
 
     public Lark Lark(Func<bool> precondition, Radius radius) =>
-        new Lark(brain, precondition, errorFilter, radius, 1.5f, terrainAction);
+        new Lark(brain, precondition, errorFilter, radius, GlobalConfig.I.defaultTerraformingReach, terrainAction);
 
     private IEnumerator<YieldInstruction> MuxBehavior(Target f) {
         if (f.Is(out Character c))
             return characterBehavior(c);
         if (f.Is(out Terrain.Position pos))
-            return brain.pathfinding.ApproachThenTerraform(pos, 1.5f, terrainAction);
+            return brain.pathfinding.ApproachThenTerraform(pos, GlobalConfig.I.defaultTerraformingReach, terrainAction);
         throw new ArgumentException("Empty target");
     }
 
