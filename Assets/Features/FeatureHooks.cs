@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class FeatureHooks : MonoBehaviour {
@@ -34,4 +35,10 @@ public class FeatureHooks : MonoBehaviour {
         if (Attacked != null) return Attacked();
         return true;
     }
+
+    public static int[] SerializeString(string input) =>
+        input.ToCharArray().Select(c => (int)c).ToArray();
+
+    public static string DeserializeString(int[] serialized) =>
+        new string(serialized.Select(c => (char)c).ToArray());
 }

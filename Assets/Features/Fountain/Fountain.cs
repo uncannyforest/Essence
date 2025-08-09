@@ -10,7 +10,6 @@ public class Fountain : MonoBehaviour {
     public Transform ring;
 
     private FeatureHooks feature;
-    private Terrain terrain;
 
     private int team = 0;
     private float ringSize = 0;
@@ -35,7 +34,6 @@ public class Fountain : MonoBehaviour {
         if (feature.serializedFields != null) Deserialize(feature.serializedFields);
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
-        terrain = GameObject.FindObjectOfType<Terrain>();
         collider = GetComponent<Collider2D>();
         // If this were in PlayerController Fountains might not be loaded yet.
         if (team != 0) GameManager.I.YourPlayer.HandleDeath();
@@ -60,11 +58,11 @@ public class Fountain : MonoBehaviour {
 
     void FixedUpdate() {
         if (enemyPresent > 0) {
-            if (feature.tile == terrain.CellAt(enemy.position)) {
+            if (feature.tile == Terrain.I.CellAt(enemy.position)) {
                 RingProgress(HandleDeath);
             } else enemyPresent--;
         } else if (friendPresent > 0) {
-            if (feature.tile == terrain.CellAt(friend.transform.position)) {
+            if (feature.tile == Terrain.I.CellAt(friend.transform.position)) {
                 RingProgress(Teleport);
             } else friendPresent--;
         } else RingRegress();

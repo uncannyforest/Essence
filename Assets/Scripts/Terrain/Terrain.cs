@@ -174,9 +174,10 @@ public class Terrain : MonoBehaviour {
         if (!canBuild) throw new InvalidOperationException("Invalid terrain at " + pos + ": " + canBuild);
         return (Feature)MaybeBuildFeature(pos, config);
     }
-    public Feature SetUpFeature(Vector2Int pos, Land terrain, FeatureConfig config, int quantity = -1, bool clearRoof = true) {
+    public Feature SetUpFeature(Vector2Int pos, Land terrain, FeatureConfig config, int quantity = -1, bool clearRoof = true, bool clearFeature = true) {
         SetLand(pos, terrain, false);
         if (clearRoof) SetRoof(pos, Construction.None);
+        if (clearFeature) DestroyFeature(pos);
         Feature feature = BuildFeature(pos, config);
         if (quantity >= 0) feature.config.resourceQuantity = quantity;
         return feature;

@@ -25,7 +25,7 @@ public class Arrow : MonoBehaviour {
         rigidbody = GetComponent<Rigidbody2D>();
         rigidbody.velocity = direction.ToVelocity(speed);
         transform.rotation = Quaternion.Euler(0, 0, direction.angle);
-        Invoke("Land", reach / speed);
+        this.Invoke(Land, reach / speed);
     }
 
     private void Land() {

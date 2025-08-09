@@ -26,4 +26,5 @@ public class FeatureLibrary : MonoBehaviour {
     public FeatureConfig carrot;
     public FeatureConfig arrowPile;
     public FeatureConfig woodPile;
+    public FeatureConfig sprout;
 }

@@ -53,6 +53,13 @@ public static class GameObjectExtensions {
     public static bool LayerIsIn(this GameObject go, params string[] layerNames) {
         return ((LayerMask)LayerMask.GetMask(layerNames)).Contains(go.layer);
     }
+
+    public static Coroutine Invoke(this MonoBehaviour mb, Action method, float time) 
+        => mb.StartCoroutine(InvokeCoroutine(method, time));
+    private static IEnumerator<YieldInstruction> InvokeCoroutine(Action method, float time) {
+        yield return new WaitForSeconds(time);
+        method();
+    }
 }
 
 public static class TransformExtensions {
