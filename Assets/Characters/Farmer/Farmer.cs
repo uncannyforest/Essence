@@ -26,7 +26,7 @@ public class FarmerBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithTerrain(farmer.farmAction, 
-                pathfinding.ApproachThenInteract(FarmTile, rewardExp: false).PendingPosition(CanFarm).Queued(), TeleFilter.Terrain.TILES),
+                pathfinding.ApproachThenInteract(CanFarm, FarmTile, rewardExp: false).PendingPosition().Queued(), TeleFilter.Terrain.TILES),
             CreatureAction.Instant(farmer.clearAction, (creature) => resource.Reset(), keepFollowing: true)
         };
 

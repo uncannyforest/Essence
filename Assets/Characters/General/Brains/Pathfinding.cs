@@ -94,24 +94,25 @@ public class Pathfinding {
         }
     }
 
-    // if no rewardExp is supplied, it defaults to true
-    public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
-        => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
+    public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<Terrain.Position, WhyNot> giveUpUnless, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
+        => new ApproachThenInteract(brain, giveUpUnless, interactionDistance, interactionTime, interaction, rewardExp);
 
-    public ApproachThenInteract ApproachThenInteract(Action<Terrain.Position> interaction, bool rewardExp = true)
-        => new ApproachThenInteract(brain, GlobalConfig.I.defaultTerraformingReach, () => brain.creature.stats.ExeTime, interaction, rewardExp);
+    public ApproachThenInteract ApproachThenInteract(Func<Terrain.Position, WhyNot> giveUpUnless, Action<Terrain.Position> interaction, bool rewardExp = true)
+        => new ApproachThenInteract(brain, giveUpUnless, GlobalConfig.I.defaultTerraformingReach, () => brain.creature.stats.ExeTime, interaction, rewardExp);
 
-    public ApproachThenInteract Terraform(Action<Terrain.Position> action)
-        => ApproachThenInteract((loc) => {
+    public ApproachThenInteract Terraform(Func<Terrain.Position, WhyNot> giveUpUnless, Action<Terrain.Position> action)
+        => ApproachThenInteract(giveUpUnless, (loc) => {
             brain.resource.Use(1);
             action(loc);
         });
 
     public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, int cost = 1)
-        => ApproachThenInteract((loc) => {
+        => ApproachThenInteract(
+        (pos) => brain.resource.Has(cost) ? feature.IsValidTerrain(pos.Coord) : "insufficient_resource",
+        (loc) => {
             brain.resource.Use(cost);
             Terrain.I.BuildFeature(loc.Coord, feature);
-        }).PendingVector2Int((p) => brain.resource.Has(cost)).Queued();
+        }).PendingVector2Int().Queued();
 
     public Func<YieldInstruction> FaceAnd(string animationTrigger,
             Vector2 location,
@@ -195,6 +196,7 @@ public class Pathfinding {
 //      approachThenInteract.Enumerator(position)
 public class ApproachThenInteract {
     private readonly Brain brain;
+    private readonly Func<Terrain.Position, WhyNot> giveUpUnless;
     private readonly float interactDistance;
     private readonly Func<float> interactTime;
     private readonly Action<Terrain.Position> interaction;
@@ -203,11 +205,13 @@ public class ApproachThenInteract {
 
     public ApproachThenInteract (
             Brain brain,
+            Func<Terrain.Position, WhyNot> giveUpUnless,
             float interactDistance,
             Func<float> interactTime,
             Action<Terrain.Position> interaction,
             bool rewardExp) {
         this.brain = brain;
+        this.giveUpUnless = giveUpUnless;
         this.interactDistance = interactDistance;
         this.interactTime = interactTime;
         this.interaction = interaction;
@@ -216,9 +220,11 @@ public class ApproachThenInteract {
     }
 
     public IEnumerator<YieldInstruction> Enumerator(Terrain.Position location) =>
-        brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location), interactDistance)
-            .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance))
-            .Then(Finish(location));
+        from target in Continually.For(location)
+        where giveUpUnless(target).NegLog(brain.legalName + " could no longer approach " + target)
+        select brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(target), interactDistance)
+            .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(target), interactDistance))
+            .Then(Finish(target));
 
     private IEnumerator<YieldInstruction> Finish(Terrain.Position location) {
         brain.movement.IdleFacing(Terrain.I.CellCenter(location));
@@ -227,12 +233,12 @@ public class ApproachThenInteract {
         if (rewardExp) brain.creature.GenericExeSucceeded();
     }
 
-    public TargetedBehavior<Vector2Int> PendingVector2Int(Func<Vector2Int, WhyNot> errorFilter) => new TargetedBehavior<Vector2Int>(
+    public TargetedBehavior<Vector2Int> PendingVector2Int() => new TargetedBehavior<Vector2Int>(
         (target) => enumeratorWithParam(new Terrain.Position(Terrain.Grid.Roof, target)),
-        errorFilter
+        giveUpUnless.Vct()
     );
-    public TargetedBehavior<Terrain.Position> PendingPosition(Func<Terrain.Position, WhyNot> errorFilter) => new TargetedBehavior<Terrain.Position>(
+    public TargetedBehavior<Terrain.Position> PendingPosition() => new TargetedBehavior<Terrain.Position>(
         enumeratorWithParam,
-        errorFilter
+        giveUpUnless
     );
 }

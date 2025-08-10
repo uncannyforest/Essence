@@ -118,11 +118,11 @@ public class FlexTargetedBehavior : FlexSourceBehavior {
     }
 
     public CreatureAction CreatureActionCharacter(Sprite sprite) => CreatureAction.WithCharacter(sprite,
-        new TargetedBehavior<Transform>(characterBehavior, (t) => errorFilter(Target.Character(t))),
+        new TargetedBehavior<Transform>(characterBehavior, errorFilter.Transform()),
         silentFilter.characterFilter);
 
     public CreatureAction CreatureActionTerrain(Sprite sprite) => CreatureAction.WithTerrain(sprite,
-        brain.pathfinding.Terraform(terrainAction).PendingPosition((pos) => errorFilter(new Target(pos))).Queued(),
+        brain.pathfinding.Terraform(errorFilter.Pos(), terrainAction).PendingPosition().Queued(),
         silentFilter.terrainSelection);
 
     public WhyNot IsValidFocus(Transform characterFocus) =>
@@ -131,12 +131,12 @@ public class FlexTargetedBehavior : FlexSourceBehavior {
     public IEnumerator<YieldInstruction> FocusedBehavior() => MuxFocus(brain.state);
 
     public Lark Lark(Func<bool> precondition, Radius radius) =>
-        new Lark(brain, precondition, errorFilter, radius, terrainAction);
+        new Lark(brain, precondition, errorFilter.Vct(), radius, terrainAction);
 
     private IEnumerator<YieldInstruction> MuxFocus(CreatureState state) =>
         MuxFocus(state,
             characterBehavior,
-            (pos) => brain.pathfinding.Terraform(terrainAction).Enumerator(pos));
+            (pos) => brain.pathfinding.Terraform(errorFilter.Pos(), terrainAction).Enumerator(pos));
 
     public static IEnumerator<YieldInstruction> MuxFocus(CreatureState state,
             Func<Transform, IEnumerator<YieldInstruction>> characterBehavior,
@@ -145,4 +145,29 @@ public class FlexTargetedBehavior : FlexSourceBehavior {
         if (state.terrainFocus is DesireMessage.Obstacle obstacle) return terrainBehavior(obstacle.location);
         throw new InvalidOperationException("Tried to build focused behavior without a focus");
     }
+}
+
+// For filter type conversions
+public static class Filter {
+    // use Log when processing a single T
+    public static Func<T, bool> Log<T>(this Func<T, WhyNot> filter, string message = "Filtered")
+        => (t) => filter(t).NegLog(message);
+    // use Silence when processing through a list of T's, to reduce logging
+    public static Func<T, bool> Silence<T>(this Func<T, WhyNot> filter)
+        => (t) => (bool)filter(t);
+    
+    public static Func<Vector2Int, U> Vct<U>(this Func<Target, U> filter)
+        => (v) => filter(new Target(new Terrain.Position(Terrain.Grid.Roof, v)));
+
+    public static Func<Vector2Int, U> Vct<U>(this Func<Terrain.Position, U> filter)
+        => (v) => filter(new Terrain.Position(Terrain.Grid.Roof, v));
+
+    public static Func<Terrain.Position, U> Coord<U>(this Func<Vector2Int, U> filter)
+        => (pos) => filter(pos.Coord);
+
+    public static Func<Terrain.Position, U> Pos<U>(this Func<Target, U> filter)
+        => (pos) => filter(new Target(pos));
+
+    public static Func<Transform, U> Transform<U>(this Func<Target, U> filter)
+        => (t) => filter(Target.Character(t));
 }

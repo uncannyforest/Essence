@@ -72,12 +72,12 @@ public static class EnumeratorExtensions {
     }
 }
 
+// Provisionally ends the Enumerator once Where returns false.
 public static class Provisionally {
     public static Provisionally<T> Run<T>(IEnumerator<T> e) {
         return Provisionally<T>.Run(e);
     }
 }
-
 public class Provisionally<T> : IEnumerator<T> {
     IEnumerator<T> e;
     Func<object, bool> where;
@@ -101,12 +101,13 @@ public class Provisionally<T> : IEnumerator<T> {
     public void Dispose() {}
 }
 
+// Like Provisionally, Continually ends the Enumerator once Where returns false.
+// In takes a single target object as parameter, which is passed along repeatedly.
 public static class Continually {
     public static Continually<T> For<T>(T target) {
         return Continually<T>.For(target);
     }
 }
-
 public class Continually<T> {
     T target;
     Func<T, bool> where;
@@ -121,7 +122,7 @@ public class Continually<T> {
     public Continually<T> Where(Func<T, bool> where) => new Continually<T>(target, where);
 
     public IEnumerator<U> Select<U>(Func<T, IEnumerator<U>> selector) {
-        if (where == null) throw new InvalidOperationException("Repeat must be used with where clause");
+        if (where == null) throw new InvalidOperationException("Continually must be used with where clause");
         while (where(target)) {
             IEnumerator<U> enumerator = selector(target);
             if (enumerator.MoveNext()) yield return enumerator.Current;
@@ -129,7 +130,7 @@ public class Continually<T> {
         }
     }
     public IEnumerator<U> Select<U>(Func<T, U> selector) {
-        if (where == null) throw new InvalidOperationException("Repeat must be used with where clause");
+        if (where == null) throw new InvalidOperationException("Continually must be used with where clause");
         while (where(target)) yield return selector(target);
     }
 }

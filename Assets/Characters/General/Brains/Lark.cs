@@ -11,22 +11,14 @@ using UnityEngine;
 public class Lark {
     protected Brain brain;
     protected Func<bool> precondition;
-    protected Func<Vector2Int, bool> criterion;
+    protected Func<Vector2Int, WhyNot> criterion;
     protected Radius scanRadius;
     protected Action<Terrain.Position> action;
 
-    public Lark(Brain brain, Func<bool> precondition, Func<Vector2Int, bool> criterion, Radius scanRadius, Action<Terrain.Position> action) {
+    public Lark(Brain brain, Func<bool> precondition, Func<Vector2Int, WhyNot> criterion, Radius scanRadius, Action<Terrain.Position> action) {
         this.brain = brain;
         this.precondition = precondition;
         this.criterion = criterion;
-        this.scanRadius = scanRadius;
-        this.action = action;
-    }
-
-    public Lark(Brain brain, Func<bool> precondition, Func<Target, WhyNot> mainErrorFilter, Radius scanRadius, Action<Terrain.Position> action) {
-        this.brain = brain;
-        this.precondition = precondition;
-        this.criterion = ConvertFilter(mainErrorFilter);
         this.scanRadius = scanRadius;
         this.action = action;
     }
@@ -36,13 +28,10 @@ public class Lark {
     // and thus here: return from p in target select DoLark(p)
     virtual public Optional<IEnumerator<YieldInstruction>> ScanForLark() {
         if (!precondition()) return Optional.Empty<IEnumerator<YieldInstruction>>();
-        Optional<Terrain.Position> target = from v in scanRadius.ClosestTo(brain.transform.position, criterion)
+        Optional<Terrain.Position> target = from v in scanRadius.ClosestTo(brain.transform.position, criterion.Silence())
                                             select new Terrain.Position(Terrain.Grid.Roof, v);
-        return from p in target select brain.pathfinding.Terraform(action).Enumerator(p);
+        return from p in target select brain.pathfinding.Terraform(criterion.Coord(), action).Enumerator(p);
     }
-
-    private static Func<Vector2Int, bool> ConvertFilter(Func<Target, WhyNot> mainErrorFilter) =>
-        (v) => (bool)mainErrorFilter(new Target(new Terrain.Position(Terrain.Grid.Roof, v)));
 
     public static Lark None() => new Lark(null, () => false, null, Radius.Inside, null);
 }

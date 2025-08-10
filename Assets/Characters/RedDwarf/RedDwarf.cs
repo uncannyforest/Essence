@@ -21,8 +21,8 @@ public class RedDwarfBrain : Brain {
         Actions = new List<CreatureAction>() {
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
                 pathfinding.ApproachThenInteract(
-                    redDwarf.buildDistance, () => creature.stats.ExeTime,
-                    (loc) => { resource.Use(Cost(loc)); terrain[loc] = Construction.Wood; }).PendingPosition((p) => SufficientResource(Cost(p))).Queued(),
+                    redDwarf.buildDistance, (p) => SufficientResource(Cost(p)), () => creature.stats.ExeTime,
+                    (loc) => { resource.Use(Cost(loc)); terrain[loc] = Construction.Wood; }).PendingPosition().Queued(),
                 TeleFilter.Terrain.WOODBUILDING),
             CreatureAction.WithFeature(FeatureLibrary.C.boat,
                 pathfinding.BuildFeature(FeatureLibrary.C.boat, 60))
