@@ -28,7 +28,7 @@ public class StipuleBrain : Brain {
             (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
         Actions = new List<CreatureAction>() {
-            MainBehavior.CreatureAction(stipule.attackAction)
+            MainBehavior.CreatureActionCharacter(stipule.attackAction)
         };
 
         Habitat = Habitat.Feature(this, FeatureLibrary.C.jasmine);

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Habitat {
 
@@ -23,6 +22,7 @@ public class Habitat {
     public Habitat(Brain brain, Radius restRadius) {
         this.brain = brain;
         this.restRadius = restRadius;
+        RestBehavior = RestBehaviorDefault;
     }
 
     static public Habitat Feature(Brain brain, FeatureConfig feature, Radius mode = Radius.Nearby) => new Habitat(brain, feature, mode);
@@ -38,14 +38,9 @@ public class Habitat {
     }
 
     public Func<Vector2Int, bool> IsShelter;
+    public Func<Vector2Int, IEnumerator<YieldInstruction>> RestBehavior;
 
-    private IEnumerable<Vector2Int> ValidShelterLocations(Radius radius) => radius.Center(brain.transform.position);
-
-    public bool IsPresent(Radius radius) {
-        foreach (Vector2Int validShelterLocation in ValidShelterLocations(radius))
-            if (IsShelter(validShelterLocation)) return true;
-        return false;
-    }
+    public bool IsPresent(Radius radius) => radius.Center(brain).Where(IsShelter).Any();
     public bool IsPresent() => IsPresent(restRadius);
     virtual public bool CanTame() => IsPresent();
 
@@ -76,49 +71,36 @@ public class Habitat {
         while (restBehavior.MoveNext()) yield return restBehavior.Current;
     }
 
-    virtual public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorDefault(shelter);
-
     private IEnumerator<YieldInstruction> RestBehaviorDefault(Vector2Int shelter) {
         recentlyVisited.Add(shelter);
         float transitionTime = Time.time + restDuration;
         restDuration += 5;
-        while (Time.time < transitionTime || brain.resource?.IsFull() == false) {
-            brain.resource?.Increase(1);
+        while (Time.time < transitionTime || !brain.resource.IsFull()) {
+            brain.resource.Increase(1);
             yield return new WaitForSeconds(brain.creature.stats.ExeTime);
         }
         restAgainTime = Time.time + restDuration;
         restDuration += 5;
     }
 
-    public IEnumerator<YieldInstruction> RestBehaviorSleep() {
+    public IEnumerator<YieldInstruction> RestBehaviorSleep(Vector2Int unused) {
         while (true) {
-            brain.resource?.Increase(1);
+            brain.resource.Increase(1);
             yield return new WaitForSeconds(brain.creature.stats.ExeTime);
         }
     }
 
     public IEnumerator<YieldInstruction> RestBehaviorConsume(Vector2Int shelter, Func<float> consumeTime, Action consume) =>
         Provisionally.Run(Enumerators.AfterWait(consumeTime, consume))
-            .Where(yi => brain.resource?.IsFull() != true)
+            .Where(yi => !brain.resource.IsFull())
             .Then(RestBehaviorDefault(shelter));
 }
 
 public class ConsumableFeatureHabitat : Habitat {
-    private Func<float> consumeTime;
-
     public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime) : base(brain, feature) {
-        this.consumeTime = consumeTime;
-    }
-
-    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) =>
-        RestBehaviorConsume(shelter, consumeTime, () => {
-            brain.resource?.Increase(Terrain.I.Feature[shelter]?.config?.resourceQuantity ?? 1);
+        RestBehavior = (shelter) => RestBehaviorConsume(shelter, consumeTime, () => {
+            brain.resource.Increase(Terrain.I.Feature[shelter]?.config?.resourceQuantity ?? 1);
             Terrain.I.DestroyFeature(shelter);
-    });
-}
-
-public class SleepHabitat : Habitat {
-    public SleepHabitat(Brain brain, Radius restRadius) : base(brain, restRadius) {}
-
-    override public IEnumerator<YieldInstruction> RestBehavior(Vector2Int shelter) => RestBehaviorSleep();
+        });
+    }
 }

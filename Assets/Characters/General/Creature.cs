@@ -8,6 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(Team))]
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Stats))]
+[RequireComponent(typeof(Resource))]
 public class Creature : MonoBehaviour {
     public BrainConfig brainConfig;
     public Species species;
@@ -163,7 +164,7 @@ public class Creature : MonoBehaviour {
 
     private string UserFriendly(string error) {
         if (error.StartsWith("insufficient_resource"))
-            return new Regex("(?<=insufficient_resource\\().*(?=\\))").Match(error).Value + " " + stats.resourceName + " needed to do that";
+            return new Regex("(?<=insufficient_resource\\().*(?=\\))").Match(error).Value + " " + brain.resource.type + " needed to do that";
         else
             return "Error: " + error;
     }

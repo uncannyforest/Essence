@@ -10,6 +10,8 @@ public enum Radius {
 }
 
 public static class RadiusExtensions {
+    public static IEnumerable<Vector2Int> Center(this Radius mode, Brain brain) => mode.Center(brain.transform.position);
+
     public static IEnumerable<Vector2Int> Center(this Radius mode, Vector2 position) {
         Vector2Int center;
         switch (mode) {

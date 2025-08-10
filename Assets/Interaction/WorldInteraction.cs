@@ -140,20 +140,21 @@ public class WorldInteraction : MonoBehaviour {
         if (creature == null || actionIndex >= creature.action.Count) return false;
         CreatureAction action = creature.action[actionIndex];
         if (action.IsInstant) {
-            ForcePopFollowing();
+            if (!action.keepFollowing) ForcePopFollowing();
             action.instantDirective(creature);
         }
         else Direct(creature, actionIndex);
         return true;
     }
     public List<Interaction> Actions() {
-        List<Interaction> actions = new List<Interaction>();
-        actions.Add(Interaction.Player(Mode.Sword));
-        actions.Add(Interaction.Player(Mode.Arrow));
-        actions.Add(Interaction.Player(Mode.Praxel));
-        actions.Add(Interaction.Player(Mode.WoodBuilding));
-        actions.Add(Interaction.Player(Mode.Sod));
-        actions.Add(Interaction.Player(Mode.Taming));
+        List<Interaction> actions = new List<Interaction> {
+            Interaction.Player(Mode.Sword),
+            Interaction.Player(Mode.Arrow),
+            Interaction.Player(Mode.Praxel),
+            Interaction.Player(Mode.WoodBuilding),
+            Interaction.Player(Mode.Sod),
+            Interaction.Player(Mode.Taming)
+        };
         Creature creature = PeekFollowing();
         if (creature != null) for (int i = 0; i < creature.action.Count; i++) 
             actions.Add(Interaction.Creature(creature, i));

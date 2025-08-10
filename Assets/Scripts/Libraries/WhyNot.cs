@@ -5,7 +5,7 @@ using UnityEngine;
 //
 // WhyNot isValid =
 //     characterFocus == null ? "null_focus" :                 // string
-//     resource?.Has() == false ? "insufficient_resource" :    // string
+//     !resource.Has() ? "insufficient_resource" :             // string
 //     general.hasAttack ? Will.IsThreat() :                   // WhyNot (maybe true, maybe string)
 //     (WhyNot)true;                                           // if none of the above: true
 // 

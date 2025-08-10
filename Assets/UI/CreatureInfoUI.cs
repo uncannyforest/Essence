@@ -56,9 +56,8 @@ public class CreatureInfoUI : MonoBehaviour {
             healthObject.SetActive(true);
             health.anchorMax = new Vector2(healthComponent.LevelPercent, 1f);
         }
-        Resource resourceComponent = creature.GetComponent<Resource>();
-        if (resourceComponent == null) return; // TODO remove soon
-        resourceText.text = stats.resourceName;
+        Resource resourceComponent = creature.GetComponentStrict<Resource>();
+        resourceText.text = resourceComponent.type;
         resource.anchorMax = new Vector2(resourceComponent.LevelPercent, 1f);
     }
 }

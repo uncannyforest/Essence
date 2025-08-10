@@ -33,7 +33,7 @@ public class ArcherBrain : Brain {
             (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
         Actions = new List<CreatureAction>() {
-            MainBehavior.CreatureAction(archer.attackAction)
+            MainBehavior.CreatureActionCharacter(archer.attackAction)
         };
 
         Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.arrowPile, () => creature.stats.ExeTime * 2);

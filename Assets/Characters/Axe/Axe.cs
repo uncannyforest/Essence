@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 [Serializable]
 public class AxeConfig {
+    public Sprite chopWoodAction;
     public Sprite attackAction;
 }
 
@@ -47,10 +46,11 @@ public class AxeBrain : Brain {
         Lark = MainBehavior.Lark(() => Habitat?.IsPresent(Radius.Nearby) != true,  Radius.Nearby);
 
         Actions = new List<CreatureAction>() {
-            MainBehavior.CreatureAction(axe.attackAction)
+            ((FlexTargetedBehavior)MainBehavior).CreatureActionTerrain(axe.chopWoodAction),
+            MainBehavior.CreatureActionCharacter(axe.attackAction)
         };
 
-        Habitat = new SleepHabitat(this, Radius.Inside) {
+        Habitat = new Habitat(this, Radius.Inside) {
             IsShelter = (coord) =>
                 terrain.Feature[coord + new Vector2Int(-1, -1)]?.config == FeatureLibrary.C.woodPile &&
                 terrain.Feature[coord + new Vector2Int(-1, 0)]?.config == FeatureLibrary.C.woodPile &&
@@ -60,14 +60,14 @@ public class AxeBrain : Brain {
                 terrain.Feature[coord + new Vector2Int(0, 1)]?.config == FeatureLibrary.C.woodPile &&
                 terrain.Feature[coord + new Vector2Int(1, -1)]?.config == FeatureLibrary.C.woodPile &&
                 terrain.Feature[coord + new Vector2Int(1, 0)]?.config == FeatureLibrary.C.woodPile &&
-                terrain.Feature[coord + new Vector2Int(1, 1)]?.config == FeatureLibrary.C.woodPile
-        };
+                terrain.Feature[coord + new Vector2Int(1, 1)]?.config == FeatureLibrary.C.woodPile};
+        Habitat.RestBehavior = Habitat.RestBehaviorSleep;
     }
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    private IEnumerator<YieldInstruction> AttackBehavior(Character c) 
-        => from focus in Continually.For(c.transform)
+    private IEnumerator<YieldInstruction> AttackBehavior(Transform character) 
+        => from focus in Continually.For(character)
             where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
             select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
                 .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));

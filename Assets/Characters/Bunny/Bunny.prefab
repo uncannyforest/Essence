@@ -72,7 +72,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainConfig:
-    numMovementDirections: 1
     canFaint: 0
     lureMaxTime: 10
     roamRestingFraction: 0.4
@@ -96,6 +95,7 @@ MonoBehaviour:
     you must whistle a song for sufficient time.  Press and hold the left mouse button
     to whistle a song.  A blue stat bar will appear beneath the <creature/> to indicate
     it can hear you; when the stat bar reaches the end the <creature/> will be tamed.
+  terraformingPower: 5
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -299,6 +299,7 @@ MonoBehaviour:
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
   statBarOffset: 0.125
   showOnHover: 1
+  type: Medicine
 --- !u!1 &6868019693913487994
 GameObject:
   m_ObjectHideFlags: 0

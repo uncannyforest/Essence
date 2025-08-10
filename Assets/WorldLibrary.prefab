@@ -412,6 +412,7 @@ MonoBehaviour:
   redDwarf: {fileID: 5170738914887468554, guid: 5461900406cb64deea05bbc20eee85ac, type: 3}
   moose: {fileID: 9085166757081951501, guid: 589a3cf3c5b784847963621b5a7f3166, type: 3}
   axe: {fileID: 5056396508191743918, guid: 46c61f227d76342c3a7455eaa228c78b, type: 3}
+  farmer: {fileID: 5016052423844688794, guid: 08994d93c85604906ac35b7f2cb0b682, type: 3}
 --- !u!114 &8377938587873387453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,6 +511,17 @@ MonoBehaviour:
     strength: 1
     maxHealth: 1
     prefab: {fileID: 1013115055112380956, guid: 537e12bf7febe490687955df18d70218, type: 3}
+    resourceName: 
+    resourceQuantity: 0
+    replaceWhenDestroyedByPlayer: 
+  hoard:
+    validLand: 0
+    roofValid: 1
+    sprite: {fileID: 0}
+    impassable: 1
+    strength: 5
+    maxHealth: 10
+    prefab: {fileID: 0}
     resourceName: 
     resourceQuantity: 0
     replaceWhenDestroyedByPlayer: 

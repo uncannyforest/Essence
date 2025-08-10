@@ -27,4 +27,5 @@ public class CreatureLibrary : MonoBehaviour {
     public Creature redDwarf;
     public Creature moose;
     public Creature axe;
+    public Creature farmer;
 }

@@ -70,7 +70,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainConfig:
-    numMovementDirections: 1
     canFaint: 0
     lureMaxTime: 10
     roamRestingFraction: 0.5
@@ -92,6 +91,7 @@ MonoBehaviour:
   tamingInfoShort: On arrowpile, you can tame
   tamingInfoLong: <color=creature>Arrowwiggles</color> make arrows, and they will
     make you arrows if you first lure them to your side with a woodpile for materials.
+  terraformingPower: 5
 --- !u!50 &4481103850635713295
 Rigidbody2D:
   serializedVersion: 4
@@ -263,6 +263,7 @@ MonoBehaviour:
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
   statBarOffset: 0.125
   showOnHover: 1
+  type: Wood
 --- !u!1 &6868019693913487994
 GameObject:
   m_ObjectHideFlags: 0

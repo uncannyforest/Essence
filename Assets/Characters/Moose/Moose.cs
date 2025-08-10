@@ -35,7 +35,7 @@ public class MooseBrain : Brain {
                 new PathTracingBehavior.Targeted(transform, IsDestroyable, (pos) => ApproachAndDestroy(pos).NextOrDefault()),
                 new TeleFilter(TeleFilter.Terrain.TILES, null)
                     .WithLine(GetDestinationsForDisplay)),
-            MainBehavior.CreatureAction(moose.attackAction)
+            MainBehavior.CreatureActionCharacter(moose.attackAction)
         };
 
         Habitat = new Habitat(this, Radius.Inside) {

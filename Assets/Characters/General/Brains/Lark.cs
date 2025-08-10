@@ -9,40 +9,40 @@ using UnityEngine;
 // and happens in the Roam state (PassiveCommand, priority = 100) using the Lark class.
 // See CreatureStateType in Habit.cs for full list of priority levels.
 public class Lark {
-    private Brain brain;
-    private Func<bool> precondition;
-    private Func<Vector2Int, bool> criterion;
-    private Radius radius;
-    private float interactionDistance;
-    private Action<Terrain.Position> action;
+    protected Brain brain;
+    protected Func<bool> precondition;
+    protected Func<Vector2Int, bool> criterion;
+    protected Radius scanRadius;
+    protected Action<Terrain.Position> action;
 
-    public Lark(Brain brain, Func<bool> precondition, Func<Vector2Int, bool> criterion, Radius radius, float interactionDistance, Action<Terrain.Position> action) {
+    public Lark(Brain brain, Func<bool> precondition, Func<Vector2Int, bool> criterion, Radius scanRadius, Action<Terrain.Position> action) {
         this.brain = brain;
         this.precondition = precondition;
         this.criterion = criterion;
-        this.radius = radius;
-        this.interactionDistance = interactionDistance;
+        this.scanRadius = scanRadius;
         this.action = action;
     }
 
-    public Lark(Brain brain, Func<bool> precondition, Func<Target, WhyNot> mainErrorFilter, Radius radius, float interactionDistance, Action<Terrain.Position> action) {
+    public Lark(Brain brain, Func<bool> precondition, Func<Target, WhyNot> mainErrorFilter, Radius scanRadius, Action<Terrain.Position> action) {
         this.brain = brain;
         this.precondition = precondition;
         this.criterion = ConvertFilter(mainErrorFilter);
-        this.radius = radius;
-        this.interactionDistance = interactionDistance;
+        this.scanRadius = scanRadius;
         this.action = action;
     }
 
+    // In subclasses, for a more sophisticated lark action,
+    // create a method: private IEnumerator<YieldInstruction> DoLark(Terrain.Position target) 
+    // and thus here: return from p in target select DoLark(p)
     virtual public Optional<IEnumerator<YieldInstruction>> ScanForLark() {
         if (!precondition()) return Optional.Empty<IEnumerator<YieldInstruction>>();
-        Optional<Terrain.Position> target = from v in radius.ClosestTo(brain.transform.position, criterion)
+        Optional<Terrain.Position> target = from v in scanRadius.ClosestTo(brain.transform.position, criterion)
                                             select new Terrain.Position(Terrain.Grid.Roof, v);
-        return from p in target select brain.pathfinding.ApproachThenTerraform(p, interactionDistance, action);
+        return from p in target select brain.pathfinding.Terraform(action).Enumerator(p);
     }
 
     private static Func<Vector2Int, bool> ConvertFilter(Func<Target, WhyNot> mainErrorFilter) =>
         (v) => (bool)mainErrorFilter(new Target(new Terrain.Position(Terrain.Grid.Roof, v)));
 
-    public static Lark None() => new Lark(null, () => false, null, Radius.Inside, 0, null);
+    public static Lark None() => new Lark(null, () => false, null, Radius.Inside, null);
 }

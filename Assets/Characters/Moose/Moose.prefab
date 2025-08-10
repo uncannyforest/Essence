@@ -40,7 +40,6 @@ MonoBehaviour:
     destroyAction: {fileID: -285889112722792646, guid: fdd73900c3a934ad39751d398c11ad57, type: 3}
     destroyDistance: 1
     destroyTime: 0.5
-    meleeReach: 1
     attack: 1
 --- !u!1001 &6362756172984435830
 PrefabInstance:
@@ -105,6 +104,10 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2222550371208491110, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: type
+      value: Energy
+      objectReference: {fileID: 0}
     - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: waterSpeed
       value: 1
@@ -143,7 +146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.hasAttack
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: brainConfig.canClearFeatures

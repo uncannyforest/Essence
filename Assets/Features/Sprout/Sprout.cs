@@ -1,7 +1,8 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(FeatureHooks))]
 public class Sprout : MonoBehaviour {
@@ -22,6 +23,15 @@ public class Sprout : MonoBehaviour {
     private void Grow() {
         FeatureConfig adult = FeatureLibrary.C.ByTypeName(adultFeature);
         Terrain.I.SetUpFeature((Vector2Int)feature.tile, Land.Grass, adult);
+    }
+
+    public static bool IsPlant(FeatureConfig feature)
+        => feature != null && typeof(GrowthTimes).GetField(feature.type) != null;
+    public static string RandomPlant() {
+        IEnumerable<string> plants =
+            from field in typeof(GrowthTimes).GetFields()
+            select field.Name;
+        return Randoms.InArray(plants.ToArray());
     }
 
     public GrowthTimes delay;

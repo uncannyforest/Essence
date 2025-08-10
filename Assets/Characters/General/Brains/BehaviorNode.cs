@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Wrapper for IEnumerator<YieldInstruction>
+// except with one additional method UpdateWithNewBehavior()
+// which either replaces or combines the two IEnumerators, depending on implementation
+// 
 // usage: behaviorNode.enumerator()
 public class BehaviorNode {
     virtual public Func<IEnumerator<YieldInstruction>> enumerator { get; protected set; }

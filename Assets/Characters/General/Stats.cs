@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
-    public string resourceName = "Resource";
     public float minStr = 3;
     public float minDef = 25;
     public float minExe = 2;

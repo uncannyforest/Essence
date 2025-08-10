@@ -72,7 +72,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainConfig:
-    numMovementDirections: 3
     canFaint: 0
     lureMaxTime: 10
     roamRestingFraction: 0.75
@@ -97,6 +96,7 @@ MonoBehaviour:
 
     You can tame
     a fainted <creature/> as long as there is an arrow pile within view of it.'
+  terraformingPower: 5
 --- !u!114 &4481103850635713288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,6 +309,7 @@ MonoBehaviour:
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
   statBarOffset: 0.1875
   showOnHover: 1
+  type: Arrows
 --- !u!1 &6868019693913487994
 GameObject:
   m_ObjectHideFlags: 0

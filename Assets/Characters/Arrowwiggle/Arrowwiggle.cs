@@ -25,7 +25,7 @@ public class ArrowwiggleBrain : Brain {
 
         Actions = new List<CreatureAction>() {
             CreatureAction.WithFeature(FeatureLibrary.C.arrowPile,
-                pathfinding.BuildFeature(FeatureLibrary.C.arrowPile, this, () => creature.stats.ExeTime, 5))
+                pathfinding.BuildFeature(FeatureLibrary.C.arrowPile, 5))
         };
 
         Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5);

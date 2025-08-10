@@ -94,22 +94,24 @@ public class Pathfinding {
         }
     }
 
+    // if no rewardExp is supplied, it defaults to true
     public ApproachThenInteract ApproachThenInteract(float interactionDistance, Func<float> interactionTime, Action<Terrain.Position> interaction, bool rewardExp = true)
         => new ApproachThenInteract(brain, interactionDistance, interactionTime, interaction, rewardExp);
 
-    public IEnumerator<YieldInstruction> ApproachThenTerraform(Terrain.Position pos, float interactionDistance, Action<Terrain.Position> action)
-        => ApproachThenInteract(interactionDistance, () => brain.creature.stats.ExeTime,
-            (loc) => {
-                brain.resource.Use(1);
-                action(loc);
-            }).E(pos);
+    public ApproachThenInteract ApproachThenInteract(Action<Terrain.Position> interaction, bool rewardExp = true)
+        => new ApproachThenInteract(brain, GlobalConfig.I.defaultTerraformingReach, () => brain.creature.stats.ExeTime, interaction, rewardExp);
 
-    public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, Brain brain, Func<float> time, int cost)
-        => ApproachThenInteract(GlobalConfig.I.defaultTerraformingReach, time,
-            (loc) => {
-                brain.resource.Use(cost);
-                Terrain.I.BuildFeature(loc.Coord, feature);
-            }).ForVector2Int((p) => brain.resource.Has(cost)).Queued();
+    public ApproachThenInteract Terraform(Action<Terrain.Position> action)
+        => ApproachThenInteract((loc) => {
+            brain.resource.Use(1);
+            action(loc);
+        });
+
+    public QueueOperator.Targeted<Vector2Int> BuildFeature(FeatureConfig feature, int cost = 1)
+        => ApproachThenInteract((loc) => {
+            brain.resource.Use(cost);
+            Terrain.I.BuildFeature(loc.Coord, feature);
+        }).PendingVector2Int((p) => brain.resource.Has(cost)).Queued();
 
     public Func<YieldInstruction> FaceAnd(string animationTrigger,
             Vector2 location,
@@ -176,6 +178,21 @@ public class Pathfinding {
     }
 }
 
+// This is a factory class storing configuration for approach+interact behavior,
+// and can be exported to several different types for usage.
+//
+// Approach+interact behavior involves:
+//      (1) Approaching a target, including prerequisites (including checking for obstacles)
+//      (2) Running a single Action on that target, integrating connections to the Animator and EXP
+//
+// Note: this class only runs a single action once upon reaching.
+// For continuous actions upon reaching, use Pathfinding::Approach().Then()
+// 
+// Exported types available for usage:
+// For CreatureActions, a TargetedBehavior is needed, which requires supplying an error filter, for example:
+//      approachThenInteract.ForPosition(errorFilter).Queued()
+// In other cases, a simple IEnumerator<YieldInstruction> is desired, which requires supplying the Position targeted:
+//      approachThenInteract.Enumerator(position)
 public class ApproachThenInteract {
     private readonly Brain brain;
     private readonly float interactDistance;
@@ -195,27 +212,26 @@ public class ApproachThenInteract {
         this.interactTime = interactTime;
         this.interaction = interaction;
         this.rewardExp = rewardExp;
-        this.enumeratorWithParam = E;
+        this.enumeratorWithParam = Enumerator;
     }
 
-    public IEnumerator<YieldInstruction> E(Terrain.Position location) =>
+    public IEnumerator<YieldInstruction> Enumerator(Terrain.Position location) =>
         brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location), interactDistance)
             .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance))
             .Then(Finish(location));
 
     private IEnumerator<YieldInstruction> Finish(Terrain.Position location) {
         brain.movement.IdleFacing(Terrain.I.CellCenter(location));
+        yield return new WaitForSeconds(interactTime());
         interaction(location);
         if (rewardExp) brain.creature.GenericExeSucceeded();
-        yield return new WaitForSeconds(interactTime());
-        yield break;
     }
 
-    public TargetedBehavior<Vector2Int> ForVector2Int(Func<Vector2Int, WhyNot> errorFilter) => new TargetedBehavior<Vector2Int>(
+    public TargetedBehavior<Vector2Int> PendingVector2Int(Func<Vector2Int, WhyNot> errorFilter) => new TargetedBehavior<Vector2Int>(
         (target) => enumeratorWithParam(new Terrain.Position(Terrain.Grid.Roof, target)),
         errorFilter
     );
-    public TargetedBehavior<Terrain.Position> ForPosition(Func<Terrain.Position, WhyNot> errorFilter) => new TargetedBehavior<Terrain.Position>(
+    public TargetedBehavior<Terrain.Position> PendingPosition(Func<Terrain.Position, WhyNot> errorFilter) => new TargetedBehavior<Terrain.Position>(
         enumeratorWithParam,
         errorFilter
     );

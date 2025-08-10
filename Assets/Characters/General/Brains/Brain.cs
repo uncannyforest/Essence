@@ -86,7 +86,7 @@ public class Brain {
     public Brain InitializeAll() {
         creature = GetComponentStrict<Creature>();
         terrain = GameObject.FindObjectOfType<Terrain>();
-        resource = GetComponent<Resource>();
+        resource = GetComponentStrict<Resource>();
         Health health = GetComponent<Health>();
         if (health != null) {
             health.ReachedZero += OnHealthReachedZero;
@@ -104,7 +104,7 @@ public class Brain {
     }
 
     public WhyNot SufficientResource(int quantityNeeded = 1) =>
-        resource?.Has(quantityNeeded) != false ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";
+        resource.Has(quantityNeeded) ? (WhyNot) true : "insufficient_resource(" + quantityNeeded + ")";
     public WhyNot IsValidIfTerrain(Target t, LandFlags? land = null, ConstructionFlags? construction = null) =>
         t.WhichType == typeof(Character) ? true : terrain.IsValid((Terrain.Position)t, land, construction);
 

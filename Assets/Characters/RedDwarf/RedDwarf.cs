@@ -17,19 +17,15 @@ public class RedDwarf : Species<RedDwarfConfig> {
 }
 
 public class RedDwarfBrain : Brain {
-    private RedDwarfConfig redDwarf;
-
     public RedDwarfBrain(RedDwarf species, BrainConfig general, RedDwarfConfig redDwarf) : base(species, general) {
-        this.redDwarf = redDwarf;
-
         Actions = new List<CreatureAction>() {
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
                 pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, () => creature.stats.ExeTime,
-                    (loc) => { resource.Use(Cost(loc)); terrain[loc] = Construction.Wood; }).ForPosition((p) => SufficientResource(Cost(p))).Queued(),
+                    (loc) => { resource.Use(Cost(loc)); terrain[loc] = Construction.Wood; }).PendingPosition((p) => SufficientResource(Cost(p))).Queued(),
                 TeleFilter.Terrain.WOODBUILDING),
             CreatureAction.WithFeature(FeatureLibrary.C.boat,
-                pathfinding.BuildFeature(FeatureLibrary.C.boat, this, () => creature.stats.ExeTime, 60))
+                pathfinding.BuildFeature(FeatureLibrary.C.boat, 60))
         };
 
         Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5);
