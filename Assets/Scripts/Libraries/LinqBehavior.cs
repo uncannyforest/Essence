@@ -103,6 +103,8 @@ public class Provisionally<T> : IEnumerator<T> {
 
 // Like Provisionally, Continually ends the Enumerator once Where returns false.
 // In takes a single target object as parameter, which is passed along repeatedly.
+// 
+// Provisionally may be better when you don't want the provided IEnumerator (in Select()) to start over.
 public static class Continually {
     public static Continually<T> For<T>(T target) {
         return Continually<T>.For(target);

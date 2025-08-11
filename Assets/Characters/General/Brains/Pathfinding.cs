@@ -220,11 +220,11 @@ public class ApproachThenInteract {
     }
 
     public IEnumerator<YieldInstruction> Enumerator(Terrain.Position location) =>
-        from target in Continually.For(location)
-        where giveUpUnless(target).NegLog(brain.legalName + " could no longer approach " + target)
-        select brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(target), interactDistance)
-            .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(target), interactDistance))
-            .Then(Finish(target));
+        Provisionally.Run(
+            brain.pathfinding.CheckTargetForObstacles(Terrain.I.CellCenter(location), interactDistance)
+                .Then(brain.pathfinding.Approach(Terrain.I.CellCenter(location), interactDistance))
+                .Then(Finish(location)))
+            .Where((_) => giveUpUnless(location).NegLog(brain.legalName + " could no longer approach " + location));
 
     private IEnumerator<YieldInstruction> Finish(Terrain.Position location) {
         brain.movement.IdleFacing(Terrain.I.CellCenter(location));

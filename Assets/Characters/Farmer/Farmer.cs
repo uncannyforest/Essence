@@ -37,7 +37,7 @@ public class FarmerBrain : Brain {
                 Habitat.RestBehaviorConsume(shelter, () => creature.stats.ExeTime, () => Harvest(shelter))
         };
 
-        Lark = new Lark(this, CanLark, (v) => (bool)FeatureLibrary.C.sprout.IsValidTerrain(v), Radius.Beside, DoLark);
+        Lark = new Lark(this, CanLark, (v) => FeatureLibrary.C.sprout.IsValidTerrain(v), Radius.Beside, DoLark);
     }
 
     override protected void Initialize() {
