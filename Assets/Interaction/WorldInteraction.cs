@@ -267,7 +267,7 @@ public class WorldInteraction : MonoBehaviour {
                 rangedSelect.InputVelocity = velocity;
             break;
             case Mode.Praxel:
-                meleeSquare.InputVelocity = velocity;
+                meleeSquare.KeyInputVelocity = velocity;
             break;
         }
 
@@ -277,6 +277,9 @@ public class WorldInteraction : MonoBehaviour {
         switch (PlayerAction) {
             case Mode.Arrow:
                 rangedSelect.PointerToKeys(PointerForAim(pointer));
+            break;
+            case Mode.Praxel:
+                meleeSquare.PointerToSquare(pointer);
             break;
             case Mode.Sod:
                 activeTile = teleSelect.SelectSquareOnly(pointer);
