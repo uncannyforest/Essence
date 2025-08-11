@@ -90,8 +90,8 @@ MonoBehaviour:
     targetRange: 4.2426405
     targetZ: 3
   praxelSelectConfig:
-    latency: 0.2
-    delay: 0.1
+    latency: 0.1
+    delay: 0
   swordRate: 0.5
   arrowRate: 0.33333334
   noArrowsTip:
