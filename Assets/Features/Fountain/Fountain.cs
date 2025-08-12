@@ -17,7 +17,7 @@ public class Fountain : MonoBehaviour {
     private int enemyPresent = 0;
     private Transform enemy;
     private int friendPresent = 0;
-    private PlayerCharacter friend;
+    private Anthopoid friend;
     private bool lastOutward;
 
     public int Team {
@@ -36,13 +36,13 @@ public class Fountain : MonoBehaviour {
         feature.PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
         // If this were in PlayerController Fountains might not be loaded yet.
-        if (team != 0) GameManager.I.YourPlayer.HandleDeath();
+        if (team != 0) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().HandleDeath();
     }
 
     int[] Serialize() => new int[] { team };
     void Deserialize(int[] fields) => Team = fields[0];
 
-    bool HandlePlayerEntered(PlayerCharacter target) {
+    bool HandlePlayerEntered(Anthopoid target) {
         int playerTeam = target.GetComponentStrict<Team>().TeamId;
         if (playerTeam == team) {
             friendPresent = 2;

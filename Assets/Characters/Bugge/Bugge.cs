@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuggeConfig {
 }
 
-[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(Anthopoid))]
 public class Bugge : Species<BuggeConfig> {
     override public Brain Brain(BrainConfig generalConfig) {
         return new BuggeBrain(this, generalConfig, speciesConfig);

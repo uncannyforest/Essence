@@ -1,29 +1,20 @@
 using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(Health))]
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Anthopoid))]
 public class PlayerCharacter : MonoBehaviour {
     private Transform pointOfView;
 
-    private Health health;
     private Vector2Int inputVelocity = Vector2Int.zero; // not scaled to speed, instant update on key change
     [NonSerialized] public CharacterController movement;
     private Action<Vector2Int> VehicleInput = null;
 
-    private float SQRT_2 = Mathf.Sqrt(2);
     public const int neighborhood = 8;
 
     void Start() {
-        pointOfView = GetComponentInChildren<PointOfView>().transform;
         movement = GetComponent<CharacterController>();
-        movement.CrossingTile += HandleCrossingTile;
-        health = GetComponent<Health>();
-        health.ReachedZero += HandleDeath;
+        pointOfView = GetComponentInChildren<PointOfView>().transform;
     }
 
     public WorldInteraction Interaction { // Implmentation will change when I add multiplayer
@@ -42,41 +33,6 @@ public class PlayerCharacter : MonoBehaviour {
             if (value == Vector2Int.zero) movement.Idle();
             else movement.InDirection(Disp.FT(Vector2.zero, ((Vector2)value).normalized));
         }
-    }
-
-    public bool HandleCrossingTile(Vector2Int newTile) {
-        if (Terrain.I.Feature[newTile] is Feature feature
-                && feature.hooks != null
-                && feature.hooks.PlayerEntered != null) {
-            return feature.hooks.PlayerEntered(this);
-        }
-        return true;
-    }
-
-    public void HandleDeath() {
-        health.Reset();
-        MoveViaFountain(null);
-    }
-
-    public void MoveViaFountain(Fountain prev) {
-        Fountain[] allSpawnPoints = GameObject.FindObjectsOfType<Fountain>();
-        Fountain[] teamSpawnPoints =
-            (from point in allSpawnPoints
-            where point.Team == GetComponent<Team>().TeamId
-            select point).ToArray<Fountain>();
-        int index = 0;
-        if (prev == null) {
-            index = Random.Range(0, teamSpawnPoints.Length);
-        } else {
-            for ( ; index < teamSpawnPoints.Length; index++) {
-                if (teamSpawnPoints[index] == prev) break;
-            }
-            index--;
-            if (index < 0) index = teamSpawnPoints.Length - 1;
-            teamSpawnPoints[index].Teleporting();
-        }
-        transform.position = (Vector2)(teamSpawnPoints[index].transform.position);
-        Terrain.I.mapRenderer.Reset();
     }
 
     public void EnteredVehicle(Transform vehicle, Action<Vector2Int> ReceiveInput) {

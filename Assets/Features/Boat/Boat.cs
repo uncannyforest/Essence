@@ -41,7 +41,9 @@ public class Boat : MonoBehaviour {
         CreatureExits = new TaskRunner(CreatureExitE, this);
     }
 
-    bool HandlePlayerEntered(PlayerCharacter player) {
+    bool HandlePlayerEntered(Anthopoid anthopoid) {
+        PlayerCharacter player = anthopoid.GetComponent<PlayerCharacter>();
+        if (player == null) return false; // Not supporting bugge drivers yet
         this.player = player;
         inUse = true;
         movement.rigidbody.bodyType = RigidbodyType2D.Dynamic;

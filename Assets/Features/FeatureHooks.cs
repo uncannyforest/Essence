@@ -10,7 +10,7 @@ public class FeatureHooks : MonoBehaviour {
     public Vector2Int? tile;
     public Feature feature;
 
-    public Func<PlayerCharacter, bool> PlayerEntered;
+    public Func<Anthopoid, bool> PlayerEntered;
     public Func<bool> Attacked;
 
     [NonSerialized] public Func<int[]> SerializeFields;
