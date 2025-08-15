@@ -31,11 +31,7 @@ public class Anthopoid : MonoBehaviour {
     }
 
     public void MoveViaFountain(Fountain prev) {
-        Fountain[] allSpawnPoints = GameObject.FindObjectsOfType<Fountain>();
-        Fountain[] teamSpawnPoints = 
-            (from point in allSpawnPoints
-            where point.Team == GetComponent<Team>().TeamId
-            select point).ToArray();
+        Fountain[] teamSpawnPoints = Fountain.FindAllByTeam(GetComponent<Team>().TeamId);
         int index = 0;
         if (prev == null) {
             index = Random.Range(0, teamSpawnPoints.Length);

@@ -36,7 +36,7 @@ public class Fauna : MonoBehaviour {
         Vector2 magnitude = new Vector2(PlayerCharacter.neighborhood + beyondPlayer.x * rawMagnitude * rawMagnitude, // square rawMagniture to bias closer to player
                                         PlayerCharacter.neighborhood + beyondPlayer.y * rawMagnitude * rawMagnitude); // TODO: change that to include fountains
         Vector2 location = direction * magnitude;
-        return terrain.Bounds.Wrap(terrain.CellAt(player.position) + location.FloorToInt());
+        return terrain.Bounds.Wrap(terrain.CellAt(GameManager.I.AnyPlayer.transform.position) + location.FloorToInt());
     }
 
     private Vector2Int? IdentifyLocation() {

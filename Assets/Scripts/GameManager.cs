@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -7,11 +8,26 @@ public class GameManager : MonoBehaviour {
         instance = this;
     }
 
+    public Transform worldBag;
+    public PlayerCharacter playerPrefab;
+    public Bugge buggePrefab;
+    public int numberOfBugges = 1;
+
     private PlayerCharacter singlePlayer;
+    private List<Bugge> bugges = new List<Bugge>();
 
     void Awake() {
-        singlePlayer = GameObject.FindObjectOfType<PlayerCharacter>();
+        singlePlayer = GameObject.Instantiate(playerPrefab, worldBag);
         Debug.Log("SINGLE PLAYER = " + singlePlayer);
+        for (int i = 0; i < numberOfBugges; i++)
+            bugges.Add(GameObject.Instantiate(buggePrefab, worldBag));
+    }
+
+    public void FountainsLoaded(int team) {
+        if (team == 1) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().HandleDeath();
+        if (team == 0) foreach (Bugge bugge in bugges) {
+            bugge.GetComponentStrict<Anthopoid>().HandleDeath();
+        }
     }
 
     // This is a placeholder for any code

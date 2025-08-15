@@ -151,6 +151,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Farmer
       objectReference: {fileID: 0}
+    - target: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
 --- !u!1 &586268032104133617 stripped

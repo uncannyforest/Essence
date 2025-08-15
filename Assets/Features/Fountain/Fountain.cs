@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(FeatureHooks))]
@@ -35,8 +36,7 @@ public class Fountain : MonoBehaviour {
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
-        // If this were in PlayerController Fountains might not be loaded yet.
-        if (team != 0) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().HandleDeath();
+        GameManager.I.FountainsLoaded(Team);
     }
 
     int[] Serialize() => new int[] { team };
@@ -106,5 +106,13 @@ public class Fountain : MonoBehaviour {
         ring.gameObject.SetActive(true);
         ringSize = ringMaxSize;
         lastOutward = true;
+    }
+
+    public static Fountain[] FindAllByTeam(int teamId, bool invert = false) {
+        Fountain[] allSpawnPoints = GameObject.FindObjectsOfType<Fountain>();
+        return
+            (from point in allSpawnPoints
+            where point.Team == teamId ^ invert
+            select point).ToArray();
     }
 }

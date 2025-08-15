@@ -31,7 +31,7 @@ public class EcologicalSuccession : MonoBehaviour {
     }
 
     public void Grow() {
-        Vector2Int center = terrain.CellAt(player.position);
+        Vector2Int center = terrain.CellAt(GameManager.I.AnyPlayer.transform.position);
 
         Vector2Int location = center;
         Land? attemptedGrowth = null;

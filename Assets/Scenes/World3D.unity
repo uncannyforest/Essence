@@ -295,6 +295,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9aa3064d400a64aa0aaec76b1942e621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldBag: {fileID: 8377938586136475610}
+  playerPrefab: {fileID: 3814134692195865407, guid: ebb5786e8ec214615a736c6212f17f2c, type: 3}
+  buggePrefab: {fileID: 4916508158703164589, guid: 9af9035aa8fba4868ad75a1ec6f544c6, type: 3}
+  numberOfBugges: 1
 --- !u!4 &1500105217
 Transform:
   m_ObjectHideFlags: 0
@@ -322,7 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c20760738614734b44d4996e81d913, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 2058306385}
+  camera: {fileID: 0}
   transparencySortAxis: {x: 0, y: 1, z: -25}
   rotation: 0
 --- !u!114 &1500105219
@@ -351,32 +355,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c3c9fafa5d214ecd855f18f2dfd8d5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &2058306382 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4659797944244414378, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
-  m_PrefabInstance: {fileID: 8377938586136475609}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2058306383 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4659797945189086508, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
-  m_PrefabInstance: {fileID: 8377938586136475609}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2058306384 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4659797944244414375, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
-  m_PrefabInstance: {fileID: 8377938586136475609}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 764d2ede1b9844b33b55a76e6d1cefae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!20 &2058306385 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 4659797944133832737, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
-  m_PrefabInstance: {fileID: 8377938586136475609}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2093137515
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,6 +458,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expToLevelUp: 10
   creatureStartLevelDistance: 24
+  defaultMeleeReach: 1
+  defaultTerraformingReach: 1.5
 --- !u!4 &2120764631
 Transform:
   m_ObjectHideFlags: 0
@@ -523,7 +503,7 @@ MonoBehaviour:
   frequency: 4
   radius: 24
   terrain: {fileID: 2120764633}
-  player: {fileID: 2058306382}
+  player: {fileID: 0}
 --- !u!114 &2120764636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -573,7 +553,7 @@ MonoBehaviour:
   possibilityRate: 0.25
   terrain: {fileID: 2120764633}
   parent: {fileID: 2120764631}
-  player: {fileID: 2058306382}
+  player: {fileID: 0}
 --- !u!114 &2120764644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -603,7 +583,7 @@ PrefabInstance:
     - target: {fileID: 5313570216385545635, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: inventory
       value: 
-      objectReference: {fileID: 2058306384}
+      objectReference: {fileID: 0}
     - target: {fileID: 5313570216519711682, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: inputManager
       value: 
@@ -611,7 +591,7 @@ PrefabInstance:
     - target: {fileID: 5313570216856801314, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: inventory
       value: 
-      objectReference: {fileID: 2058306384}
+      objectReference: {fileID: 0}
     - target: {fileID: 5313570216925484418, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: interaction
       value: 
@@ -711,11 +691,11 @@ PrefabInstance:
     - target: {fileID: 5313570217230043623, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: inventory
       value: 
-      objectReference: {fileID: 2058306384}
+      objectReference: {fileID: 0}
     - target: {fileID: 5313570218180991241, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
       propertyPath: inventory
       value: 
-      objectReference: {fileID: 2058306384}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f45cf678a619d41e2bb7244cc9e33dd0, type: 3}
 --- !u!1 &5313570218107531559 stripped
@@ -853,6 +833,11 @@ PrefabInstance:
       objectReference: {fileID: 2120764633}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
+--- !u!4 &8377938586136475610 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8377938587873387449, guid: 6faa80cb4da044b90ac4bae700936040, type: 3}
+  m_PrefabInstance: {fileID: 8377938586136475609}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &9165450011474910284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -887,7 +872,7 @@ PrefabInstance:
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: camera
       value: 
-      objectReference: {fileID: 2058306385}
+      objectReference: {fileID: 0}
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: terrain
       value: 
@@ -895,7 +880,7 @@ PrefabInstance:
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: inventory
       value: 
-      objectReference: {fileID: 2058306384}
+      objectReference: {fileID: 0}
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: uiMapEdgeX
       value: 
@@ -907,7 +892,7 @@ PrefabInstance:
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: rangedConfig.target
       value: 
-      objectReference: {fileID: 2058306383}
+      objectReference: {fileID: 0}
     - target: {fileID: 9165450013374557086, guid: bcc45b5759e7f47adb56ebbb3c82eccf, type: 3}
       propertyPath: rangedConfig.targetZ
       value: -0.03

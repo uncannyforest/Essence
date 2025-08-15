@@ -24,6 +24,7 @@ public class Pathfinding {
     public readonly Brain brain;
     public Pathfinding(Brain brain) {
         this.brain = brain;
+        Roam = RoamImpl;
     }
     private BrainConfig general { get => brain.general; }
     private CharacterController movement { get => brain.movement; }
@@ -38,7 +39,8 @@ public class Pathfinding {
         movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
     }
 
-    public IEnumerator<YieldInstruction> Roam() {
+    public Func<IEnumerator<YieldInstruction>> Roam;
+    public IEnumerator<YieldInstruction> RoamImpl() {
         while (true) {
             IEnumerator<YieldInstruction> larkStep;
             while (true) {

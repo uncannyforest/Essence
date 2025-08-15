@@ -13,13 +13,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   max: 100
-  startAtMax: 1
+  startAtFraction: 1
   statBarPrefab: {fileID: 8118819313906825176, guid: a210b7f679fb144a8baf2c2e90627b53, type: 3}
   statBarColor: {r: 0.8, g: 0, b: 0.2, a: 1}
+  statBarOffset: 0.125
+  showOnHover: 1
   itemDrop: {fileID: 0}
   itemDropSize: 0
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+  ColorableSprites: []
+--- !u!114 &2863867359812185280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4793379402429288721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f85ddd577e594e0e890fe8347fa57c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4916508158703164589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,7 +96,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: waterSpeed
-      value: 2
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: personalBubble
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: icon
@@ -92,7 +111,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4916508158703164589}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: breastplate
+      value: 
+      objectReference: {fileID: 8759099588972460110, guid: b9db112b43ad24559a1077d65e8ce9e3, type: 3}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureName
+      value: Bugge
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: tamingInfoLong
+      value: Bugges cannot be tamed.
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: creatureShortName
       value: Bugge
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
@@ -245,13 +276,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8652825595509261789, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: m_Layer
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 71628518836826874, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
 --- !u!1 &4793379402429288721 stripped
 GameObject:

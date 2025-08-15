@@ -39,7 +39,7 @@ public class Flora : MonoBehaviour{
         Vector2 magnitude = new Vector2(PlayerCharacter.neighborhood + beyondPlayer.x * rawMagnitude,
                                         PlayerCharacter.neighborhood + beyondPlayer.y * rawMagnitude);
         Vector2 location = direction * magnitude;
-        return terrain.Bounds.Wrap(terrain.CellAt(player.position) + location.FloorToInt());
+        return terrain.Bounds.Wrap(terrain.CellAt(GameManager.I.AnyPlayer.transform.position) + location.FloorToInt());
     }
 
     private Vector2Int? IdentifyLocation() {

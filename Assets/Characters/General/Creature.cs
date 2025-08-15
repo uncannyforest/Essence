@@ -177,8 +177,13 @@ public class Creature : MonoBehaviour {
                 Physics2D.OverlapCircleAll(transform.position, PlayerCharacter.neighborhood, LayerMask.GetMask("Player"));
             if (playersNearby.Length == 0) {
                 Debug.Log("Despawning " + gameObject + " at " + transform.position);
-                Destroy(gameObject);
-                yield break;
+                if (creatureShortName == "Bugge") {
+                    this.GetComponentStrict<Anthopoid>().HandleDeath();
+                    yield break;
+                } else {
+                    Destroy(gameObject);
+                    yield break;
+                }
             } else {
                 Debug.Log("Too close to player to despawn " + gameObject + " at " + transform.position);
             }
