@@ -45,10 +45,17 @@ Shader "Dither/Nearby"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             float2 uv = IN.screenPos.xy;
-            float radiusSqr = 4 * ((uv.x - 0.5) * (uv.x - 0.5) + (uv.y - 6.25/12) * (uv.y - 6.25/12));
-            if (radiusSqr < (1.0/36) && (uv.x * 192 % 2 >= 1 || uv.y * 96 % 2 >= 1 || ((uv.y + 2 * uv.x) * 48) % 2 >= 1)
-                || radiusSqr < (25.0/576) && (uv.x * 192 % 2 >= 1 || uv.y * 96 % 2 >= 1)
-                || radiusSqr < (1.0/16) && (uv.x * 192 % 2 >= 1 ^ uv.y * 96 % 2 >= 1)) discard;
+            float sqrt2 = 1.4142135624;
+            float tilesDiagonal = unity_OrthoParams.x * sqrt2;
+            float xInTd = (uv.x - 0.5) * tilesDiagonal;
+            // This shader used to offset y to center dither on player's hips.
+            // The camera itself has now been adjusted to center there.
+            float yInTd = (uv.y - 0.5) * tilesDiagonal;
+            float radiusSqr = xInTd * xInTd + yInTd * yInTd;
+            float2 pixel = uv * _ScreenParams;
+            if (radiusSqr < 1 && (pixel.x + pixel.y) % 4 >= 2
+                || radiusSqr < 1.5625 && (pixel.x % 2 >= 1 || pixel.y % 2 >= 1)
+                || radiusSqr < 2.25 && (pixel.x % 2 >= 1 ^ pixel.y % 2 >= 1)) discard;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;

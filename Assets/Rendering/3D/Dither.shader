@@ -43,7 +43,8 @@ Shader "Dither/All"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             float2 uv = IN.screenPos.xy;
-            if (uv.x * 192 % 2 >= 1 || uv.y * 96 % 2 >= 1 || ((uv.y + 2 * uv.x) * 48) % 2 >= 1) discard;
+            float2 pixel = uv * _ScreenParams;
+            if (pixel.x % 2 >= 1 || pixel.y % 2 >= 1 || (pixel.x + pixel.y) % 4 >= 2) discard;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
