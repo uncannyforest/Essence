@@ -8,7 +8,6 @@ public class ActionDisplay : MonoBehaviour {
     public Sprite noAction;
     public Sprite featureBackground;
     public Sprite sword;
-    public Sprite arrow;
     public Sprite praxel;
     public Sprite pile;
     public Sprite sod;
@@ -118,8 +117,6 @@ public class ActionDisplay : MonoBehaviour {
         switch (action.mode) {
             case WorldInteraction.Mode.Sword:
                 return sword;
-            case WorldInteraction.Mode.Arrow:
-                return arrow;
             case WorldInteraction.Mode.Praxel:
                 return praxel;
             case WorldInteraction.Mode.WoodBuilding:

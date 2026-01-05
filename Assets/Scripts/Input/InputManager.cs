@@ -67,12 +67,11 @@ public class InputManager : MonoBehaviour {
     public void SelectAction(int id) {
         switch (id) {
             case 1: world.PlayerAction = WorldInteraction.Mode.Sword; break;
-            case 2: world.PlayerAction = WorldInteraction.Mode.Arrow; break;
-            case 3: world.PlayerAction = WorldInteraction.Mode.Praxel; break;
-            case 4: world.PlayerAction = WorldInteraction.Mode.WoodBuilding; break;
-            case 5: world.PlayerAction = WorldInteraction.Mode.Sod; break;
-            case 6: world.PlayerAction = WorldInteraction.Mode.Taming; break;
-            default: world.MaybeUseCreatureAction(id - 7); break;
+            case 2: world.PlayerAction = WorldInteraction.Mode.Praxel; break;
+            case 3: world.PlayerAction = WorldInteraction.Mode.WoodBuilding; break;
+            case 4: world.PlayerAction = WorldInteraction.Mode.Sod; break;
+            case 5: world.PlayerAction = WorldInteraction.Mode.Taming; break;
+            default: world.MaybeUseCreatureAction(id - 6); break;
         }
     }
 

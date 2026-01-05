@@ -58,7 +58,6 @@ public class WorldInteraction : MonoBehaviour {
     void Awake() { if (instance == null) instance = this; }
 
     public Melee.Config meleeConfig = new Melee.Config(1, .5f, 10);
-    public Ranged.Config rangedConfig = new Ranged.Config(1f, 6f, 15, null, 6, 100);
     public MeleeSquare.Config praxelSelectConfig = new MeleeSquare.Config(.5f, .0625f);
     public float swordRate = 1/2f;
     public float arrowRate = 1/3f;
@@ -83,13 +82,10 @@ public class WorldInteraction : MonoBehaviour {
 
     public float signalFrontOfPlayer = 1f;
     public float signalMeleeRadius = 2f;
-    public float signalRangedRadius = 1f;
-    public float signalRangedDistance = 4f;
 
     public bool freeTamingCheat = false;
 
     private Transform player;
-    private Ranged rangedSelect;
     private Melee meleeSelect;
     private MeleeSquare meleeSquare;
     private Tele teleSelect;
@@ -105,7 +101,6 @@ public class WorldInteraction : MonoBehaviour {
 
     public enum Mode {
         Sword,
-        Arrow,
         Praxel,
         WoodBuilding,
         Sod,
@@ -123,7 +118,6 @@ public class WorldInteraction : MonoBehaviour {
         set {
             ClearTile();
             ClearLine();
-            if (currentAction.mode == Mode.Arrow && value.mode != Mode.Arrow) rangedSelect.Reset();
             currentAction = value;
             if (interactionChanged != null) interactionChanged(currentAction, PeekFollowing());
         }
@@ -149,7 +143,6 @@ public class WorldInteraction : MonoBehaviour {
     public List<Interaction> Actions() {
         List<Interaction> actions = new List<Interaction> {
             Interaction.Player(Mode.Sword),
-            Interaction.Player(Mode.Arrow),
             Interaction.Player(Mode.Praxel),
             Interaction.Player(Mode.WoodBuilding),
             Interaction.Player(Mode.Sod),
@@ -165,7 +158,6 @@ public class WorldInteraction : MonoBehaviour {
     void Start() {
         player = GameManager.I.YourPlayer.transform;
         Debug.Log("PLAYER  = " + player);
-        rangedSelect = new Ranged(rangedConfig);
         meleeSelect = new Melee(meleeConfig, player);
         meleeSquare = new MeleeSquare(praxelSelectConfig, player);
         teleSelect = new Tele(terrain);
@@ -263,9 +255,6 @@ public class WorldInteraction : MonoBehaviour {
             case Mode.Sword:
                 meleeSelect.InputVelocity = velocity;
             break;
-            case Mode.Arrow:
-                rangedSelect.InputVelocity = velocity;
-            break;
             case Mode.Praxel:
                 meleeSquare.KeyInputVelocity = velocity;
             break;
@@ -275,9 +264,6 @@ public class WorldInteraction : MonoBehaviour {
 
     public void PointerMove(Vector2 pointer, bool duringPress) {
         switch (PlayerAction) {
-            case Mode.Arrow:
-                rangedSelect.PointerToKeys(PointerForAim(pointer));
-            break;
             case Mode.Praxel:
                 meleeSquare.PointerToSquare(pointer);
             break;
@@ -331,7 +317,6 @@ public class WorldInteraction : MonoBehaviour {
         Creature creature;
         switch (PlayerAction) {
             case Mode.Sword:
-            case Mode.Arrow:
                 if (!ConfirmOngoing.isRunning) ConfirmOngoing.Start();
             break;
             case Mode.Praxel:
@@ -451,22 +436,6 @@ public class WorldInteraction : MonoBehaviour {
                     swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
                     yield return new WaitForSeconds(swordRate);
                 break;
-                case Mode.Arrow:
-                    if (Input.GetMouseButton(0)) // click not space
-                        rangedSelect.PointerToKeys(PointerForAim(worldPoint));
-                    if (inventory.Retrieve(Material.Type.Arrow, 1)) {
-                        Debug.Log("Player " + player);
-                        Arrow.Instantiate(
-                            flyingArrowPrefab,
-                            bag,
-                            player,
-                            (Vector2)player.position + (Vector2)rangedSelect.DirectionVector,
-                            10);
-                        SignalOffensiveTarget(rangedSelect.DirectionVector,
-                            signalRangedRadius, signalFrontOfPlayer, signalRangedDistance);
-                    } else TextDisplay.I.ShowTip(noArrowsTip);
-                    yield return new WaitForSeconds(arrowRate);
-                break;
                 default:
                     toolChanged = true;
                 break;
@@ -523,9 +492,6 @@ public class WorldInteraction : MonoBehaviour {
     }
 
     void Update() {
-        if (PlayerAction == Mode.Arrow) {
-            rangedSelect.Update();
-        }
         if (lineStarterUpdate == true) {
             lineSelect.positionCount = 2;
             lineSelect.SetPositions(new Vector3[] {
