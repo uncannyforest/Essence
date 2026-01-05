@@ -726,6 +726,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICamera
       objectReference: {fileID: 0}
+    - target: {fileID: 7429089220530780967, guid: 172a7850a422145929023ba9a0938e37, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7429089220530780971, guid: 172a7850a422145929023ba9a0938e37, type: 3}
       propertyPath: m_RootOrder
       value: 6

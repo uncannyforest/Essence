@@ -103,7 +103,6 @@ GameObject:
   - component: {fileID: 3814134692151419978}
   - component: {fileID: 3814134692151420085}
   - component: {fileID: 3814134692151420087}
-  - component: {fileID: 3814134692151420084}
   m_Layer: 8
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -152,13 +151,13 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.2426405
+  orthographic size: 6.363962
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 16351
+    m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 43a152ab21dbe42429db0cd65fea3740, type: 2}
+  m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 0
   m_HDR: 1
@@ -176,26 +175,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3814134692151420086}
   m_Enabled: 1
---- !u!114 &3814134692151420084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3814134692151420086}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AssetsPPU: 12
-  m_RefResolutionX: 192
-  m_RefResolutionY: 108
-  m_UpscaleRT: 1
-  m_PixelSnapping: 1
-  m_CropFrameX: 1
-  m_CropFrameY: 1
-  m_StretchFill: 0
 --- !u!1 &3814134692164310018
 GameObject:
   m_ObjectHideFlags: 0
@@ -684,15 +663,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4d2e0bada735c47cb940f6314058a628, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.08
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4d2e0bada735c47cb940f6314058a628, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.08
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4d2e0bada735c47cb940f6314058a628, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.08
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4d2e0bada735c47cb940f6314058a628, type: 3}
       propertyPath: m_LocalPosition.x

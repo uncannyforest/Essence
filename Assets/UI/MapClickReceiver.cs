@@ -4,12 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class MapClickReceiver : MonoBehaviour {
-    void OnMouseOver() {
+    void Update() {
         InputManager.I.pointerIsOverMap = !IsMouseOverUI();
-    }
-    
-    void OnMouseExit() {
-        InputManager.I.pointerIsOverMap = false;
     }
     
     // derived from https://youtu.be/ptmum1FXiLE

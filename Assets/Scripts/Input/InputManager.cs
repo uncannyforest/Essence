@@ -98,6 +98,7 @@ public class InputManager : MonoBehaviour {
             if (textDisplay.IsFullTextUp) {
                 textDisplay.HideFullText();
             } else {
+                Debug.Log("Clicked map? " + pointerIsOverMap);
                 if (pointerIsOverMap) world.Confirm(PointerPosition);
                 else FindObjectOfType<MapClickReceiver>().DebugRaycast();
             }
