@@ -54,8 +54,10 @@ Shader "Dither/Nearby"
             float radiusSqr = xInTd * xInTd + yInTd * yInTd;
             float2 pixel = uv * _ScreenParams;
             if (radiusSqr < 1 && (pixel.x + pixel.y) % 4 >= 2
-                || radiusSqr < 1.5625 && (pixel.x % 2 >= 1 || pixel.y % 2 >= 1)
-                || radiusSqr < 2.25 && (pixel.x % 2 >= 1 ^ pixel.y % 2 >= 1)) discard;
+                || radiusSqr < 1.265625 && (pixel.x % 2 >= 1 || pixel.y % 2 >= 1)
+                || radiusSqr < 1.5625 && (pixel.x % 2 >= 1 ^ pixel.y % 2 >= 1)
+                || radiusSqr < 1.890625 && (pixel.x % 2 >= 1 && pixel.y % 2 < 1)
+                || radiusSqr < 2.25 && (pixel.x % 2 >= 1 && pixel.y % 2 < 1 && (pixel.x + pixel.y + 1) % 4 >= 2)) discard;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
