@@ -6,7 +6,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 public class CharacterController : MonoBehaviour {
-    public const int subGridUnit = 4;
+    public const int subGridUnit = 10;
 
     public float personalBubble = 0;
     public Transform body3d; // if not cardboard
@@ -69,16 +69,17 @@ public class CharacterController : MonoBehaviour {
 
     public CharacterController InDirection(Displacement inputVelocity) {
         velocityChebyshevSubgridUnit = inputVelocity / inputVelocity.chebyshevMagnitude / subGridUnit;
-        timeToChebyshevSubgridUnit = 1f / inputVelocity.chebyshevMagnitude / subGridUnit;
+        Displacement actualVelocity = inputVelocity * Speed;
+        timeToChebyshevSubgridUnit = 1f / actualVelocity.chebyshevMagnitude / subGridUnit;
         SetAnimatorDirection(inputVelocity);
-        animator?.SetBool("Moving", true);
+        animator?.SetFloat("Speed", Mathf.Sqrt(actualVelocity.sqrMagnitude));
         return this;
     }
 
     // Chain after Toward() to indicate direction faced to the animator.
     public CharacterController Idle() {
         velocityChebyshevSubgridUnit = Displacement.zero;
-        animator?.SetBool("Moving", false);
+        animator?.SetFloat("Speed", 0);
         return this;
     }
 
@@ -137,7 +138,7 @@ public class CharacterController : MonoBehaviour {
                 Vector2? maybeMove = Move();
                 if (maybeMove is Vector2 move) {
                     rigidbody.MovePosition(move);
-                    yield return new WaitForSeconds(timeToChebyshevSubgridUnit / Speed);
+                    yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
                 } else yield return new WaitForFixedUpdate();
             } else yield return new WaitForFixedUpdate();
         }

@@ -23,7 +23,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    motionNodeName: 
+    motionNodeName: Armature/Root
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
@@ -39,7 +39,144 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|Punching
+      takeName: Armature|Punching
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 0
+      - path: Armature/Root
+        weight: 0
+      - path: Armature/Root/LowerBack
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperBack
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Neck
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Neck/Eyes
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Neck/Eyes/Eyes_end
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.L
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.L/UpperArm.L
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.L/UpperArm.L/LowerArm.L
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.L/UpperArm.L/LowerArm.L/LowerArm.L_end
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.R
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.R/UpperArm.R
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.R/UpperArm.R/LowerArm.R
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperBack/Shoulder.R/UpperArm.R/LowerArm.R/LowerArm.R_end
+        weight: 1
+      - path: Armature/Root/LowerBack/UpperLeg.L
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.L/LowerLeg.L
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.L/LowerLeg.L/Foot.L
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.L/LowerLeg.L/Foot.L/Foot.L_end
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.R
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.R/LowerLeg.R
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.R/LowerLeg.R/Foot.R
+        weight: 0
+      - path: Armature/Root/LowerBack/UpperLeg.R/LowerLeg.R/Foot.R/Foot.R_end
+        weight: 0
+      - path: Player
+        weight: 0
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|Running
+      takeName: Armature|Running
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|Standing
+      takeName: Armature|Standing
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 479
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -95,7 +232,7 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     globalScale: 1
-    rootMotionBoneName: 
+    rootMotionBoneName: Root
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
@@ -103,7 +240,7 @@ ModelImporter:
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   additionalBone: 0
   userData: 

@@ -97,9 +97,13 @@ public class InputManager : MonoBehaviour {
             if (textDisplay.IsFullTextUp) {
                 textDisplay.HideFullText();
             } else {
-                Debug.Log("Clicked map? " + pointerIsOverMap);
-                if (pointerIsOverMap) world.Confirm(PointerPosition);
-                else FindObjectOfType<MapClickReceiver>().DebugRaycast();
+                if (pointerIsOverMap) {
+                    world.Confirm(PointerPosition);
+                    if (world.PlayerAction <= WorldInteraction.Mode.Sod) {
+                        GameManager.I.YourPlayer.movement.IdleFacing(PointerPosition);
+                        GameManager.I.YourPlayer.movement.Trigger("Attack");
+                    }
+                } else FindObjectOfType<MapClickReceiver>().DebugRaycast();
             }
         }
         if (SimpleInput.GetButtonUp("Fire")) {
