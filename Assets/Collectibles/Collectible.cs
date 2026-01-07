@@ -26,11 +26,12 @@ public class Collectible : MonoBehaviour {
     }
 
     private bool TryCollect(Inventory inventory) {
-        if (!inventory.materials[material].IsFull) {
-            inventory.Add(material, quantity);
-            StartCoroutine(CollectAnimation());
-            return true;
-        } else return false;
+        // if (!inventory.materials[material].IsFull) {
+        //     inventory.Add(material, quantity);
+        //     StartCoroutine(CollectAnimation());
+        //     return true;
+        // } else
+        return false;
     }
 
     private IEnumerator<YieldInstruction> CollectAnimation() {

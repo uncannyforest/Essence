@@ -334,7 +334,9 @@ public class WorldInteraction : MonoBehaviour {
                         terrain.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, 5);
                     }
                 } else if (terrain.Feature[coord] is Feature feature) {
-                    terrain.AttackFeature(coord, 10, 10);
+                    int resourceQuantity = feature.ResourceQuantity; // in case needed, retrieve before destroyed
+                    if (terrain.AttackFeature(coord, 10, 10) && feature.config.isResourcePile)
+                        inventory.Add(feature.config.resourceName, resourceQuantity);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
                     Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);
@@ -354,17 +356,28 @@ public class WorldInteraction : MonoBehaviour {
                 coord = teleSelect.SelectSquareOnly(worldPoint);
                 if (!terrain.InBounds(coord)) {
                     TextDisplay.I.ShowMiniText("Cannot modify terrain there");
-                } else if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water) {
-                    if (inventory.Retrieve(Material.Type.Soil, sodCost))
-                        terrain.Land[coord] = Land.Grass;
-                    else TextDisplay.I.ShowMiniText("You don't have any soil to place");
-                } else if (terrain.Land[coord] == Land.Grass) {
-                    if (inventory.Retrieve(Material.Type.Soil, dirtPileCost))
-                        terrain.Land[coord] = Land.Dirtpile;
-                    else TextDisplay.I.ShowMiniText("You don't have enough soil to place pile");
-                } else {
-                    TextDisplay.I.ShowMiniText("Cannot place soil there");
+                } else if (inventory.resource == "soil") {
+                    if (terrain.Land[coord] == Land.Ditch || terrain.Land[coord] == Land.Water) {
+                        if (inventory.Retrieve("soil", sodCost))
+                            terrain.Land[coord] = Land.Grass;
+                        else TextDisplay.I.ShowMiniText("You don't have enough soil to replace"); // should not happen if sodCost == 1
+                    } else if (terrain.Land[coord] == Land.Grass) {
+                        if (inventory.Retrieve("soil", dirtPileCost))
+                            terrain.Land[coord] = Land.Dirtpile;
+                        else TextDisplay.I.ShowMiniText("You don't have enough soil to place pile");
+                    } else {
+                        TextDisplay.I.ShowMiniText("Cannot place soil there");
+                    }
+                } else if (FeatureLibrary.C.ResourceHasPile(inventory.resource, out FeatureConfig pile)) {
+                    if (!pile.IsValidTerrain(coord)) {
+                        TextDisplay.I.ShowMiniText("Cannot place " + inventory.resource + " there");
+                    } else if (!inventory.Retrieve(inventory.resource, pile.resourceQuantity)) {
+                        TextDisplay.I.ShowMiniText("You need " + pile.resourceQuantity + " " + inventory.resource + " to place pile");
+                    } else {
+                        Terrain.I.BuildFeature(coord, pile);
+                    }
                 }
+                
             break;
             case Mode.Taming:
                 if (activeCharacter == null) break;

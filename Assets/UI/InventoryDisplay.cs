@@ -4,81 +4,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventoryDisplay : MonoBehaviour {
     public Inventory inventory;
-    public int columns = 5;
-    public int rows = 2;
-    public float offset = 2f;
-    public float itemZ = -1;
-    public Vector3 localScale = new Vector3(16, 16, 1);
-    public Material.Type material1;
-    public Material.Type material2;
-
-    private int count1 = 0;
-    private int count2 = 0;
-
+    public TMP_Text text;
+    public RectTransform bar;
+    
     void Start() {
-        inventory.itemsAddedEventHandler += AddItems;
-        inventory.itemsRetrievedEventHandler += RemoveItems;
+        inventory = GameManager.I.YourPlayer.GetComponentStrict<Inventory>();
         inventory.itemsClearedEventHandler += RemoveAllItems;
+        inventory.itemsCanBeReplacedEventHandler += AlertItemsToReplace;
+        inventory.itemsUpdatedEventHandler += NewItem;
     }
 
-    public void AddItems(Material.Type material, int number) {
-        int indexPosition = transform.childCount;
-        for (int i = 0; i < number; i++) {
-            if (material == material1) {
-                indexPosition = count1;
-                count1++;
-            }
-            else if (material == material2) {
-                indexPosition = count1 + count2;
-                count2++;
-            }
-            else return;
-            GameObject newSprite = GameObject.Instantiate(CollectibleLibrary.P[material].transform.GetComponentInChildren<SpriteRenderer>().gameObject, transform);
-            GameObject.Destroy(newSprite.GetComponent<Cardboard>());
-            newSprite.layer = LayerMask.NameToLayer("UI");
-            Transform newTransform = newSprite.transform;
-            newTransform.localScale = localScale;
-            newTransform.localPosition = PositionForIndex(indexPosition);
-            newTransform.SetSiblingIndex(indexPosition);
-        }
-        UpdateChildrenFromIndex(indexPosition + 1);
+    public void ChangeQuantity(float percent) => bar.anchorMax = new Vector3(percent, 1);
+
+    public void NewItem(string resource, float percent) {
+        text.text = resource;
+        ChangeQuantity(percent);
     }
 
-    public void RemoveItems(Material.Type material, int number) {
-        int indexPosition = transform.childCount;
-        for (int i = 0; i < number; i++) {
-            if (material == material1) {
-                count1--;
-                indexPosition = count1;
-            }
-            else if (material == material2) {
-                count2--;
-                indexPosition = count1 + count2;
-            }
-            else return;
-            GameObject.Destroy(transform.GetChild(indexPosition).gameObject);
-        }
-        UpdateChildrenFromIndex(indexPosition);
-    }
+    public void RemoveAllItems() => NewItem("", 0);
 
-    public void RemoveAllItems() {
-        foreach (Transform child in transform) {
-            GameObject.Destroy(child.gameObject);
-        }
-        count1 = 0;
-        count2 = 0;
+    public void AlertItemsToReplace(string resource, int quantity) {
+        TextDisplay.I.ShowMiniText(quantity + " " + resource + "available to replace");
     }
-
-    public void UpdateChildrenFromIndex(int indexPosition) {
-        for (int i = indexPosition; i < transform.childCount; i++) {
-            transform.GetChild(i).localPosition = PositionForIndex(i);
-        }
-    }
-
-    // Pivot point of collectibles is bottom center, so add (offset / 2f, 0)
-    public Vector3 PositionForIndex(int i) =>
-        new Vector3(i / rows * offset + offset / 2f, i % rows * offset, itemZ);
 }

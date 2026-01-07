@@ -38,13 +38,7 @@ public class Health : StatusQuantity {
 
     public void HandleDeath() {
         if (itemDrop != null) Collectible.Instantiate(itemDrop, grid, transform.position, itemDropSize);
-        Inventory inventory = GetComponent<Inventory>();
-        if (inventory != null) {
-            foreach (Material.Type type in Enum.GetValues(typeof(Material.Type)))
-                if (inventory.materials[type].Quantity > 0)
-                    Collectible.Instantiate(inventory.materials[type], transform.position);
-            inventory.Clear();
-        }
+        // TODO: drop inventory
     }
 
     // This code is getting increasingly spaghettified because it is on its way out with the transition to 3D.

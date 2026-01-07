@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -7,16 +8,23 @@ public class FeatureLibrary : MonoBehaviour {
     public static FeatureLibrary C {
         get => instance;
     }
+
+    private Dictionary<string, FeatureConfig> resourcePiles = new Dictionary<string, FeatureConfig>();
+
     void Awake() {
         if (instance == null) instance = this;
-
         foreach (FieldInfo field in this.GetType().GetFields())
             if (field.GetValue(this) is FeatureConfig feature)
                 feature.type = field.Name;
+        foreach (FieldInfo field in this.GetType().GetFields())
+            if (field.GetValue(this) is FeatureConfig feature && feature.isResourcePile)
+                resourcePiles.Add(feature.resourceName, feature);
     }
     public FeatureConfig ByTypeName(string type) {
         return (FeatureConfig)this.GetType().GetField(type).GetValue(this);
     }
+    public bool ResourceHasPile(string resource, out FeatureConfig feature)
+        => resourcePiles.TryGetValue(resource, out feature);
 
     public GameObject renderPrefab;
     public FeatureConfig fountain;

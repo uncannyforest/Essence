@@ -435,7 +435,7 @@ MonoBehaviour:
     prefab: {fileID: -6226454821118147200, guid: be69f3ac745be40639a5925ede6bc99e, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   windmill:
     validLand: 1
     roofValid: 0
@@ -446,7 +446,7 @@ MonoBehaviour:
     prefab: {fileID: 5500238641662902520, guid: 2e73418e674d34064a27d30599c45843, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   boat:
     validLand: 64
     roofValid: 1
@@ -457,7 +457,7 @@ MonoBehaviour:
     prefab: {fileID: 515407244984913832, guid: a176caffd352747409ffad0dba6806f6, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   jasmine:
     validLand: 1
     roofValid: 1
@@ -468,7 +468,7 @@ MonoBehaviour:
     prefab: {fileID: 4485684207470832518, guid: 74a580025ebe14410acde5939a72d8f1, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   carrot:
     validLand: 1
     roofValid: 1
@@ -479,7 +479,7 @@ MonoBehaviour:
     prefab: {fileID: 7481764238130470887, guid: a5898b24b3e6246d4b0cbbb849a2c712, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   arrowPile:
     validLand: 1
     roofValid: 1
@@ -490,7 +490,7 @@ MonoBehaviour:
     prefab: {fileID: 6124574314353845736, guid: 9993a2f39391e4ebe8b44cb4adaef689, type: 3}
     resourceName: arrows
     resourceQuantity: 20
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 1
   woodPile:
     validLand: 1
     roofValid: 1
@@ -500,8 +500,8 @@ MonoBehaviour:
     maxHealth: 10
     prefab: {fileID: 6124574314353845736, guid: 82ea8786181fb45318cefb3bc91d5c07, type: 3}
     resourceName: wood
-    resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    resourceQuantity: 1
+    isResourcePile: 1
   sprout:
     validLand: 1
     roofValid: 1
@@ -512,7 +512,7 @@ MonoBehaviour:
     prefab: {fileID: 1013115055112380956, guid: 537e12bf7febe490687955df18d70218, type: 3}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
   hoard:
     validLand: 0
     roofValid: 1
@@ -523,7 +523,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     resourceName: 
     resourceQuantity: 0
-    replaceWhenDestroyedByPlayer: 
+    isResourcePile: 0
 --- !u!114 &8377938587873387450
 MonoBehaviour:
   m_ObjectHideFlags: 0

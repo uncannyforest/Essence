@@ -1,5 +1,28 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
+[Serializable] public class Bucket {
+    [SerializeField] public int max = 60;
+
+    [SerializeField] private List<Material> materials = new List<Material>();
+
+    public Bucket(int max) {
+        this.max = max;
+    }
+
+    public int Size {
+        get => (from material in materials select material.Quantity).Sum();
+    }
+    public int SpaceAvailable {
+        get => max - Size;
+    }
+
+    public void AddMaterial(Material material) {
+        materials.Add(material);
+    }
+}
 
 public class Material {
     public enum Type {

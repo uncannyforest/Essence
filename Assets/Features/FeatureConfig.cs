@@ -16,7 +16,7 @@ public class FeatureConfig {
     public FeatureHooks prefab = null; // (optional) GameObject with further logic to spawn here
     public string resourceName = "";  // resource name when destroyed
     public int resourceQuantity = 0; // resource quantity when destroyed, may be overridden in FeatureHooks
-    public string replaceWhenDestroyedByPlayer = null; // replace with another feature when destroyed by player - or null
+    public bool isResourcePile = false; // if not, replace with resource pile when destroyed by player
 
     private Feature Instantiate() {
         if (prefab == null) return new Feature() { config = this, hooks = null };
