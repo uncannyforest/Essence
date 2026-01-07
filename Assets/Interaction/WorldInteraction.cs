@@ -369,7 +369,11 @@ public class WorldInteraction : MonoBehaviour {
                         TextDisplay.I.ShowMiniText("Cannot place soil there");
                     }
                 } else if (FeatureLibrary.C.ResourceHasPile(inventory.resource, out FeatureConfig pile)) {
-                    if (!pile.IsValidTerrain(coord)) {
+                    Feature? featureAlreadyThere = Terrain.I.Feature[coord];
+                    if (pile == featureAlreadyThere?.config &&
+                            (featureAlreadyThere?.hooks?.ChangeResourceQuantity(1) ?? false)) {
+                        inventory.Retrieve(inventory.resource, 1); // guaranteed to work since inv.res != ""
+                    } else if (!pile.IsValidTerrain(coord)) {
                         TextDisplay.I.ShowMiniText("Cannot place " + inventory.resource + " there");
                     } else if (!inventory.Retrieve(inventory.resource, pile.resourceQuantity)) {
                         TextDisplay.I.ShowMiniText("You need " + pile.resourceQuantity + " " + inventory.resource + " to place pile");
