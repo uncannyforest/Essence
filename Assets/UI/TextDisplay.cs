@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +16,8 @@ using UnityEngine.UI;
 
 public class TextDisplay : MonoBehaviour {
     public float miniTextDuration = 3;
-    public Text fullText;
-    public Text miniText;
+    public TMP_Text fullText;
+    public TMP_Text miniText;
     public GameObject miniTextExpandIcon;
     public Color creatureName;
     public Color keyName;
