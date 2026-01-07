@@ -51,6 +51,19 @@ public class Woodpile : MonoBehaviour {
                 pos += Vector3.back / 2;
                 GameObject.Instantiate(plankPrefab, pos, Random.rotation, planksParent);
             }
+            if (quantity == 10) {
+                int i = 10;
+                foreach (Transform plank in planksParent) {
+                    i--;
+                    bool rotate90 = i % 4 >= 2;
+                    float positionElev = (i / 2 + 1) * .1f;
+                    plank.localPosition = (rotate90 ?
+                        (i % 2 == 0 ? Vector3.right : Vector3.left) :
+                        (i % 2 == 0 ? Vector3.up : Vector3.down)) * .125f
+                        + Vector3.back * positionElev;
+                    plank.rotation = rotate90 ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+                }
+            }
         }
 
         bool doneAnimating = false;

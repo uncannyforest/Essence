@@ -91,7 +91,7 @@ MonoBehaviour:
   planksParent: {fileID: 8115942189351195478}
   plankPrefab: {fileID: 2281974143718813228, guid: 43014905c08d24971a7b40df9fb8a4f9, type: 3}
   gravityForce: 9.8
-  animationFreezeBelowMotionSquared: 0.00000001
+  animationFreezeBelowMotionSquared: 0.0001
   visualizing: 1
 --- !u!1001 &3342451689431129708
 PrefabInstance:
