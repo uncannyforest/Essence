@@ -56,6 +56,10 @@ public class MapRenderer3D : MonoBehaviour {
         if (!IsInRenderWindow(pos)) {
             return false;
         }
+        if (tilesParent == null) {
+            Debug.LogWarning("Tiles go not present yet");
+            return false;
+        }
         Transform cellTransform = tilesParent.Find(pos.ToString());
         if (cellTransform == null) {
             Debug.LogWarning(pos + " in render window (playerPos "

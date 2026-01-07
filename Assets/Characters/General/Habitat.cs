@@ -98,9 +98,8 @@ public class Habitat {
 
 public class ConsumableFeatureHabitat : Habitat {
     public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime) : base(brain, feature) {
-        RestBehavior = (shelter) => RestBehaviorConsume(shelter, consumeTime, () => {
-            brain.resource.Increase(Terrain.I.Feature[shelter]?.config?.resourceQuantity ?? 1);
-            Terrain.I.DestroyFeature(shelter);
-        });
+        RestBehavior = (shelter) => RestBehaviorConsume(shelter, consumeTime,
+            () => brain.resource.Increase(Terrain.I.ConsumeFeature(shelter))
+        );
     }
 }

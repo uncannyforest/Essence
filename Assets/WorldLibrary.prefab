@@ -494,13 +494,13 @@ MonoBehaviour:
   woodPile:
     validLand: 1
     roofValid: 1
-    sprite: {fileID: 21300000, guid: af11ea0a5d6d6427f9710eb364e2ae4d, type: 3}
+    sprite: {fileID: 0}
     impassable: 0
     strength: 5
     maxHealth: 10
-    prefab: {fileID: 0}
+    prefab: {fileID: 6124574314353845736, guid: 82ea8786181fb45318cefb3bc91d5c07, type: 3}
     resourceName: wood
-    resourceQuantity: 5
+    resourceQuantity: 0
     replaceWhenDestroyedByPlayer: 
   sprout:
     validLand: 1

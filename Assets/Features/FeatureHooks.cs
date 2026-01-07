@@ -15,6 +15,31 @@ public class FeatureHooks : MonoBehaviour {
 
     [NonSerialized] public Func<int[]> SerializeFields;
     [NonSerialized] public int[] serializedFields;
+    // Use these in a custom component like so:
+    // void Start() {
+    //     FeatureHooks featureHooks = GetComponent<FeatureHooks>();
+    //     if (featureHooks.serializedFields != null) Deserialize(featureHooks.serializedFields);
+    //     featureHooks.SerializeFields += Serialize;
+    // }
+    // int[] Serialize() => new int[] { };
+    // void Deserialize(int[] fields) { }
+
+    // If unused, Feature will instead access resourceQuantity from FeatureConfig
+    [NonSerialized] public Func<int?> GetResourceQuantity = () => null;
+    // false indicates that operation could not be performed (including setting quantity equal or lt zero)
+    [NonSerialized] public Func<int, bool> SetResourceQuantity = (value) => false;
+    public bool ChangeResourceQuantity(int delta) {
+        int? oldQuantity = GetResourceQuantity();
+        return oldQuantity == null ? false : SetResourceQuantity((int)oldQuantity + delta);
+    }
+    // Use these in a custom component like so:
+    // void Start() {
+    //     FeatureHooks featureHooks = GetComponent<FeatureHooks>();
+    //     featureHooks.GetResourceQuantity = GetResourceQuantity;
+    //     featureHooks.ChangeResourceQuantity = ChangeResourceQuantity;
+    // }
+    // int? GetResourceQuantity() { }
+    // bool ChangeResourceQuantity(int delta) { }
 
     public bool Place(Vector2Int pos) {
         if (!feature.config.IsValidTerrain(pos)) return false;

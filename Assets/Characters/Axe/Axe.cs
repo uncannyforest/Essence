@@ -17,7 +17,7 @@ public class Axe : Species<AxeConfig> {
     public static Feature ChopWood(Vector2Int coord) {
         Land? land = Terrain.I.GetLand(coord);
         if (land?.IsPlanty() != true) throw new NotSupportedException("Do not call ChopWood unless you are confident tile is planty");
-        int woodQuantity = land == Land.Meadow ? 1 : land == Land.Shrub ? 3 : 5;
+        int woodQuantity = land == Land.Meadow ? 1 : land == Land.Shrub ? 3 : 6;
         return Terrain.I.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, woodQuantity);
     }
 

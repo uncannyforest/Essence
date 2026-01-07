@@ -179,8 +179,13 @@ public class Terrain : MonoBehaviour {
         if (clearRoof) SetRoof(pos, Construction.None);
         if (clearFeature) DestroyFeature(pos);
         Feature feature = BuildFeature(pos, config);
-        if (quantity >= 0) feature.config.resourceQuantity = quantity;
+        if (quantity >= 0) StartCoroutine(UpdateFeatureQuantity(feature, quantity));
         return feature;
+    }
+    private IEnumerator<YieldInstruction> UpdateFeatureQuantity(Feature feature, int quantity) {
+        yield return null;
+        bool setQuantity = feature.hooks?.SetResourceQuantity(quantity) ?? false;
+        if (!setQuantity) throw new ArgumentException("Passed quantity " + quantity + " to feature " + feature.config.type + " that can't accept it");
     }
     // returns true if feature was destroyed
     public bool AttackFeature(Vector2Int pos, int pow, int atk) {
@@ -219,6 +224,22 @@ public class Terrain : MonoBehaviour {
     public void DestroyFeature(Vector2Int pos) {
         FeatureHooks feature = UninstallFeature(pos);
         if (feature != null) GameObject.Destroy(feature.gameObject);
+    }
+    public int ConsumeFeature(Vector2Int pos) {
+        Feature? maybeFeature = features[pos.x, pos.y];
+        if (maybeFeature == null) throw new ArgumentException("No feature to consume at " + pos);
+        Feature feature = (Feature)maybeFeature;
+        bool tryDiminish = feature.hooks?.ChangeResourceQuantity(-1) ?? false;
+        if (tryDiminish) return 1;
+        int quantity = feature.ResourceQuantity;
+        DestroyFeature(pos);
+        return quantity;
+    }
+    public bool IncreaseFeature(Vector2Int pos, int delta) {
+        Feature? maybeFeature = features[pos.x, pos.y];
+        if (maybeFeature == null) throw new ArgumentException("No feature to increase at " + pos);
+        Feature feature = (Feature)maybeFeature;
+        return feature.hooks?.ChangeResourceQuantity(delta) ?? false;
     }
 
     private void SetXWall(int x, int y, Construction construction, bool force = false) {
