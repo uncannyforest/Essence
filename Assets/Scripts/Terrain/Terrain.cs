@@ -142,6 +142,7 @@ public class Terrain : MonoBehaviour {
     public Vector2 CellCenter(Vector2Int cellPosition) => mapRenderer.CellCenter(cellPosition);
     public Vector2Int CellAt(Vector3 worldPosition) => mapRenderer.CellAt(worldPosition);
     public Vector2 CellCenterAt(Vector3 screenPosition) => mapRenderer.CellCenterAt(screenPosition);
+    public Displacement PositionInCell(Vector3 screenPosition) => mapRenderer.PositionInCell(screenPosition);
 
     public Land? GetLand(int x, int y) => GetLand(new Vector2Int(x, y));
     public Land? GetLand(Vector2Int coord) => InBounds(coord) ? Land[coord] : (Land?)null;

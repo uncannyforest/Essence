@@ -30,6 +30,8 @@ public struct Displacement {
     public static Vector2 operator+(Vector2 v, Displacement d) => v + d.displacement;
     public static Vector2 operator+(Displacement d, Vector3 v) => (Vector2)v + d.displacement;
     public static Vector2 operator+(Vector3 v, Displacement d) => (Vector2)v + d.displacement;
+    public static Displacement operator-(Displacement a)
+        => new Displacement(-a.displacement);
     public static Displacement operator+(Displacement a, Displacement b)
         => new Displacement(a.displacement + b.displacement);
     public static Displacement operator-(Displacement a, Displacement b)
@@ -67,7 +69,8 @@ public struct Displacement {
         get => Quaternion.Euler(0, 0, angle);
     }
 
-    public Vector2 ToVelocity(float speed) => displacement.normalized * speed;
+    public Vector2 ToVelocityWithSpeed(float speed) => displacement.normalized * speed;
+    public Vector2 ToVelocityGivenTime(float time) => displacement / time;
 
     // Rotate index * 90 degrees, but there's no reason to multiply by 90 here
     public Displacement RotateRightAngles(int numRightAngles) {

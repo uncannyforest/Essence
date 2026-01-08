@@ -7,6 +7,7 @@ public class Health : StatusQuantity {
     public int itemDropSize = 0;
     public float damageVisual1Time = .1f;
     public float damageVisual2Time = .4f;
+    public GameObject skeletonPrefab;
 
     private Transform grid;
 
@@ -37,8 +38,13 @@ public class Health : StatusQuantity {
     }
 
     public void HandleDeath() {
-        if (itemDrop != null) Collectible.Instantiate(itemDrop, grid, transform.position, itemDropSize);
-        // TODO: drop inventory
+        if (skeletonPrefab != null) {
+            Feature? maybeSkeleton = Terrain.I.MaybeBuildFeature(Terrain.I.CellAt(transform.position), FeatureLibrary.C.skeleton);
+            if (maybeSkeleton is Feature skeleton) {
+                skeleton.hooks.GetComponentStrict<Skeleton>().Initialize(skeletonPrefab, transform.position,
+                    GetComponent<CharacterController>().animatorDirection.quaternion);
+            }
+        }
     }
 
     // This code is getting increasingly spaghettified because it is on its way out with the transition to 3D.

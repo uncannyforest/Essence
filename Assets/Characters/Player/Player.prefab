@@ -275,17 +275,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764d2ede1b9844b33b55a76e6d1cefae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lureBucket:
-    max: 10
-  soilBucket:
-    max: 10
-  buildBucket:
-    max: 30
-  arrowBucket:
-    max: 30
-  scale: {fileID: 21300000, guid: fb1d89cd8a65f4a70abf58f11c8587c2, type: 3}
-  wood: {fileID: 21300000, guid: 49f1e735201b240209fa91d155954f78, type: 3}
-  soil: {fileID: 21300000, guid: 81dfdca911e3e4d72a904237554eb723, type: 3}
+  resource: 
+  quantity: 0
+  resourceToReplace: 
+  quantityToReplace: 0
 --- !u!114 &3814134692195865392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,6 +301,7 @@ MonoBehaviour:
   itemDropSize: 1
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+  skeletonPrefab: {fileID: 1441431803241820474, guid: b85f68b426f384610b35e714b020f6e8, type: 3}
   ColorableSprites: []
 --- !u!114 &3814134692195865399
 MonoBehaviour:
@@ -363,6 +357,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f85ddd577e594e0e890fe8347fa57c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  respawnDelay: 5
+  respawnDelayHiddenObject: {fileID: 185333017277597695}
 --- !u!95 &8706568863932493409
 Animator:
   serializedVersion: 3

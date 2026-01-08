@@ -23,7 +23,7 @@ public class Arrow : MonoBehaviour {
 
     public void Fire(Displacement direction) {
         rigidbody = GetComponent<Rigidbody2D>();
-        rigidbody.velocity = direction.ToVelocity(speed);
+        rigidbody.velocity = direction.ToVelocityWithSpeed(speed);
         transform.rotation = Quaternion.Euler(0, 0, direction.angle);
         this.Invoke(Land, reach / speed);
     }

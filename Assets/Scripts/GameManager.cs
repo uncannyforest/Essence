@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FountainsLoaded(int team) {
-        if (team == 1) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().HandleDeath();
+        if (team == 1) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().Respawn();
         if (team == 0) foreach (Bugge bugge in bugges) {
-            bugge.GetComponentStrict<Anthopoid>().HandleDeath();
+            bugge.GetComponentStrict<Anthopoid>().Respawn();
         }
     }
 

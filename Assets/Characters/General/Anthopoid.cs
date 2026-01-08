@@ -6,17 +6,26 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Team))]
 public class Anthopoid : MonoBehaviour {
+    public float respawnDelay = 3;
+    public GameObject respawnDelayHiddenObject;
+
     private Health health;
     [NonSerialized] public CharacterController movement;
 
     void Start() {        
         health = GetComponent<Health>();
         health.ReachedZero += HandleDeath;
+        movement = GetComponent<CharacterController>();
+        movement.CrossingTile += HandleCrossingTile;
     }
 
     public void HandleDeath() {
-        movement = GetComponent<CharacterController>();
-        movement.CrossingTile += HandleCrossingTile;
+        respawnDelayHiddenObject.SetActive(false);
+        Invoke("Respawn", respawnDelay);
+    }
+
+    public void Respawn() {
+        respawnDelayHiddenObject.SetActive(true);
         health.Reset();
         MoveViaFountain(null);
     }

@@ -36,4 +36,5 @@ public class FeatureLibrary : MonoBehaviour {
     public FeatureConfig woodPile;
     public FeatureConfig sprout;
     public FeatureConfig hoard;
+    public FeatureConfig skeleton;
 }

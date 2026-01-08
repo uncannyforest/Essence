@@ -69,7 +69,7 @@ public class Woodpile : MonoBehaviour {
         bool doneAnimating = false;
         foreach (Transform plank in planksParent) {
             Vector3 pos = plank.position;
-            plank.GetComponentStrict<Rigidbody>().AddForce(Vector3.forward * gravityForce);
+            plank.GetComponentStrict<Rigidbody>().AddForce(Vector3.forward * gravityForce, ForceMode.Acceleration);
             if (Disp.FT(pos, plank.position).sqrMagnitude > animationFreezeBelowMotionSquared) {
                 doneAnimating = false;
             }

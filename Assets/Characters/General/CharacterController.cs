@@ -16,6 +16,8 @@ public class CharacterController : MonoBehaviour {
 
     public float waterSpeed = 0;
     
+    public Displacement animatorDirection;
+
     private Terrain terrain;
     [NonSerialized] new public Rigidbody2D rigidbody;
     [NonSerialized] new public Collider2D collider;
@@ -28,7 +30,6 @@ public class CharacterController : MonoBehaviour {
     
     private Displacement velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
-    private Displacement animatorDirection;
     private float terrainSpeed;
 
     void Awake() {
@@ -90,11 +91,11 @@ public class CharacterController : MonoBehaviour {
     }
 
     private void SetAnimatorDirection(Displacement direction) {
+        animatorDirection = direction;
         if (body3d != null) {
             body3d.localRotation = direction.quaternion;
             return;
         }
-        animatorDirection = direction;
         Displacement orientedDirection = Quaternion.Euler(0, 0, 360 - (int)Orientor.Rotation) * direction;
         if (setAnimatorDirectionDirectly) {
             animator?.SetFloat("X", orientedDirection.x);

@@ -41,7 +41,7 @@ public class MapRenderer3D : MonoBehaviour {
     public Vector2Int CellAt(Vector3 worldPosition) =>
         new Vector2Int(Mathf.FloorToInt(worldPosition.x), Mathf.FloorToInt(worldPosition.y));
     public Vector2 CellCenterAt(Vector3 screenPosition) => CellCenter(CellAt(screenPosition));
-    private Vector2 PositionInCell(Vector2 position) /* -1 <= x, y <= 1 */ => 2 * (position - CellCenterAt(position));
+    public Displacement PositionInCell(Vector2 position) /* -1 <= x, y <= 1 */ => 2 * Disp.FT(CellCenterAt(position), position);
 
     private bool IsInRenderWindow(Transform tile) => IsInRenderWindow(((Vector2)tile.GetChild(0).position).RoundToInt());
     public bool IsInRenderWindow(Vector2Int pos) {
@@ -162,7 +162,7 @@ public class MapRenderer3D : MonoBehaviour {
     public Vector2 ShoreSlope(Vector2 position, float shorePushNoZone) {
         Vector2 shoreCorrection = Vector2.zero;
         Land?[] nearTiles = GetFourLandTilesAround(position);
-        Vector2 sub = 2 * PositionInCell(position + Vct.F(-.5f, -.5f)); // [-1, 1] - 0 means boat is on edge
+        Displacement sub = 2 * PositionInCell(position + Vct.F(-.5f, -.5f)); // [-1, 1] - 0 means boat is on edge
         if ((1 - Mathf.Abs(sub.x)) + (1 - Mathf.Abs(sub.y)) < shorePushNoZone) return Vector2.zero; // if sub is near a corner
         if ((nearTiles[0] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(1, 1) * (1 - Mathf.Max(sub.x, sub.y));
         if ((nearTiles[1] ?? terrain.Depths) != Land.Water) shoreCorrection += Vct.F(-1, 1) * (1 - Mathf.Max(-sub.x, sub.y));

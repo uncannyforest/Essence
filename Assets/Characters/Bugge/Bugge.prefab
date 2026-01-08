@@ -22,6 +22,7 @@ MonoBehaviour:
   itemDropSize: 0
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+  skeletonPrefab: {fileID: 0}
   ColorableSprites: []
 --- !u!114 &2863867359812185280
 MonoBehaviour:
@@ -35,6 +36,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f85ddd577e594e0e890fe8347fa57c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  respawnDelay: 3
+  respawnDelayHiddenObject: {fileID: 358659626593787095}
 --- !u!114 &4916508158703164589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,5 +291,10 @@ PrefabInstance:
 --- !u!1 &4793379402429288721 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7775390753821550864, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+  m_PrefabInstance: {fileID: 2982013636318017537}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &358659626593787095 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3285387601392870614, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
   m_PrefabInstance: {fileID: 2982013636318017537}
   m_PrefabAsset: {fileID: 0}
