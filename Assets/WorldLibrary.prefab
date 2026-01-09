@@ -425,6 +425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderPrefab: {fileID: 857304749228554616, guid: 058f25aab1d1144fc8d84b7ff27140b7, type: 3}
+  defaultRenderPrefab: {fileID: 5229131109048246108, guid: a90a703c80d874ad08e192423253477a, type: 3}
   fountain:
     validLand: 1
     roofValid: 0
@@ -436,6 +437,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   windmill:
     validLand: 1
     roofValid: 0
@@ -447,6 +449,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   boat:
     validLand: 64
     roofValid: 1
@@ -458,6 +461,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   jasmine:
     validLand: 1
     roofValid: 1
@@ -469,6 +473,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   carrot:
     validLand: 1
     roofValid: 1
@@ -480,6 +485,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   arrowPile:
     validLand: 1
     roofValid: 1
@@ -491,6 +497,7 @@ MonoBehaviour:
     resourceName: arrows
     resourceQuantity: 20
     isResourcePile: 1
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   woodPile:
     validLand: 1
     roofValid: 1
@@ -502,6 +509,7 @@ MonoBehaviour:
     resourceName: wood
     resourceQuantity: 1
     isResourcePile: 1
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   sprout:
     validLand: 1
     roofValid: 1
@@ -513,17 +521,7 @@ MonoBehaviour:
     resourceName: 
     resourceQuantity: 0
     isResourcePile: 0
-  hoard:
-    validLand: 0
-    roofValid: 1
-    sprite: {fileID: 0}
-    impassable: 1
-    strength: 5
-    maxHealth: 10
-    prefab: {fileID: 0}
-    resourceName: 
-    resourceQuantity: 0
-    isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
   skeleton:
     validLand: -1
     roofValid: 1
@@ -535,6 +533,19 @@ MonoBehaviour:
     resourceName: fertilizer
     resourceQuantity: 10
     isResourcePile: 0
+    resourceColor: {r: 1, g: 1, b: 1, a: 1}
+  fertilizer:
+    validLand: -1
+    roofValid: 1
+    sprite: {fileID: 0}
+    impassable: 1
+    strength: 5
+    maxHealth: 10
+    prefab: {fileID: 0}
+    resourceName: fertilizer
+    resourceQuantity: 10
+    isResourcePile: 1
+    resourceColor: {r: 0.5019608, g: 1, b: 1, a: 1}
 --- !u!114 &8377938587873387450
 MonoBehaviour:
   m_ObjectHideFlags: 0

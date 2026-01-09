@@ -17,16 +17,23 @@ public class FeatureLibrary : MonoBehaviour {
             if (field.GetValue(this) is FeatureConfig feature)
                 feature.type = field.Name;
         foreach (FieldInfo field in this.GetType().GetFields())
-            if (field.GetValue(this) is FeatureConfig feature && feature.isResourcePile)
+            if (field.GetValue(this) is FeatureConfig feature && feature.isResourcePile) {
+                Debug.Log("Feature " + feature.type + " is a pile of " + feature.resourceName);
                 resourcePiles.Add(feature.resourceName, feature);
+        }
     }
     public FeatureConfig ByTypeName(string type) {
         return (FeatureConfig)this.GetType().GetField(type).GetValue(this);
     }
     public bool ResourceHasPile(string resource, out FeatureConfig feature)
         => resourcePiles.TryGetValue(resource, out feature);
+    public Color? ResourceColor(string resource)
+        => ResourceHasPile(resource, out FeatureConfig feature) ? feature.resourceColor : (Color?)null;
+    public bool FeatureTransformsAfterAttack(Feature feature, out FeatureConfig newFeature)
+        => resourcePiles.TryGetValue(feature.config.resourceName, out newFeature) && newFeature != feature.config;
 
     public GameObject renderPrefab;
+    public GameObject defaultRenderPrefab;
     public FeatureConfig fountain;
     public FeatureConfig windmill;
     public FeatureConfig boat;
@@ -35,6 +42,6 @@ public class FeatureLibrary : MonoBehaviour {
     public FeatureConfig arrowPile;
     public FeatureConfig woodPile;
     public FeatureConfig sprout;
-    public FeatureConfig hoard;
     public FeatureConfig skeleton;
+    public FeatureConfig fertilizer;
 }

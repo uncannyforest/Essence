@@ -165,10 +165,19 @@ public class GridCell3D : MonoBehaviour {
     public void UpdateFeature() {
         if (feature != null) GameObject.Destroy(feature.gameObject);
         if (GetFeature(x, y) is Feature featureData) {
-            feature = GameObject.Instantiate(FeatureLibrary.C.renderPrefab,
-                Terrain.I.CellCenter(Vct.I(x, y)), Quaternion.identity, transform).transform;
-            feature.GetComponentInChildren<SpriteRenderer>().sprite = featureData.config.sprite;
-            feature.GetComponent<BoxCollider2D>().enabled = featureData.config.impassable;
+            // Use a default prefab with 2D sprite
+            if (featureData.config.sprite != null) {
+                feature = GameObject.Instantiate(FeatureLibrary.C.renderPrefab,
+                    Terrain.I.CellCenter(Vct.I(x, y)), Quaternion.identity, transform).transform;
+                feature.GetComponentInChildren<SpriteRenderer>().sprite = featureData.config.sprite;
+                feature.GetComponent<BoxCollider2D>().enabled = featureData.config.impassable;
+            // Use a default prefab with the Pile 3D model
+            } else if (featureData.config.prefab == null) {
+                feature = GameObject.Instantiate(FeatureLibrary.C.defaultRenderPrefab,
+                    Terrain.I.CellCenter(Vct.I(x, y)), Quaternion.identity, transform).transform;
+                feature.GetComponentInChildren<MeshRenderer>().material.color = featureData.config.resourceColor;
+                feature.GetComponent<BoxCollider2D>().enabled = featureData.config.impassable;
+            }
         }
     }
 }

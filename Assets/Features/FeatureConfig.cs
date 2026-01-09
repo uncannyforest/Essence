@@ -17,6 +17,7 @@ public class FeatureConfig {
     public string resourceName = "";  // resource name when destroyed
     public int resourceQuantity = 0; // resource quantity when destroyed, may be overridden in FeatureHooks
     public bool isResourcePile = false; // if not, replace with resource pile when destroyed by player
+    public Color resourceColor = Color.white; // used in status bars and default pile render
 
     private Feature Instantiate() {
         if (prefab == null) return new Feature() { config = this, hooks = null };

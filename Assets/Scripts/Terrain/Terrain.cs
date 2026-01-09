@@ -162,21 +162,25 @@ public class Terrain : MonoBehaviour {
         set => SetConstruction(key, value);
     }
 
+    // Set feature at location, with no instantiation or checks
     public void ForceSetFeature(Vector2Int pos, Feature feature) {
         features[pos.x, pos.y] = feature;
     }
+    // Add feature to tile if allowed or return null
     public Feature? MaybeBuildFeature(Vector2Int pos, FeatureConfig config) {
         Feature? feature = config.MaybeInstantiate(pos);
         if (feature != null) mapRenderer.UpdateFeature(pos);
         return feature;
     }
+    // Add feature to tile if allowed
     public Feature BuildFeature(Vector2Int pos, FeatureConfig config) {
         WhyNot canBuild = config.IsValidTerrain(pos);
         if (!canBuild) throw new InvalidOperationException("Invalid terrain at " + pos + ": " + canBuild);
         return (Feature)MaybeBuildFeature(pos, config);
     }
-    public Feature SetUpFeature(Vector2Int pos, Land terrain, FeatureConfig config, int quantity = -1, bool clearRoof = true, bool clearFeature = true) {
-        SetLand(pos, terrain, false);
+    // Replace anything present in a tile with a feature
+    public Feature SetUpFeature(Vector2Int pos, Land? terrain, FeatureConfig config, int quantity = -1, bool clearRoof = true, bool clearFeature = true) {
+        if (terrain != null) SetLand(pos, (Land)terrain, false);
         if (clearRoof) SetRoof(pos, Construction.None);
         if (clearFeature) DestroyFeature(pos);
         Feature feature = BuildFeature(pos, config);
@@ -188,13 +192,14 @@ public class Terrain : MonoBehaviour {
         bool setQuantity = feature.hooks?.SetResourceQuantity(quantity) ?? false;
         if (!setQuantity) throw new ArgumentException("Passed quantity " + quantity + " to feature " + feature.config.type + " that can't accept it");
     }
+    // Apply damage to feature's HP if strength is sufficient
     // returns true if feature was destroyed
     public bool AttackFeature(Vector2Int pos, int pow, int atk) {
         Feature feature = (Feature)Feature[pos];
         if (feature.config.strength > pow) return false;
         bool attacking = feature.hooks == null || feature.hooks.Attack();
         if (!attacking) return false;
-        return Attack(new Position(Grid.Roof, pos), atk, feature.config.maxHealth, (pos) => DestroyFeature(pos.Coord));
+        return Attack(new Position(Grid.Roof, pos), atk, feature.config.maxHealth, (pos) => DemolishFeature(pos.Coord));
     }
     public bool Attack(Position pos, int atk, int maxHealth, Action<Position> destroy) {
         bool destroyIt = maxHealth <= atk;
@@ -214,6 +219,7 @@ public class Terrain : MonoBehaviour {
         }
         return destroyIt;
     }
+    // Remove from map, do not destroy GameObject (e.g. player enters boat)
     public FeatureHooks UninstallFeature(Vector2Int pos) {
         Feature? feature = features[pos.x, pos.y];
         FeatureHooks hooks = feature?.hooks;
@@ -222,10 +228,19 @@ public class Terrain : MonoBehaviour {
         if (hooks != null) hooks.tile = null;
         return hooks;
     }
+    // Delete feature
     public void DestroyFeature(Vector2Int pos) {
         FeatureHooks feature = UninstallFeature(pos);
         if (feature != null) GameObject.Destroy(feature.gameObject);
     }
+    // Delete feature unless attacking it should break it down into another feature
+    public void DemolishFeature(Vector2Int pos) {
+        Feature? feature = features[pos.x, pos.y];
+        if (FeatureLibrary.C.FeatureTransformsAfterAttack((Feature)feature, out FeatureConfig newFeature))
+            SetUpFeature(pos, null, newFeature, -1, false, true);
+        else DestroyFeature(pos);
+    }
+    // Delete feature and return resource
     public int ConsumeFeature(Vector2Int pos) {
         Feature? maybeFeature = features[pos.x, pos.y];
         if (maybeFeature == null) throw new ArgumentException("No feature to consume at " + pos);
