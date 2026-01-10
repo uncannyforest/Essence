@@ -56,12 +56,6 @@ public class MooseBrain : Brain {
 
     override public IEnumerator<YieldInstruction> UnblockSelf(Terrain.Position location) => ApproachAndDestroy(location);
 
-    private IEnumerator<YieldInstruction> AttackCharacterBehavior(Transform f) =>
-        from focus in Continually.For(f)
-        where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
-        select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
-            .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
-
     private IEnumerator<YieldInstruction> ApproachAndDestroy(Terrain.Position l) =>
         from location in Continually.For(l)
         where resource.Has()

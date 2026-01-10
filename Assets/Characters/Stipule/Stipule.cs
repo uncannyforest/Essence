@@ -23,7 +23,7 @@ public class StipuleBrain : Brain {
         this.stipule = stipule;
 
         MainBehavior = new CharacterTargetedBehavior(this,
-            AttackBehavior,
+            AttackCharacterBehavior,
             (c) => Will.IsThreat(teamId, c),
             (c) => SufficientResource() && Will.CanSee(transform.position, c));
 
@@ -35,10 +35,4 @@ public class StipuleBrain : Brain {
     }
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
-
-    private IEnumerator<YieldInstruction> AttackBehavior(Transform f) =>
-        from focus in Continually.For(f)
-        where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
-        select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
-            .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
 }

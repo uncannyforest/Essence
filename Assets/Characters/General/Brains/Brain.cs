@@ -122,7 +122,14 @@ public class Brain {
         Health health = target.GetComponentStrict<Health>();
         health.Decrease(creature.stats.Str, transform);
         resource.Use();
+        AttackTerraformSideEffect(Terrain.I.CellAt(target.position));
     }
+    virtual public void AttackTerraformSideEffect(Vector2Int loc) {}
+    virtual public IEnumerator<YieldInstruction> AttackCharacterBehavior(Transform f) =>
+        from focus in Continually.For(f)
+        where IsValidFocus(focus)                   .NegLog(legalName + " focus " + focus + " no longer valid")
+        select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
+            .Then(() => pathfinding.FaceAnd("Attack", focus, Melee));
 
     /////////////////////////
     // STATE UPDATE FUNCTIONS

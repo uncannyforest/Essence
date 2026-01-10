@@ -34,7 +34,7 @@ public class AxeBrain : Brain {
         this.axe = axe;
 
         MainBehavior = new FlexTargetedBehavior(this,
-            characterBehavior: AttackBehavior,
+            characterBehavior: AttackCharacterBehavior,
             terrainAction: (pos) => Axe.ChopWood(pos),
             silentFilter: new TeleFilter(
                 TeleFilter.Terrain.TILES,
@@ -66,15 +66,7 @@ public class AxeBrain : Brain {
 
     override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
-    private IEnumerator<YieldInstruction> AttackBehavior(Transform character) 
-        => from focus in Continually.For(character)
-            where IsValidFocus(focus)                                   .NegLog(legalName + " focus " + focus + " no longer valid")
-            select pathfinding.Approach(focus, GlobalConfig.I.defaultMeleeReach)
-                .Then(() => pathfinding.FaceAnd("Attack", focus, Attack));
-
-    private void Attack(Transform target) {
-        Melee(target);
-        Vector2Int location = terrain.CellAt(target.position);
-        if (terrain.GetLand(location)?.IsPlanty() == true) Axe.ChopWood(location);
+    override public void AttackTerraformSideEffect(Vector2Int loc) {
+        if (terrain.GetLand(loc)?.IsPlanty() == true) Axe.ChopWood(loc);
     }
 }
