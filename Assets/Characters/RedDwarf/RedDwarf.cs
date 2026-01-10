@@ -5,6 +5,7 @@ using UnityEngine;
 
 [Serializable]
 public class RedDwarfConfig {
+    public Sprite attackAction;
     public Sprite woodBuildAction;
     public float buildTime;
     public float buildDistance;
@@ -18,7 +19,13 @@ public class RedDwarf : Species<RedDwarfConfig> {
 
 public class RedDwarfBrain : Brain {
     public RedDwarfBrain(RedDwarf species, BrainConfig general, RedDwarfConfig redDwarf) : base(species, general) {
+        MainBehavior = new CharacterTargetedBehavior(this,
+            AttackCharacterBehavior,
+            (c) => Will.IsThreat(teamId, c),
+            (c) => SufficientResource() && Will.CanSee(transform.position, c));
+
         Actions = new List<CreatureAction>() {
+            MainBehavior.CreatureActionCharacter(redDwarf.attackAction),
             CreatureAction.WithTerrain(redDwarf.woodBuildAction,
                 pathfinding.ApproachThenInteract(
                     redDwarf.buildDistance, (p) => SufficientResource(Cost(p)), () => creature.stats.ExeTime,
@@ -34,6 +41,9 @@ public class RedDwarfBrain : Brain {
                 && feature.ResourceQuantity == FeatureLibrary.C.woodPile.prefab.GetComponentStrict<Woodpile>().maxPile
         };
     }
+
+    // TODO move this to Brain, every creature will have it
+    override public Optional<Transform> FindFocus() => resource.Has() ? Will.NearestThreat(this) : Optional<Transform>.Empty();
 
     public int Cost(Terrain.Position pos) => pos.grid == Terrain.Grid.Roof ? 4 : 1;
 }

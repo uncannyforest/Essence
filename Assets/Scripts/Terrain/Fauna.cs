@@ -52,7 +52,7 @@ public class Fauna : MonoBehaviour {
     }
 
     private Creature IdentifyCreature() {
-        int justARandomNumberForNow = Random.Range(0, 7);
+        int justARandomNumberForNow = Random.Range(0, 8);
         switch (justARandomNumberForNow) {
             case 0: return CreatureLibrary.P.bunny;
             case 1: return CreatureLibrary.P.arrowwiggle;
