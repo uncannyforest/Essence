@@ -15,6 +15,7 @@ MonoBehaviour:
   adultFeature: 
   delay:
     carrot: 20
+    jasmine: 20
 --- !u!1001 &8400149263990544792
 PrefabInstance:
   m_ObjectHideFlags: 0

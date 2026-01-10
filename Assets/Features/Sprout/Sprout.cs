@@ -40,5 +40,6 @@ public class Sprout : MonoBehaviour {
             (float)this.GetType().GetField(type).GetValue(this);
 
         public float carrot;
+        public float jasmine;
     }
 }

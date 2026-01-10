@@ -168,6 +168,8 @@ MonoBehaviour:
   setAnimatorDirectionDirectly: 0
   snap: 0
   waterSpeed: 0
+  animatorDirection:
+    displacement: {x: 0, y: 0}
 --- !u!114 &2763505932110915963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,7 +183,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainConfig:
-    numMovementDirections: 0
     canFaint: 0
     lureMaxTime: 10
     roamRestingFraction: 0.5
@@ -202,6 +203,7 @@ MonoBehaviour:
   breastplate: {fileID: 0}
   tamingInfoShort: You cannot tame any
   tamingInfoLong: That creature cannot be tamed.
+  terraformingPower: 5
 --- !u!114 &71628518836826874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,9 +241,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentExp: 0
   minDistanceFromOrigin: 0
-  resourceName: Resource
-  minStr: 3
-  minDef: 25
+  minStr: 5
+  minDef: 50
   minExe: 2
   exeIncrEvery: 10
   minSpd: 1
@@ -264,6 +265,7 @@ MonoBehaviour:
   statBarColor: {r: 0.33333334, g: 0.93333334, b: 0.26666668, a: 1}
   statBarOffset: 0.1875
   showOnHover: 1
+  type: Resource
 --- !u!1 &8652825595509261789
 GameObject:
   m_ObjectHideFlags: 0
