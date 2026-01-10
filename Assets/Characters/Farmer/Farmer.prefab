@@ -53,11 +53,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoLong
-      value: A <creature/> can be tames when it is within sight of a Hoard.
+      value: 'A <creature/> can be tamed when it is within sight of a fertilizer
+        pile.
+
+
+        Fertilizer can be obtained from skeletons.'
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoShort
-      value: Near a Hoard, you can tame
+      value: Tame with fertilizer pile
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureShortName

@@ -16,19 +16,23 @@ public class Habitat {
         restDuration = 10;
     }
 
+    public readonly Radius tameRadius;
     public readonly Radius restRadius;
     protected readonly Brain brain;
 
-    public Habitat(Brain brain, Radius restRadius) {
+    public Habitat(Brain brain, Radius restRadius) : this(brain, restRadius, restRadius) { }
+    public Habitat(Brain brain, Radius tameRadius, Radius restRadius) {
         this.brain = brain;
+        this.tameRadius = tameRadius;
         this.restRadius = restRadius;
+        IsAphrodisiac = (pos) => IsShelter(pos);
         RestBehavior = RestBehaviorDefault;
     }
 
     static public Habitat Feature(Brain brain, FeatureConfig feature, Radius mode = Radius.Nearby) => new Habitat(brain, feature, mode);
     public Habitat(Brain brain, FeatureConfig feature, Radius mode = Radius.Nearby)
         : this(brain, mode) {
-        IsShelter = (loc) => feature == Terrain.I.Feature[loc]?.config; // okay??
+        IsShelter = IsFeature(feature);
     }
 
     static public Habitat Land(Brain brain, Land land, Radius mode) => new Habitat(brain, land, mode);
@@ -38,11 +42,16 @@ public class Habitat {
     }
 
     public Func<Vector2Int, bool> IsShelter;
+    public Func<Vector2Int, bool> IsAphrodisiac;
     public Func<Vector2Int, IEnumerator<YieldInstruction>> RestBehavior;
 
-    public bool IsPresent(Radius radius) => radius.Center(brain).Where(IsShelter).Any();
-    public bool IsPresent() => IsPresent(restRadius);
-    virtual public bool CanTame() => IsPresent();
+    public bool IsShelterPresent(Radius radius) => radius.Center(brain).Where(IsShelter).Any();
+    public bool IsAphrodisiacPresent(Radius radius) => radius.Center(brain).Where(IsAphrodisiac).Any();
+    public bool IsAphrodisiacPresent() => IsAphrodisiacPresent(tameRadius);
+    virtual public bool CanTame() => IsAphrodisiacPresent();
+
+    static public Func<Vector2Int, bool> IsFeature(FeatureConfig feature)
+        => (loc) => feature == Terrain.I.Feature[loc]?.config;
 
     public Optional<Vector2Int> FindShelter() {
         if (Time.time < restAgainTime) return Optional<Vector2Int>.Empty();
@@ -97,7 +106,8 @@ public class Habitat {
 }
 
 public class ConsumableFeatureHabitat : Habitat {
-    public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime) : base(brain, feature) {
+    public ConsumableFeatureHabitat(Brain brain, FeatureConfig feature, Func<float> consumeTime)
+        : base(brain, feature) {
         RestBehavior = (shelter) => RestBehaviorConsume(shelter, consumeTime,
             () => brain.resource.Increase(Terrain.I.ConsumeFeature(shelter))
         );

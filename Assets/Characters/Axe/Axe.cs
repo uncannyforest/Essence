@@ -43,7 +43,7 @@ public class AxeBrain : Brain {
                 && target.IfCharacter((c) => Will.CanSee(transform.position, c.transform))
                 && IsValidIfTerrain(target, LandCats.PLANTY));
 
-        Lark = MainBehavior.Lark(() => Habitat?.IsPresent(Radius.Nearby) != true,  Radius.Nearby);
+        Lark = MainBehavior.Lark(() => Habitat?.IsShelterPresent(Radius.Nearby) != true,  Radius.Nearby);
 
         Actions = new List<CreatureAction>() {
             ((FlexTargetedBehavior)MainBehavior).CreatureActionTerrain(axe.chopWoodAction),

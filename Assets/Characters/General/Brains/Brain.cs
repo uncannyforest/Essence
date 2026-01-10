@@ -100,7 +100,7 @@ public class Brain {
     public List<CreatureAction> Actions { get; protected set; } = new List<CreatureAction>();
     virtual public bool CanTame(Transform player) {
         if (GetComponent<Health>() == null) return Habitat?.CanTame() ?? false;
-        else return state.type == CreatureStateType.Faint && (Habitat?.IsPresent(Radius.Nearby) ?? false);
+        else return state.type == CreatureStateType.Faint && (Habitat?.IsAphrodisiacPresent(Radius.Nearby) ?? false);
     }
 
     public WhyNot SufficientResource(int quantityNeeded = 1) =>

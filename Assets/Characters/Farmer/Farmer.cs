@@ -30,7 +30,8 @@ public class FarmerBrain : Brain {
             CreatureAction.Instant(farmer.clearAction, (creature) => resource.Reset(), keepFollowing: true)
         };
 
-        Habitat = new Habitat(this, Radius.Beside) {
+        Habitat = new Habitat(this, Radius.Nearby, Radius.Beside) {
+            IsAphrodisiac = Habitat.IsFeature(FeatureLibrary.C.fertilizer),
             IsShelter = CanHarvest,
 
             RestBehavior = (shelter) =>

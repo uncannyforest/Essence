@@ -93,15 +93,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoLong
-      value: 'To tame a <creature/>, it must be on a woodpile.
+      value: 'To tame a <creature/>, it must be near a woodpile with 10 pieces of
+        wood.
 
 
-        You can
-        build a woodpile after harvesting meadow, shrub, or forest.'
+        You can build a woodpile after harvesting meadow, shrub,
+        or forest.'
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: tamingInfoShort
-      value: When it's on a woodpile, tame
+      value: Tame using a 10-piece woodpile
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: creatureShortName

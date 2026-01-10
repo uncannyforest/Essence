@@ -162,6 +162,16 @@ public class Terrain : MonoBehaviour {
         set => SetConstruction(key, value);
     }
 
+    public bool IsFeature(Vector2Int pos, out Feature feature) {
+        if (features[pos.x, pos.y] == null) {
+            feature = default;
+            return false;
+        } else {
+            feature = (Feature)features[pos.x, pos.y];
+            return true;
+        }
+    }
+    
     // Set feature at location, with no instantiation or checks
     public void ForceSetFeature(Vector2Int pos, Feature feature) {
         features[pos.x, pos.y] = feature;

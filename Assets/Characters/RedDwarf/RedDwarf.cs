@@ -28,7 +28,11 @@ public class RedDwarfBrain : Brain {
                 pathfinding.BuildFeature(FeatureLibrary.C.boat, 60))
         };
 
-        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5);
+        Habitat = new ConsumableFeatureHabitat(this, FeatureLibrary.C.woodPile, () => creature.stats.ExeTime * 5) {
+            IsAphrodisiac = (pos) => Terrain.I.IsFeature(pos, out Feature feature)
+                && feature.config == FeatureLibrary.C.woodPile
+                && feature.ResourceQuantity == FeatureLibrary.C.woodPile.prefab.GetComponentStrict<Woodpile>().maxPile
+        };
     }
 
     public int Cost(Terrain.Position pos) => pos.grid == Terrain.Grid.Roof ? 4 : 1;
