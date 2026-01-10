@@ -125,15 +125,6 @@ public class Creature : MonoBehaviour {
             select result.transform).FirstOrDefault();
     }
 
-    public void FollowOffensive(Transform target) {
-        if (!brain.general.hasAttack) return;
-        new Senses() {
-            hint = (target != null)
-                ? new Hint() { target = Optional.Of(target) }
-                : new Hint() { generallyOffensive = true }
-        }.TryUpdateCreature(this);
-    }
-
     public void GenericExeSucceeded() => stats.Exp += 2;
 
     public void AttackSucceeded(int? completedWithDef = null) {

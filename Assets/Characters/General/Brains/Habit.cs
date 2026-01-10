@@ -200,9 +200,6 @@ public struct Habit {
         }.ExitAndEnterOnUpdate(),
 
         [CreatureStateType.PassiveCommand] = new Node(CreatureStateType.PassiveCommand) {
-            onEnter = (state, brain) => {
-                if (state.followOffensive) brain.UpdateFollowOffensive();
-            },
             onExit = (_, newState, brain) => {
                 if (newState.type != CreatureStateType.Rest) 
                     brain.Habitat?.ClearRecentlyVisited();

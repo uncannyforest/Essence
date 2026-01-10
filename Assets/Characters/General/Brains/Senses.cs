@@ -91,18 +91,6 @@ public struct CreatureMessage {
     }
 }
 
-public struct Hint {
-    public bool generallyOffensive;
-    public Optional<Transform> target;
-
-    override public string ToString() {
-        string result = "";
-        if (generallyOffensive) result += " generally offensive";
-        if (target.HasValue) result += " target: " + target.Value.gameObject.name;
-        return result.Substring(1);
-    }
-}
-
 public struct Senses {
     public static Senses CreateForCreature(Creature creature) {
         Senses senses = new Senses()
@@ -131,8 +119,6 @@ public struct Senses {
     public bool faint;
 
     public Command? command;
-
-    public Hint? hint;
 
     public CreatureMessage? message;
 
@@ -182,7 +168,6 @@ public struct Senses {
         if (controlOverride.IsRemove) result += " remove control override";
         if (faint) result += " faint";
         if (command is Command actualCommand) result += " command: " + actualCommand;
-        if (hint is Hint actualHint) result += " hint: " + hint;
         if (message is CreatureMessage actualMessage) result += " creature message: " + actualMessage;
         if (desireMessage is DesireMessage actualDesireMessage) result += " desire message: " + actualDesireMessage;
         if (environment is Environment actualEnvironment) result += " environment: " + actualEnvironment;

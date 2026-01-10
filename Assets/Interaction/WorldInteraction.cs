@@ -446,8 +446,6 @@ public class WorldInteraction : MonoBehaviour {
                     if (Input.GetMouseButton(0)) // click not space
                         meleeSelect.PointerToKeys(PointerForAim(worldPoint));
                     meleeSelect.Damage(player.GetComponent<Team>().TeamId);
-                    SignalOffensiveTarget(meleeSelect.InputVelocity,
-                        signalMeleeRadius, signalFrontOfPlayer, 0);
                     Transform swordSwipe = GameObject.Instantiate(swordSwipePrefab, bag).transform;
                     swordSwipe.position = meleeSelect.DamageCenter.WithZ(-GlobalConfig.I.elevation.groundLevelHighlight);
                     swordSwipe.localScale = new Vector3(meleeSelect.DamageRadius * 2, meleeSelect.DamageRadius * 2, 1);
@@ -517,15 +515,6 @@ public class WorldInteraction : MonoBehaviour {
             });
         }
         ThroroughCleanUpTopFollowingCharacter();
-    }
-
-    public void SignalOffensiveTarget(Vector2 direction, float castRadius, float castStart, float castDistance) {
-        Transform offensiveTarget = Creature.FindOffensiveTarget(
-            player.GetComponent<Team>().TeamId, player.position, direction,
-            castRadius, castStart, castDistance);
-        Debug.Log("Signaling to attack: " + offensiveTarget);
-        foreach (Character character in followingCharacters) if (character != null)
-            character.GetComponentStrict<Creature>().FollowOffensive(offensiveTarget);
     }
 
     private Vector2 PointerForAim(Vector2 pointer) =>

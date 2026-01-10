@@ -259,16 +259,6 @@ public class Brain {
         environment = new Senses.Environment() { removeInvestigation = true }
     }.TryUpdateCreature(creature);
 
-    public void DisableFollowOffensive() => new Senses() {
-        hint = new Hint() { generallyOffensive = false }
-    }.TryUpdateCreature(creature);
-
-    public void UpdateFollowOffensive() {
-        Optional<Transform> threat = Will.NearestThreat(this);
-        if (!threat.HasValue) DisableFollowOffensive();
-        else SetFocus(threat.Value);
-    }
-
     private void SetShelter(Vector2Int shelter) => new Senses() {
         environment = new Senses.Environment() {
             shelter = Delta<Vector2Int>.Add(shelter)

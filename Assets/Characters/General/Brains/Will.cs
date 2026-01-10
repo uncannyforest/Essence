@@ -83,21 +83,6 @@ public class Will {
                 return CreatureState.Command(command);
             }
 
-        } else if (input.hint is Hint hint) {
-            if (!input.knowledge.config.hasAttack)
-                return "hasAttack false";
-            if (state.command?.type != CommandType.Follow)
-                return "No use for player hints under command " + state.command?.type;
-
-            if (!hint.generallyOffensive && !hint.target.HasValue)
-                return state.DisableFollowOffensive();
-            else if (hint.generallyOffensive)
-                return state.FollowOffensive();
-            else {
-                relinquishedPriority = (int)CreatureStateType.Investigate; // to another investigation
-                return DesireAttack(input.knowledge.config, input.knowledge.position, state, hint.target.Value);
-            }
-
         } else if (input.message is CreatureMessage message) {
             switch (message.type) {
                 case CreatureMessage.Type.PairToSubject:
