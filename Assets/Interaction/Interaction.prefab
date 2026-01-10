@@ -83,13 +83,6 @@ MonoBehaviour:
     damageCenterDistance: 0.5
     damageRadius: 0.5
     damage: 15
-  rangedConfig:
-    aimMinRate: 45
-    aimMaxRate: 540
-    aimTransitionAngle: 20
-    target: {fileID: 0}
-    targetRange: 4.2426405
-    targetZ: 3
   praxelSelectConfig:
     latency: 0.1
     delay: 0
@@ -109,7 +102,7 @@ MonoBehaviour:
       a dropped arrow from an <color=creature>Archer</color>, you must dodge its
       shots and then pick up the arrow.'
   sodCost: 1
-  dirtPileCost: 2
+  dirtPileCost: 4
   flyingArrowPrefab: {fileID: 8342955255124277181, guid: fa3645875c2f2457fa3fd479c0176b77, type: 3}
   swordSwipePrefab: {fileID: 1998722872617208, guid: 235d96e1b4f334589b775bf0d7ead730, type: 3}
   followingCharacterColor: {r: 0.6, g: 0.8666667, b: 0.73333335, a: 1}
@@ -125,8 +118,6 @@ MonoBehaviour:
   soil: {fileID: 1566047546139531794, guid: db843597c34a44c658e6b7015c7cf3b3, type: 3}
   signalFrontOfPlayer: 1
   signalMeleeRadius: 2
-  signalRangedRadius: 1
-  signalRangedDistance: 5
   freeTamingCheat: 0
 --- !u!114 &9165450013374557085
 MonoBehaviour:

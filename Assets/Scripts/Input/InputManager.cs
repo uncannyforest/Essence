@@ -93,6 +93,9 @@ public class InputManager : MonoBehaviour {
         if (SimpleInput.GetButtonDown("Keys")) {
             textDisplay.ShowFullText(keysTip);
         }
+        if (SimpleInput.GetButtonDown("Replace")) {
+            GameManager.I.YourPlayer.GetComponentStrict<Inventory>().ReplaceOrClearItems();
+        }
         if (SimpleInput.GetButtonDown("Fire")) {
             if (textDisplay.IsFullTextUp) {
                 textDisplay.HideFullText();

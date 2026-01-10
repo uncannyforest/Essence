@@ -63,7 +63,7 @@ public class WorldInteraction : MonoBehaviour {
     public float arrowRate = 1/3f;
     public ExpandableInfo noArrowsTip;
     public int sodCost = 1;
-    public int dirtPileCost = 2;
+    public int dirtPileCost = 4;
     public Arrow flyingArrowPrefab;
     public GameObject swordSwipePrefab;
     public Color followingCharacterColor;
@@ -339,10 +339,10 @@ public class WorldInteraction : MonoBehaviour {
                         inventory.Add(feature.config.resourceName, resourceQuantity);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
-                    Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), sodCost);
+                    inventory.Add("soil", sodCost);
                 } else if (terrain.GetLand(coord) == Land.Dirtpile) {
                     terrain.Land[coord] = Land.Grass;
-                    Collectible.Instantiate(soil, bag, terrain.CellCenter(coord).WithZ(GlobalConfig.I.elevation.collectibles), dirtPileCost);
+                    inventory.Add("soil", dirtPileCost);
                 } else if (terrain.GetLand(coord)?.IsPlanty() == true) {
                     Axe.ChopWood(coord);
                 }
