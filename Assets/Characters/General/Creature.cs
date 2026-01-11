@@ -66,7 +66,7 @@ public class Creature : MonoBehaviour {
     }.TryUpdateCreature(this, 2);
     
     public void Follow(Transform player) => new Senses() {
-        command = Command.Follow(player)
+        passiveCommand = PassiveCommand.Follow(player)
     }.TryUpdateCreature(this, 1);
     
     // Can call without calling CanTame() first; result will indicate whether it succeeded
@@ -97,7 +97,9 @@ public class Creature : MonoBehaviour {
             tamingInfoLong.Replace("<creature/>", "<color=creature>" + creatureName + "</color>"));
     }
 
-    public bool CanPair() => State.type.CanTransitionTo(CreatureStateType.Pair);
+    public bool CanPair(Transform initiator) => (bool)State.CanBecomeScanActivity(new Senses() {
+        message = CreatureMessage.PairToSubject(initiator)
+    });
     
     public bool TryPair(Transform initiator) => new Senses() {
         message = CreatureMessage.PairToSubject(initiator)
@@ -137,11 +139,11 @@ public class Creature : MonoBehaviour {
     }.TryUpdateCreature(this, -1);
 
     public void CommandRoam() => new Senses() {
-        command = Command.Roam()
+        passiveCommand = PassiveCommand.Roam()
     }.TryUpdateCreature(this);
 
     public void Station(Vector2Int location) => new Senses() {
-        command = Command.Station(Terrain.I.CellCenter(location))
+        passiveCommand = PassiveCommand.Station(Terrain.I.CellCenter(location))
     }.TryUpdateCreature(this);
 
     public void ProcessDirective(OneOf<BehaviorNode, string> executingBehaviorOrError) {
@@ -149,7 +151,7 @@ public class Creature : MonoBehaviour {
             TextDisplay.I.ShowMiniText(UserFriendly(error));
 
         else new Senses() {
-            command = Command.Execute((BehaviorNode)executingBehaviorOrError)
+            executeDirective = Optional.Of((BehaviorNode)executingBehaviorOrError)
         }.TryUpdateCreature(this);
     }
 
@@ -187,7 +189,7 @@ public class Creature : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collider) {
         Boat boat = collider.transform.parent.GetComponent<Boat>();
-        if (boat != null && boat.player != null && boat.player == brain.state.command?.followDirective.Or(null)?.GetComponent<PlayerCharacter>())
+        if (boat != null && boat.player != null && boat.player == brain.state.scanActivity?.command.followDirective.Or(null)?.GetComponent<PlayerCharacter>())
             boat.RequestCreatureEnter(this);
     }
 
@@ -220,7 +222,7 @@ public class Creature : MonoBehaviour {
         return new Data(Terrain.I.CellAt(transform.position),
             creatureName,
             team.TeamId,
-            brain.state.command?.type == CommandType.Station,
+            brain.state.scanActivity?.command.type == PassiveCommandType.Station,
             gameObject.name,
             stats.Exp);
     }

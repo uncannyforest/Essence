@@ -65,7 +65,7 @@ public class ArcherBrain : Brain {
             movement.IdleFacing(expectedFuturePosition);
             resource.Use();
             Arrow.Instantiate(archer.arrowPrefab, grid, transform, expectedFuturePosition, creature.stats.Str);
-        } else if (state.command?.type != CommandType.Station) {
+        } else if (state.scanActivity?.command.type != PassiveCommandType.Station) {
             pathfinding.MoveTowardWithoutClearingObstacles(target.position);
         }
         return new WaitForSeconds(creature.stats.ExeTime * .9f);

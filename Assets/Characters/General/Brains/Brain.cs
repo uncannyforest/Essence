@@ -14,7 +14,9 @@ public class BrainConfig {
     public float reconsiderRateFollow = 2f;
     public float reconsiderRateTarget = 1f;
     public float scanningRate = 1f;
+    [Obsolete("No creatures should scan for focus while following")]
     public bool scanForFocusWhenFollowing = true;
+    [Obsolete("All creatures should have an attack")]
     public bool hasAttack = false;
     public Land[] canClearObstacles = new Land[0];
     public Construction[] canClearConstruction = new Construction[0];
@@ -69,8 +71,8 @@ public class Brain {
     ///////////////////
     // STATE PROPERTIES
 
-    public CreatureState state { get; private set; } = CreatureState.Command(Command.Roam());
-    private CreatureState oldState = CreatureState.WithControlOverride(CreatureState.Command(Command.Roam()), null);
+    public CreatureState state { get; private set; } = CreatureState.PassiveCommand(PassiveCommand.Roam());
+    private CreatureState oldState = CreatureState.WithControlOverride(CreatureState.PassiveCommand(PassiveCommand.Roam()), null);
     private bool stateIsDirty = true;
     protected TaskRunner RunningBehaviorTask;
     protected TaskRunner ScanningBehaviorTask;
@@ -189,31 +191,29 @@ public class Brain {
 
         DebugLogStateChange(false);
 
-        ScanningBehaviorTask.RunIf(state.type.IsScanning());
+        ScanningBehaviorTask.RunIf(state.IsScanning);
     }
 
-    private void EndState() => new Senses() {
+    public void EndState() => new Senses() {
         endState = true
     }.TryUpdateCreature(creature);
 
     private IEnumerator<YieldInstruction> ScanningBehavior() {
         while (true) {
             yield return new WaitForSeconds(general.scanningRate);
-            if (state.type == CreatureStateType.PassiveCommand && 
-                    state.command?.type == CommandType.Follow &&
-                    (general.hasAttack || !general.scanForFocusWhenFollowing))
-                continue;
+            if (state.scanActivity?.command.type == PassiveCommandType.Follow)
+                continue; // do not scan for focus or habitat while following
             Optional<Transform> maybeFocus = FindFocus();
-            if (maybeFocus.HasValue) { 
-                SetFocus(maybeFocus.Value);
-                continue;
-            }
-            if (state.command?.type != CommandType.Follow && Habitat != null) {
-                Optional<Vector2Int> maybeShelter = Habitat.FindShelter();
-                if (maybeShelter.HasValue) {
-                    SetShelter(maybeShelter.Value);
-                    continue;
-                }
+            Optional<Vector2Int> maybeShelter = Optional.Empty<Vector2Int>();
+            if (Habitat != null) maybeShelter = Habitat.FindShelter();
+
+            if (maybeFocus.HasValue || maybeShelter.HasValue) {
+                new Senses() {
+                    environment = new Senses.Environment() {
+                        characterFocus = maybeFocus,
+                        shelter = maybeShelter
+                    }
+                }.TryUpdateCreature(creature);
             }
         }
     }
@@ -222,9 +222,9 @@ public class Brain {
     // AI SELF STATE CHANGES
 
     public void RequestFollow() {
-        new Senses() { command = Command.RequestFollow() }.TryUpdateCreature(creature);
-        if (state.command?.type == CommandType.Follow) {
-            WorldInteraction playerInterface = state.command?.followDirective.Value.GetComponentStrict<PlayerCharacter>().Interaction;
+        new Senses() { passiveCommand = PassiveCommand.RequestFollow() }.TryUpdateCreature(creature);
+        if (state.scanActivity?.command.type == PassiveCommandType.Follow) {
+            WorldInteraction playerInterface = state.scanActivity?.command.followDirective.Value.GetComponentStrict<PlayerCharacter>().Interaction;
             playerInterface.EnqueueFollowing(creature);
         }
     }
@@ -234,7 +234,7 @@ public class Brain {
         if (recipient?.TryPair(transform) == true) {
             new Senses {
                 environment = new Senses.Environment() {
-                    characterFocus = Delta<Transform>.Add(recipient.transform),
+                    characterFocus = Optional.Of(recipient.transform),
                     focusIsPair = Optional.Of(recipient)
                 }
             }.TryUpdateCreature(creature, 2);
@@ -243,65 +243,10 @@ public class Brain {
         else return Optional<Transform>.Empty();
     }
 
-    private void SetFocus(Transform focus) => new Senses() {
-        environment = new Senses.Environment() {
-            characterFocus = Delta<Transform>.Add(focus)
-        }
-    }.TryUpdateCreature(creature);
-
-    private void RemoveFocus() => new Senses() {
-        environment = new Senses.Environment() {
-            characterFocus = Delta<Transform>.Remove()
-        }
-    }.TryUpdateCreature(creature);
-    
-    public void RemoveInvestigation() => new Senses() {
-        environment = new Senses.Environment() { removeInvestigation = true }
-    }.TryUpdateCreature(creature);
-
-    private void SetShelter(Vector2Int shelter) => new Senses() {
-        environment = new Senses.Environment() {
-            shelter = Delta<Vector2Int>.Add(shelter)
-        }
-    }.TryUpdateCreature(creature);
-
     ////////////////
     // SANITY CHECKS
 
     public void Update() {
         if (stateIsDirty) OnStateChange();
-        StateAssumptions();
-    }
-
-    // Check for things that should never happen
-    public void StateAssumptions() {
-        if (state.type == CreatureStateType.Override) return; // put off sanity checks if overriden
-
-        // Directives
-        if (state.command?.type == CommandType.Follow && state.command?.followDirective.HasValue != true) {
-            Debug.LogError("Following without followDirective");
-            creature.CommandRoam();
-        }
-        if (state.command?.type == CommandType.Station && state.command?.stationDirective == null) {
-            Debug.LogError("Stationed without stationDirective");
-            creature.CommandRoam();
-        }
-        if (state.command?.type == CommandType.Execute && state.command?.followDirective.HasValue != true) {
-            Debug.LogError("Executing without subsequent followDirective");
-        }
-        // Invalid focus combinations
-        if (state.characterFocus.HasValue && state.investigation != null) {
-            Debug.LogError("Focus and investigation at the same time: " + state.characterFocus.Or(null) + " " + state.investigation);
-            RemoveInvestigation();
-        }
-        // I didn't bother to ensure Pair and Investigation cannot happen simultaneously
-        // so Pair is not checked here
-        if ((state.type == CreatureStateType.Execute || state.type == CreatureStateType.Faint)
-            && (state.characterFocus.HasValue || state.investigation != null)) {
-            Debug.LogError("Should not have focus or investigation while in state "
-                + state.type + ": " + state.characterFocus.Or(null) + " " + state.investigation);
-            if (state.characterFocus.HasValue) RemoveFocus();
-            if (state.investigation != null) RemoveInvestigation();
-        }
     }
 }

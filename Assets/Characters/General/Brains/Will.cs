@@ -4,41 +4,15 @@ using UnityEngine;
 
 public class Will {
 
-    public static OneOf<CreatureState, string> Decide(CreatureState old, Senses input) {
-        int? transitionPriority = null;
-        OneOf<CreatureState, string> maybeResult = Decide(old, input, ref transitionPriority);
-        if (maybeResult.Is(out CreatureState result)) {
-            if (Habit.ForcedTransitionAllowed(old, result, transitionPriority)) return result;
-            else return "Lower priority (" + transitionPriority + ") " + result.type + " not allowed to replace " + old.type;
-        }
-        else return maybeResult;
-    }
-    // States can naturally transition up
-    // To transition horizontally or down, must have with relinquishedPriority set at least as high as the starting state.
-    // When intentionally transitioning from a higher-priority state to a lower-priority state,
-    // relinquishedPriority must be set to the higher priority,
-    // otherwise this would fail.
-    // relinquishedPriority should generally only be set when the input includes
-    // a direct request to end that higher-priority state specifically.
-    // All other requests are considered requests to escalate priority (or keep it the same level).
-    public static OneOf<CreatureState, string> Decide(CreatureState state, Senses input, ref int? relinquishedPriority) {
+    public static OneOf<CreatureState, string> Decide(CreatureState state, Senses input) {
         if (input.endState) {
-            relinquishedPriority = (int)CreatureStateType.Override; // end anything
             switch (state.type) {
                 case CreatureStateType.Override:
                     return CreatureState.WithoutControlOverride(state);
                 case CreatureStateType.Execute:
-                    if (state.command?.followDirective.HasValue == true)
-                        return CreatureState.Command(Command.Follow(((Command)state.command).followDirective.Value));
-                    else return CreatureState.Command(Command.Roam()); // follow request failed
-                case CreatureStateType.Pair:
-                    return CreatureState.Unpair(state);
-                case CreatureStateType.Focus:
-                case CreatureStateType.Rest:
-                case CreatureStateType.Investigate:
-                    return state.ClearFocus();
-                case CreatureStateType.PassiveCommand:
-                    return CreatureState.Command(Command.Roam());
+                    return CreatureState.PassiveCommand(((ExecuteCommand)state.executeCommand).ToFollow());
+                case CreatureStateType.Scan:
+                    return state.EndScanState();
                 default: throw new ArgumentException("End state on wrong state");
             }
 
@@ -46,107 +20,118 @@ public class Will {
             return CreatureState.WithControlOverride(state, input.controlOverride.Value);
 
         } else if (input.controlOverride.IsRemove) {
-            relinquishedPriority = (int)CreatureStateType.Override; // end override
             return CreatureState.WithoutControlOverride(state);
 
         } else if (input.faint) {
-            return CreatureState.Fainted();
+            if (state.type == CreatureStateType.Override) return "Cannot Faint from Override";
+            else return CreatureState.Fainted();
 
-        } else if (input.command is Command command) {
-            if (state.command?.type == CommandType.Execute || command.type == CommandType.Execute) {
-                relinquishedPriority = (int)CreatureStateType.Execute; // may transition out of Execute
-                if (state.command?.type == CommandType.Execute && command.type == CommandType.Execute)
-                    command = ((Command)state.command).UpdateExecute(command);                
-                // If Follow/Execute -> Execute, copy over followDirective
-                // If Execute -> non-Execute, request follow
-                if (!command.followDirective.HasValue) {
-                    if (state.command?.followDirective.HasValue == true)
-                        command.followDirective = ((Command)state.command).followDirective;
-                    else if (command.type == CommandType.Follow)
-                        command = Command.Roam(); // follow request failed
-                }
-                return CreatureState.Command(command);
-            } else if (state.type == CreatureStateType.Faint && command.type == CommandType.Follow) {
-                relinquishedPriority = (int)CreatureStateType.Faint; // end faint
-                return CreatureState.Command(command);
-            } else if (command.type == CommandType.Roam) {
-                relinquishedPriority = (int)CreatureStateType.PassiveCommand; // to another command
-                return state.UpdatePassiveCommand(command);
-            } else if (command.type == CommandType.Follow) {
-                relinquishedPriority = (int)CreatureStateType.Focus; // clear focus
-                if (Team.SameTeam(input.knowledge.team, command.followDirective.Value))
-                    return CreatureState.Command(command);
-                else return "Creature on team " + input.knowledge.team +
-                    " not willing to follow " + command.followDirective.Value.gameObject.name;
+        } else if (input.executeDirective.HasValue) {
+            if (state.type == CreatureStateType.Execute)
+                return CreatureState.Execute(((ExecuteCommand)state.executeCommand).Update(input.executeDirective.Value));
+            else if (state.scanActivity?.command.followDirective is Optional<Transform> followDirective && followDirective.HasValue)
+                return CreatureState.Execute(ExecuteCommand.New(input.executeDirective.Value, followDirective.Value));
+            else throw new ArgumentException("Cannot Execute except from Execute or Follow");
+
+        } else return DecideScan(state, input);
+    }
+
+    public static OneOf<CreatureState, string> DecideScan(CreatureState state, Senses input) {
+        if (state.type == CreatureStateType.Faint && input.passiveCommand?.type == PassiveCommandType.Follow) {
+            return CreatureState.PassiveCommand((PassiveCommand)input.passiveCommand);
+        } else if (state.type == CreatureStateType.Scan) {
+            ScanActivity oldScan = (ScanActivity)state.scanActivity;
+            OneOf<ScanActivity, string> possibleNewScan = DraftScanUpdate(oldScan, input);
+            if (possibleNewScan.Is(out string error)) return error;
+            ScanActivity newScan = (ScanActivity)possibleNewScan;
+            if (oldScan.type == ScanActivityType.PassiveCommand || newScan.type == ScanActivityType.PassiveCommand) {
+                return CreatureState.ScanActivity(newScan);
             } else {
-                relinquishedPriority = (int)CreatureStateType.Focus; // clear focus
-                return CreatureState.Command(command);
+                WhyNot preferNewScan = WeighOptions(oldScan, newScan);
+                if (preferNewScan) return CreatureState.ScanActivity(newScan);
+                else return (string)preferNewScan;
             }
+        } else {
+            return "Cannot Scan from state " + state.type;
+        }
+    }
+            
+    public static WhyNot CanBecomeScanActivity(CreatureState state, Senses input) {
+        if (DecideScan(state, input).Is(out string reason)) return reason;
+        else return true;
+    }
 
+    public static OneOf<ScanActivity, string> DraftScanUpdate(ScanActivity state, Senses input) {
+        // Player commands
+        if (input.passiveCommand is PassiveCommand command) {
+            if (command.type == PassiveCommandType.Follow) return ScanActivity.ForCommand(command); // resets focuses
+            else return state.EndFollow(command);
+
+        // Creature commands
         } else if (input.message is CreatureMessage message) {
             switch (message.type) {
                 case CreatureMessage.Type.PairToSubject:
-                    return CreatureState.Pair(state, message.master);
+                    return state.Pair(message.master);
                 case CreatureMessage.Type.EndPairToSubject:
-                    if (!state.pairDirective.HasValue) return "Not paired already";
-                    if (state.pairDirective.Value != message.master)
-                        return "Paired to " + state.pairDirective.Value  + " not " + message.master;
-                    relinquishedPriority = (int)CreatureStateType.Pair; // end pair
-                    return CreatureState.Unpair(state);
+                    if (!state.characterFocus.HasValue) return "Not paired already";
+                    if (state.characterFocus.Value != message.master)
+                        return "Paired to " + state.characterFocus.Value  + " not " + message.master;
+                    return state.Unpair();
                 case CreatureMessage.Type.EndPairToMaster:
-                    if (state.type != CreatureStateType.Focus) { // we must have initiated
+                    if (state.type != ScanActivityType.Focus) // we must have initiated
                         return "Can't remove pair focus when no focus";
-                    } 
-                    return state.ClearFocus();
+                    return state.ClearAllFocus();
                 default:
                     return "No such CreatureMessage type";
             }
 
+        // Creature requests
         } else if (input.desireMessage is DesireMessage desireMessage) {
-            relinquishedPriority = (int)CreatureStateType.Rest; // to another investigation, or stop resting
             if (desireMessage.assailant.HasValue)
                 return DesireAttack(input.knowledge.config, input.knowledge.position, state, desireMessage.assailant.Value);
-            else if (desireMessage.obstacle is DesireMessage.Obstacle obstacle) {
+            else if (desireMessage.obstacle is DesireMessage.Obstacle obstacle)
                 return DesireClearObstacle(input.knowledge.config, state, obstacle);
-            } else throw new ArgumentException("DesireMessage must have contents");
+            else throw new ArgumentException("DesireMessage must have contents");
 
+        // Observations of surroundings
         } else if (input.environment is Senses.Environment environment) {
-            if (environment.characterFocus.IsAdd) {
-                CreatureState result = state.ClearFocus().WithCharacterFocus(environment.characterFocus.Value);
-                if (environment.focusIsPair.HasValue) result = result.WhereFocusIsPair(environment.focusIsPair.Value); // friend
-                else relinquishedPriority = (int)CreatureStateType.Rest; // stop resting to attack enemy
-                return result;
-            } else if (environment.characterFocus.IsRemove) {
-                if (!state.characterFocus.HasValue)
-                    return "Trying to remove characterFocus when none present";
-                relinquishedPriority = (int)CreatureStateType.Focus; // end focus
-                return state.ClearFocus();
-            } else if (environment.removeInvestigation) {
-                if (state.investigation == null)
-                    return "Trying to remove investigation when none present";
-                relinquishedPriority = (int)CreatureStateType.Investigate; // end investigate
-                return state.ClearFocus();
-            } else if (environment.shelter.IsAdd) {
-                return state.ClearFocus().WithShelter(environment.shelter.Value);
-            } else if (environment.shelter.IsRemove) {
-                if (state.shelter == null)
-                    return "Trying to remove shelter when none present";
-                relinquishedPriority = (int)CreatureStateType.Rest; // end rest
-                return state.ClearFocus();
-            } else return "environment present, but no change";
+            ScanActivity? characterFocusActivity = null;
+            ScanActivity? shelterActivity = null;
+            if (environment.characterFocus.HasValue) {
+                characterFocusActivity = state.ClearAllFocus().WithCharacterFocus(environment.characterFocus.Value);
+                if (environment.focusIsPair.HasValue) characterFocusActivity =
+                    ((ScanActivity)characterFocusActivity).WithFollowerToLead(environment.focusIsPair.Value); // friend
+            }
+            if (environment.shelter.HasValue) {
+                shelterActivity = state.ClearAllFocus().WithShelter(environment.shelter.Value);
+            }
+            if (characterFocusActivity is ScanActivity characterFocus) {
+                if (shelterActivity is ScanActivity shelter)
+                    return (bool)WeighOptions(characterFocus, shelter) ? shelter : characterFocus;
+                else return characterFocus;
+            } else {
+                if (shelterActivity is ScanActivity shelter) return shelter;
+                else return "environment present, but no change";
+            }
         } else return "No change";
     }
 
-    public static OneOf<CreatureState, string> DesireClearObstacle(BrainConfig config, CreatureState state, DesireMessage.Obstacle obstacle) {
+    // Returns true if second is better
+    public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct) {
+        if ((int)newAct.type > (int)oldAct.type) return true;
+        return "Prefer " + oldAct + " to " + newAct + " by " + ((int)oldAct.type - (int)newAct.type);
+    }
+
+    public static OneOf<ScanActivity, string> DesireClearObstacle(BrainConfig config, ScanActivity state, DesireMessage.Obstacle obstacle) {
         if (obstacle.wallObstacle is Construction wall) {
-            if (config.canClearConstruction.includes(wall)) return state.ClearFocus().WithTerrainFocus(obstacle);
+            if (config.canClearConstruction.includes(wall)) return state.ClearAllFocus().WithTerrainFocus(obstacle);
             else return "Cannot clear wall of " + wall;
         } else if (obstacle.featureObstacle != null) {
             if (!config.canClearFeatures) return "Cannot clear obstacles";
             else if (FeatureLibrary.C.fountain.IsTypeOf(obstacle.featureObstacle)) return "Cannot clear fountains";
-            else return state.ClearFocus().WithTerrainFocus(obstacle);
+            else return state.ClearAllFocus().WithTerrainFocus(obstacle);
         } else if (obstacle.landObstacle is Land land) {
-            if (config.canClearObstacles.includes(land)) return state.ClearFocus().WithTerrainFocus(obstacle);
+            if (config.canClearObstacles.includes(land)) return state.ClearAllFocus().WithTerrainFocus(obstacle);
             else return "Cannot clear land " + land;
         } else throw new ArgumentException("Obstacle message must include expected obstacle");
     }
@@ -162,14 +147,14 @@ public class Will {
         else return config.canClearObstacles.includes(Terrain.I.Land[location.Coord]);
     }
 
-    public static OneOf<CreatureState, string> DesireAttack(BrainConfig config, Vector3 creaturePosition, CreatureState state, Transform target) {
+    public static OneOf<ScanActivity, string> DesireAttack(BrainConfig config, Vector3 creaturePosition, ScanActivity state, Transform target) {
         if (!config.hasAttack) return "No attack for desire";
         bool canSee = CanSee(creaturePosition, target).NegLog("Desire: investigating attack");
-        if (canSee) return state.ClearFocus().WithCharacterFocus(target);
-        else if (state.type != CreatureStateType.Investigate ||
+        if (canSee) return state.ClearAllFocus().WithCharacterFocus(target);
+        else if (state.type != ScanActivityType.Investigate ||
                 Disp.FT(creaturePosition, target.position).sqrMagnitude <
                 Disp.FT(creaturePosition, (Vector2)state.investigation).sqrMagnitude)
-            return state.ClearFocus().WithInvestigation(target.position);
+            return state.ClearAllFocus().WithInvestigation(target.position);
         else return "Investigating something more important";
     }
 

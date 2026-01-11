@@ -44,7 +44,7 @@ public class MooseBrain : Brain {
     }
 
     private List<Vector3> GetDestinationsForDisplay() => 
-        (state.command?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;
+        (state.executeCommand?.executeDirective as PathTracingBehavior)?.DestinationsForDisplay;
 
     private bool IsDestroyable(Terrain.Position location) =>
         Will.CanClearObstacleAt(general, location);

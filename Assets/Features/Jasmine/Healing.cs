@@ -39,7 +39,7 @@ public class Healing : MonoBehaviour {
         float resultPriority = 1;
         foreach (Collider2D character in charactersNearby) {
             // Creature.CanPair checks the right level of AI availability to override for healing
-            if (SameTeam(character.transform) && character.GetComponentStrict<Creature>().CanPair()) {
+            if (SameTeam(character.transform) && character.GetComponentStrict<Creature>().CanPair(transform)) {
                 float priority = HealPriority(character);
                 if (priority < resultPriority) {
                     result = character.GetComponentStrict<Creature>();
@@ -70,7 +70,7 @@ public class Healing : MonoBehaviour {
                 if ((bool)CanHeal(character.transform, healDistance)) ForceHeal(character.transform, healQuantity);
                 Creature creature = character.GetComponent<Creature>();
                 if (creature != null && !healAutoCreatures.Contains(creature) &&
-                        HealPriority(character) < 1 && creature.CanPair()) {
+                        HealPriority(character) < 1 && creature.CanPair(transform)) {
                     creature.TryPair(transform);
                     healAutoCreatures.Add(creature);
                 }

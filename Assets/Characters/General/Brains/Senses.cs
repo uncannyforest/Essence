@@ -2,48 +2,55 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CommandType {
+public enum PassiveCommandType {
     Roam,
     Follow,
     Station,
-    Execute,
 }
 
-public struct Command {
-    private static Command OfType(CommandType type) {
-        Command command = new Command();
+public struct ExecuteCommand {
+    public BehaviorNode executeDirective { get; private set; }
+    public Transform followDirective { get; private set; }
+
+    public static ExecuteCommand New(BehaviorNode executeDirective, Transform followDirective) {
+        ExecuteCommand command = new ExecuteCommand();
+        command.executeDirective = executeDirective;
+        command.followDirective = followDirective;
+        return command;
+    }
+    public ExecuteCommand Update(BehaviorNode executeDirective) {
+        ExecuteCommand command = this;
+        command.executeDirective = command.executeDirective.UpdateWithNewBehavior(executeDirective);
+        return command;
+    }
+    public PassiveCommand ToFollow() => PassiveCommand.Follow(followDirective);
+
+    public override string ToString() => "follow " + followDirective.gameObject.name + " execute " + executeDirective;
+}
+
+public struct PassiveCommand {
+    private static PassiveCommand OfType(PassiveCommandType type) {
+        PassiveCommand command = new PassiveCommand();
         command.type = type;
         return command;
     }
 
-    public CommandType type { get; private set; }
+    public PassiveCommandType type { get; private set; }
     public Optional<Transform> followDirective;
     public Vector3? stationDirective { get; private set; }
-    public BehaviorNode executeDirective { get; private set; }
 
-    public static Command Roam() => Command.OfType(CommandType.Roam);
-    public static Command Follow(Transform followDirective) {
-        Command command = Command.OfType(CommandType.Follow);
+    public static PassiveCommand Roam() => PassiveCommand.OfType(PassiveCommandType.Roam);
+    public static PassiveCommand Follow(Transform followDirective) {
+        PassiveCommand command = PassiveCommand.OfType(PassiveCommandType.Follow);
         command.followDirective = Optional.Of(followDirective);
         return command;
     }
-    public static Command RequestFollow() {
-        return Command.OfType(CommandType.Follow);
+    public static PassiveCommand RequestFollow() {
+        return PassiveCommand.OfType(PassiveCommandType.Follow);
     }
-    public static Command Station(Vector3 stationDirective) {
-        Command command = Command.OfType(CommandType.Station);
+    public static PassiveCommand Station(Vector3 stationDirective) {
+        PassiveCommand command = PassiveCommand.OfType(PassiveCommandType.Station);
         command.stationDirective = stationDirective;
-        return command;
-    }
-    public static Command Execute(BehaviorNode executeDirective) {
-        Command command = Command.OfType(CommandType.Execute);
-        command.executeDirective = executeDirective;
-        return command;
-    }
-    public Command UpdateExecute(Command executeCommand) {
-        if (executeCommand.type != CommandType.Execute) throw new ArgumentException("Not execute command");
-        Command command = executeCommand;
-        command.executeDirective = this.executeDirective.UpdateWithNewBehavior(executeCommand.executeDirective);
         return command;
     }
 
@@ -51,7 +58,6 @@ public struct Command {
         string result = type.ToString();
         if (followDirective.HasValue) result += " | follow: " + followDirective.Value.gameObject.name;
         if (stationDirective is Vector3 directive) result += " | station: " + directive;
-        if (executeDirective != null) result += " | execute: " + executeDirective;
         return result;
     }
 }
@@ -118,7 +124,9 @@ public struct Senses {
 
     public bool faint;
 
-    public Command? command;
+    public Optional<BehaviorNode> executeDirective;
+
+    public PassiveCommand? passiveCommand;
 
     public CreatureMessage? message;
 
@@ -126,18 +134,15 @@ public struct Senses {
 
     public Environment? environment;
     public struct Environment {
-        public Delta<Transform> characterFocus;
+        public Optional<Transform> characterFocus;
         public Optional<Creature> focusIsPair;
-        public bool removeInvestigation;
-        public Delta<Vector2Int> shelter;
+        public Optional<Vector2Int> shelter;
 
         override  public string ToString(){
             string result = "";
-            if (characterFocus.IsAdd) result += " add character focus: " + characterFocus.Value.gameObject.name;
-            if (characterFocus.IsRemove) result += " remove character focus";
-            if (removeInvestigation) result += " remove investigation";
-            if (shelter.IsAdd) result += " add shelter: " + shelter.Value;
-            if (shelter.IsRemove) result += " remove shelter";
+            if (characterFocus.HasValue) result += " character focus: " + characterFocus.Value.gameObject.name;
+            if (focusIsPair.HasValue) result += " focus is follower to lead: " + focusIsPair.Value.gameObject.name;
+            if (shelter.HasValue) result += " shelter: " + shelter.Value;
             return result.Substring(1);
         }
     }
@@ -167,7 +172,8 @@ public struct Senses {
         if (controlOverride.IsAdd) result += " add control override: " + controlOverride.Value;
         if (controlOverride.IsRemove) result += " remove control override";
         if (faint) result += " faint";
-        if (command is Command actualCommand) result += " command: " + actualCommand;
+        if (executeDirective.HasValue) result += " execute directive: " + executeDirective.Value;
+        if (passiveCommand is PassiveCommand actualCommand) result += " passive command: " + actualCommand;
         if (message is CreatureMessage actualMessage) result += " creature message: " + actualMessage;
         if (desireMessage is DesireMessage actualDesireMessage) result += " desire message: " + actualDesireMessage;
         if (environment is Environment actualEnvironment) result += " environment: " + actualEnvironment;

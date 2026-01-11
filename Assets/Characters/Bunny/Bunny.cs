@@ -38,8 +38,8 @@ public class BunnyBrain : Brain {
     }
     
     override public IEnumerator<YieldInstruction> FocusedBehavior() =>
-        pathfinding.Approach(state.characterFocus.Value, healing.healDistance).Then(() => {
-                state.characterFocus.Value.GetComponentStrict<Health>().Increase(creature.stats.Str);
+        pathfinding.Approach(state.scanActivity?.characterFocus.Value, healing.healDistance).Then(() => {
+                state.scanActivity?.characterFocus.Value.GetComponentStrict<Health>().Increase(creature.stats.Str);
                 resource.Use();
                 creature.GenericExeSucceeded();
                 return new WaitForSeconds(creature.stats.ExeTime);

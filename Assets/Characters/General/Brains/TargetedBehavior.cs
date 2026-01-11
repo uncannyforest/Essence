@@ -88,7 +88,7 @@ public class CharacterTargetedBehavior : TargetedBehavior<Transform>, FlexSource
 
     public WhyNot IsValidFocus(Transform characterFocus) => silentFilter(characterFocus) && errorFilter(characterFocus);
 
-    public IEnumerator<YieldInstruction> FocusedBehavior() => enumeratorWithParam(brain.state.characterFocus.Value);
+    public IEnumerator<YieldInstruction> FocusedBehavior() => enumeratorWithParam(brain.state.scanActivity?.characterFocus.Value);
 
     public Lark Lark(Func<bool> precondition, Radius radius) => global::Lark.None();
 }
@@ -141,8 +141,9 @@ public class FlexTargetedBehavior : FlexSourceBehavior {
     public static IEnumerator<YieldInstruction> MuxFocus(CreatureState state,
             Func<Transform, IEnumerator<YieldInstruction>> characterBehavior,
             Func<Terrain.Position, IEnumerator<YieldInstruction>> terrainBehavior) {
-        if (state.characterFocus.IsValue(out Transform character)) return characterBehavior(character);
-        if (state.terrainFocus is DesireMessage.Obstacle obstacle) return terrainBehavior(obstacle.location);
+        ScanActivity scanActivity = (ScanActivity)state.scanActivity;
+        if (scanActivity.characterFocus.IsValue(out Transform character)) return characterBehavior(character);
+        if (scanActivity.terrainFocus is DesireMessage.Obstacle obstacle) return terrainBehavior(obstacle.location);
         throw new InvalidOperationException("Tried to build focused behavior without a focus");
     }
 }

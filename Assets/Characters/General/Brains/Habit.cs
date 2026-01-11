@@ -3,28 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CreatureStateType {
-    Override = 1000,
-    Faint = 800,
-    Execute = 600,
-    Focus = 410,
-    Pair = 370,
-    Rest = 330,
-    Investigate = 290,
-    PassiveCommand = 100,
-}
-public static class CreatureStateTypeExtensions {
-    public static bool IsScanning(this CreatureStateType type) {
-        return (int)type < 300;
-    }
-    public static bool CanTransition(this CreatureStateType from, int priority) {
-        return priority >= (int)from;
-    }
-    public static bool CanTransitionTo(this CreatureStateType from, CreatureStateType type) {
-        return from.CanTransition((int)type - 100);
-    }
-}
-
 public struct Habit {
 
     // class properties and methods
@@ -46,19 +24,12 @@ public struct Habit {
 
     // static methods
 
-    public static bool CanTransitionTo(CreatureStateType from, CreatureStateType type) => from.CanTransitionTo(type);
-    public static bool CanTransition(CreatureStateType from, int priority) => from.CanTransition(priority);
-    public static bool ForcedTransitionAllowed(CreatureState oldState, CreatureState newState, int? priority = null) {
-        if (priority is int actualPriority) return oldState.CanTransition(actualPriority);
-        else return oldState.CanTransitionTo(newState.type);
-    }
-
-    public static Habit Get(CreatureState state, Brain brain) => new Habit(Nodes[state.type], state, brain);
+    public static Habit Get(CreatureState state, Brain brain) => new Habit(Nodes[state.detailedType], state, brain);
 
     // Node class
 
     public class Node {
-        public CreatureStateType type;
+        public CreatureStateDetailedType type;
         public Action<CreatureState, Brain> onEnter = (s, b) => {}; // run on transition from another CreatureStateType
         public Action<CreatureState, CreatureState, Brain> onExit = (s, n, b) => {}; // run on transition to another CreatureStateType
         public Func<CreatureState, Brain, bool> onUpdate = (s, b) => false; // run on transition to same type, return false if illegal
@@ -66,7 +37,7 @@ public struct Habit {
         public Func<CreatureState, Brain, BehaviorNode> onRun; // retrieved on the second frame of RunBehavior()
         public Func<CreatureState, Brain, YieldInstruction> onRunStep; // single step alternative to onRun
 
-        public Node (CreatureStateType type) => this.type = type;
+        public Node (CreatureStateDetailedType type) => this.type = type;
 
         public Node ExitAndEnterOnUpdate() {
             onUpdate = (state, brain) => {
@@ -109,11 +80,11 @@ public struct Habit {
     }
 
     public class PassiveCommandNode {
-        public CommandType type;
+        public PassiveCommandType type;
         public Func<CreatureState, Brain, IEnumerator<YieldInstruction>> passiveCommandRun;
         public Optional<Func<CreatureState, Vector2>> nearbyTracking;
 
-        public PassiveCommandNode(CommandType type) => this.type = type;
+        public PassiveCommandNode(PassiveCommandType type) => this.type = type;
 
         public BehaviorNode MaybeRestrictNearby(CreatureState state, Brain brain, Func<IEnumerator<YieldInstruction>> behavior) {
             if (nearbyTracking.HasValue)
@@ -126,12 +97,12 @@ public struct Habit {
 
     // all state specs
 
-    private static Dictionary<CreatureStateType, Node> Nodes = new Dictionary<CreatureStateType, Node>() {
-        [CreatureStateType.Override] = new Node(CreatureStateType.Override) {
+    private static Dictionary<CreatureStateDetailedType, Node> Nodes = new Dictionary<CreatureStateDetailedType, Node>() {
+        [CreatureStateDetailedType.Override] = new Node(CreatureStateDetailedType.Override) {
             onRunCheck = (state, _) => state.ControlOverride != null,
         },
 
-        [CreatureStateType.Faint] = new Node(CreatureStateType.Faint) {
+        [CreatureStateDetailedType.Faint] = new Node(CreatureStateDetailedType.Faint) {
             onEnter = (_, brain) => {
                 brain.movement.Idle();
                 brain.movement.SetFainted(true);
@@ -139,89 +110,89 @@ public struct Habit {
             onExit = (_, __, brain) => brain.movement.SetFainted(false)
         },
 
-        [CreatureStateType.Execute] = new Node(CreatureStateType.Execute) {
+        [CreatureStateDetailedType.Execute] = new Node(CreatureStateDetailedType.Execute) {
             onUpdate = (_, __) => true,
-            onRun = (state, _) => state.command?.executeDirective
+            onRun = (state, _) => state.executeCommand?.executeDirective
         },
 
-        [CreatureStateType.Focus] = new Node(CreatureStateType.Focus) {
+        [CreatureStateDetailedType.Focus] = new Node(CreatureStateDetailedType.Focus) {
             onExit = (state, _, brain) => {
-                if (state.focusIsPair.HasValue) {
-                    state.focusIsPair.Value?.EndPairCommand(brain.transform);
+                if (state.scanActivity?.followerToLead.HasValue == true) {
+                    state.scanActivity?.followerToLead.Value?.EndPairCommand(brain.transform);
                 }
             },
             // TODO: once Focus & Execute have been standardized to use the same BehaviorNodes, simplify by removing this:
             // all BehaviorNodes in an executeDirective will already run this step in onRun.
             onRunCheck = (state, brain) => {
-                if (state.characterFocus.HasValue)
-                    return !state.characterFocus.IsDestroyed &&
-                        brain.IsValidFocus(state.characterFocus.Value)
-                            .NegLog(brain.legalName + " onRunCheck: focus " + state.characterFocus.Value + " no longer valid");
-                if (state.terrainFocus.HasValue)
-                    return state.terrainFocus.Value.IsStillPresent;
+                if (state.scanActivity?.characterFocus.HasValue == true)
+                    return state.scanActivity?.characterFocus.IsDestroyed == false &&
+                        brain.IsValidFocus(state.scanActivity?.characterFocus.Value)
+                            .NegLog(brain.legalName + " onRunCheck: focus " + state.scanActivity?.characterFocus.Value + " no longer valid");
+                if (state.scanActivity?.terrainFocus.HasValue == true)
+                    return state.scanActivity?.terrainFocus.Value.IsStillPresent ?? false;
                 else {
                     Debug.LogError("Neither characterFocus nor terrainFocus: " + state);
                     return false;
                 }
             },
-            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain, brain.FocusedBehavior),
+            onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].MaybeRestrictNearby(state, brain, brain.FocusedBehavior),
         },
 
-        [CreatureStateType.Pair] = new Node(CreatureStateType.Pair) {
+        [CreatureStateDetailedType.FollowPair] = new Node(CreatureStateDetailedType.FollowPair) {
             onExit = (state, _, __) => {
-                Creature master = state.pairDirective.Value.GetComponent<Creature>();
+                Creature master = state.scanActivity?.characterFocus.Value.GetComponent<Creature>();
                 if (master != null) master.EndPairRequest();
             },
-            onRunCheck = (state, _) => !state.pairDirective.IsDestroyed,
-            onRunStep = (state, brain) => brain.pathfinding.ApproachThenIdle(state.pairDirective.Value.transform.position, brain.movement.personalBubble)
+            onRunCheck = (state, _) => state.scanActivity?.characterFocus.IsDestroyed == false,
+            onRunStep = (state, brain) => brain.pathfinding.ApproachThenIdle((Vector3)state.scanActivity?.characterFocus.Value.transform.position, brain.movement.personalBubble)
         },
 
-        [CreatureStateType.Rest] = new Node(CreatureStateType.Rest) {
+        [CreatureStateDetailedType.Rest] = new Node(CreatureStateDetailedType.Rest) {
             onExit = (_, newState, brain) => {
-                if (newState.type != CreatureStateType.PassiveCommand || newState.command?.type == CommandType.Follow) 
+                if (newState.detailedType != CreatureStateDetailedType.PassiveCommand || newState.scanActivity?.command.type == PassiveCommandType.Follow) 
                     brain.Habitat?.ClearRecentlyVisited();
             },
-            onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.shelter),
-            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
-                () => brain.Habitat.ApproachAndRestBehavior((Vector2Int)state.shelter)),
+            onRunCheck = (state, brain) => brain.Habitat.IsShelter((Vector2Int)state.scanActivity?.shelter),
+            onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].MaybeRestrictNearby(state, brain,
+                () => brain.Habitat.ApproachAndRestBehavior((Vector2Int)state.scanActivity?.shelter)),
         },
 
-        [CreatureStateType.Investigate] = new Node(CreatureStateType.Investigate) {
+        [CreatureStateDetailedType.Investigate] = new Node(CreatureStateDetailedType.Investigate) {
             onEnter = (_, brain) => brain.investigationCancel =
-                RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.RemoveInvestigation),
+                RunOnce.Run(brain.species, Creature.neighborhood * brain.movement.Speed, brain.EndState),
             onExit = (_, __, brain) => brain.investigationCancel.Stop(),
-            onRunCheck = (state, brain) => ((Vector3)state.investigation - brain.transform.position).magnitude >
+            onRunCheck = (state, brain) => ((Vector3)state.scanActivity?.investigation - brain.transform.position).magnitude >
                                             brain.creature.stats.ExeTime * brain.movement.Speed,
-            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].MaybeRestrictNearby(state, brain,
+            onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].MaybeRestrictNearby(state, brain,
                 BehaviorNode.SingleLine(() => {
-                    brain.pathfinding.MoveTowardWithoutClearingObstacles((Vector3)state.investigation);
+                    brain.pathfinding.MoveTowardWithoutClearingObstacles((Vector3)state.scanActivity?.investigation);
                     return new WaitForSeconds(brain.creature.stats.ExeTime);
                 })),
         }.ExitAndEnterOnUpdate(),
 
-        [CreatureStateType.PassiveCommand] = new Node(CreatureStateType.PassiveCommand) {
+        [CreatureStateDetailedType.PassiveCommand] = new Node(CreatureStateDetailedType.PassiveCommand) {
             onExit = (_, newState, brain) => {
-                if (newState.type != CreatureStateType.Rest) 
+                if (newState.detailedType != CreatureStateDetailedType.Rest) 
                     brain.Habitat?.ClearRecentlyVisited();
             },
             onUpdate = (_, __) => true,
-            onRun = (state, brain) => PassiveCommandNodes[(CommandType)state.command?.type].Run(state, brain)
+            onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].Run(state, brain)
         },
     };
 
-    private static Dictionary<CommandType, PassiveCommandNode> PassiveCommandNodes = new Dictionary<CommandType, PassiveCommandNode>() {
-        [CommandType.Roam] = new PassiveCommandNode(CommandType.Roam) {
+    private static Dictionary<PassiveCommandType, PassiveCommandNode> PassiveCommandNodes = new Dictionary<PassiveCommandType, PassiveCommandNode>() {
+        [PassiveCommandType.Roam] = new PassiveCommandNode(PassiveCommandType.Roam) {
             nearbyTracking = Optional<Func<CreatureState, Vector2>>.Empty(),
             passiveCommandRun = (state, brain) => brain.pathfinding.Roam()
         },
-        [CommandType.Follow] = new PassiveCommandNode(CommandType.Follow) {
-            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.followDirective.Value.position),
-            passiveCommandRun = (state, brain) => Enumerators.Continually(() => brain.pathfinding.Follow(state.command?.followDirective.Value))
+        [PassiveCommandType.Follow] = new PassiveCommandNode(PassiveCommandType.Follow) {
+            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.scanActivity?.command.followDirective.Value.position),
+            passiveCommandRun = (state, brain) => Enumerators.Continually(() => brain.pathfinding.Follow(state.scanActivity?.command.followDirective.Value))
         },
-        [CommandType.Station] = new PassiveCommandNode(CommandType.Station) {
-            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.command?.stationDirective),
+        [PassiveCommandType.Station] = new PassiveCommandNode(PassiveCommandType.Station) {
+            nearbyTracking = Optional<Func<CreatureState, Vector2>>.Of((state) => (Vector2)state.scanActivity?.command.stationDirective),
             passiveCommandRun = (state, brain) => Enumerators.Continually(() => brain.pathfinding
-                .ApproachThenIdle((Vector3)state.command?.stationDirective))
+                .ApproachThenIdle((Vector3)state.scanActivity?.command.stationDirective))
         },
     };
 }
