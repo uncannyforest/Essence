@@ -16,16 +16,15 @@ Shader "Dither/Stenciled"
         }
         LOD 100
 
-        Offset -1, -1
-        ZTest LEqual
-        ZWrite On
-        Cull Off
+        // Offset -1, -1
+        // ZTest LEqual
+        // ZWrite On
+        // Cull Off
         Stencil
         {
             Ref 1
-            CompFront NotEqual
-            CompBack Never
-            //ZFail zero
+            Comp NotEqual
+            ZFail zero
         }
 
         CGPROGRAM

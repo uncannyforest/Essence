@@ -12,16 +12,15 @@ Shader "Dither/Stencil"
 
         Tags { "Queue" = "Geometry" }
 
-        Offset -1, -1
-        ZTest LEqual
-        ZWrite On
-        //ColorMask 0
-        Cull off
+        // Offset -1, -1
+        // ZTest LEqual
+        // ZWrite On
+        ColorMask 0
+        // Cull off
         Stencil
         {
             Ref 1
-            CompFront Always
-            CompBack Never
+            Comp Always
             Pass replace
         }
 
