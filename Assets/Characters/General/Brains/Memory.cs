@@ -97,7 +97,7 @@ public struct CreatureState {
     }
 }
 
-public struct ScanActivity {
+public struct ScanActivity : Positioned {
     public static ScanActivity ForCommand(PassiveCommand command) {
         ScanActivity result = new ScanActivity();
         result.command = command;
@@ -113,6 +113,12 @@ public struct ScanActivity {
     public DesireMessage.Obstacle? terrainFocus;
     public Vector3? investigation;
     public Vector2Int? shelter;
+
+    public Vector3 GetPosition()
+        => type == ScanActivityType.Focus || type == ScanActivityType.FollowPair ? characterFocus.Value.position
+        : type == ScanActivityType.Investigate ? (Vector3)investigation
+        : type == ScanActivityType.Rest ? (Vector3)Terrain.I.CellCenter((Vector2Int)shelter)
+        : throw new Exception("Can't get position when in state PassiveComand");
 
     public ScanActivity EndFollow(PassiveCommand command) {
         ScanActivity state = this;

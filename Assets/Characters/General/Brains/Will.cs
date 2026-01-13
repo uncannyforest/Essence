@@ -47,7 +47,7 @@ public class Will {
             if (oldScan.type == ScanActivityType.PassiveCommand || newScan.type == ScanActivityType.PassiveCommand) {
                 return CreatureState.ScanActivity(newScan);
             } else {
-                WhyNot preferNewScan = WeighOptions(oldScan, newScan);
+                WhyNot preferNewScan = WeighOptions(oldScan, newScan, input.knowledge.position);
                 if (preferNewScan) return CreatureState.ScanActivity(newScan);
                 else return (string)preferNewScan;
             }
@@ -107,7 +107,7 @@ public class Will {
             }
             if (characterFocusActivity is ScanActivity characterFocus) {
                 if (shelterActivity is ScanActivity shelter)
-                    return (bool)WeighOptions(characterFocus, shelter) ? shelter : characterFocus;
+                    return (bool)WeighOptions(characterFocus, shelter, input.knowledge.position) ? shelter : characterFocus;
                 else return characterFocus;
             } else {
                 if (shelterActivity is ScanActivity shelter) return shelter;
@@ -117,9 +117,15 @@ public class Will {
     }
 
     // Returns true if second is better
-    public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct) {
-        if ((int)newAct.type > (int)oldAct.type) return true;
-        return "Prefer " + oldAct + " to " + newAct + " by " + ((int)oldAct.type - (int)newAct.type);
+    public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct, Vector3 position) {
+        if (Disp.FT(position, newAct.GetPosition()).sqrMagnitude < Disp.FT(position, oldAct.GetPosition()).sqrMagnitude) {
+            Debug.DrawLine(position, oldAct.GetPosition(), Color.red, 1);
+            Debug.DrawLine(position, newAct.GetPosition(), Color.yellow, 1);
+            return true;
+        }
+        Debug.DrawLine(position, oldAct.GetPosition(), Color.magenta, 1);
+        Debug.DrawLine(position, newAct.GetPosition(), Color.blue, 1);
+        return "Prefer " + oldAct + " to " + newAct + " because it's closer";
     }
 
     public static OneOf<ScanActivity, string> DesireClearObstacle(BrainConfig config, ScanActivity state, DesireMessage.Obstacle obstacle) {

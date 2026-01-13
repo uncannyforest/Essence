@@ -12,7 +12,7 @@ using UnityEngine;
 // See TargetedBehavior.cs which uses Target to flexibly handle player-assigned targets and creature-found focuses the same.
 //
 // *DesireMessage.Obstacle has built-in checks for whether the intended terraforming is no longer possible.
-public class Target : OneOf<Terrain.Position, Character> {
+public class Target : OneOf<Terrain.Position, Character>, Positioned {
     private Target() : base() {}
     public Target(Terrain.Position t) : base(t) {}
     public Target(Character u) : base(u) {}
@@ -27,6 +27,7 @@ public class Target : OneOf<Terrain.Position, Character> {
             else throw new InvalidOperationException("Neither");
         }
     }
+    public Vector3 GetPosition() => Position;
 
     public WhyNot IfCharacter(Func<Character, WhyNot> check) {
         if (Is(out Character c)) return check(c);
