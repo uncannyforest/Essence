@@ -60,6 +60,7 @@ public class Healing : MonoBehaviour {
                 Physics2D.OverlapCircleAll(transform.position, Creature.neighborhood, LayerMask.GetMask("Player", "HealthCreature"));
             for (int i = healAutoCreatures.Count - 1; i >= 0; i--) {
                 Creature creature = healAutoCreatures[i];
+                if (creature == null) continue; // It was destroyed.  But we want code in this order to pause between each healing step
                 if (creature.GetComponentStrict<Health>().IsFull() ||
                         Vector2.Distance(transform.position, creature.transform.position) > Creature.neighborhood) {
                     if (creature.EndPairCommand(transform))

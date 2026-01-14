@@ -579,7 +579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2d80748a7946e59f7612669dc557c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  possibilityRate: 0.00390625
+  possibilityRate: 0.0625
   terrain: {fileID: 0}
   parent: {fileID: 8377938587873387449}
   player: {fileID: 0}

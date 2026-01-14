@@ -52,13 +52,13 @@ public class Fauna : MonoBehaviour {
     }
 
     private Creature IdentifyCreature() {
-        int justARandomNumberForNow = Random.Range(0, 2);
+        int justARandomNumberForNow = Random.Range(0, 3);
         switch (justARandomNumberForNow) {
             case 0: return CreatureLibrary.P.farmer;
+            case 1: return CreatureLibrary.P.moose;
             // case 0: return CreatureLibrary.P.bunny;
             // case 1: return CreatureLibrary.P.arrowwiggle;
             // case 2: return CreatureLibrary.P.archer;
-            // case 3: return CreatureLibrary.P.moose;
             // case 4: return CreatureLibrary.P.axe;
             // case 5: return CreatureLibrary.P.stipule;
             default: return CreatureLibrary.P.redDwarf;

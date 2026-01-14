@@ -114,7 +114,10 @@ public struct Senses {
     }
 
     public bool TryUpdateCreature(Creature creature, int logLevel = 0) {
-        if (creature.brain == null) throw new InvalidOperationException(creature + " has no brain");
+        if (creature.brain == null) {
+            Debug.Log("Tried to update " + creature + " before it was initialized, this happens with broadcasting desire messages on occasion");
+            return false;
+        }
         return ForCreature(creature).TryUpdateState(creature.brain, logLevel);
     }
 

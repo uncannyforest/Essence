@@ -173,14 +173,14 @@ public class Brain {
             stateIsDirty = false;
             Habit oldHabit = Habit.Get(oldState, this);
             newHabit = Habit.Get(state, this);
-            if (oldState.type != state.type) {
+            if (oldState.detailedType != state.detailedType) {
                 oldHabit.OnExit(state);
                 newHabit.OnEnter();
             } else {
                 newHabit.OnUpdate();
             }
         }
-        if (originalState.type == state.type && !newHabit.OnUpdate()) {
+        if (originalState.detailedType == state.detailedType && !newHabit.OnUpdate()) {
             Debug.LogError("Should not transition from state " + state.type + " to same state: " + state);
         }
         RunningBehaviorTask?.Stop();
@@ -247,6 +247,9 @@ public class Brain {
     // SANITY CHECKS
 
     public void Update() {
+        if (state.scanActivity?.HasValidPosition == true) {
+            Debug.DrawLine(transform.position, ((ScanActivity)state.scanActivity).GetPosition(), Color.white);
+        }
         if (stateIsDirty) OnStateChange();
     }
 }

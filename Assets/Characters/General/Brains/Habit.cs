@@ -32,7 +32,7 @@ public struct Habit {
         public CreatureStateDetailedType type;
         public Action<CreatureState, Brain> onEnter = (s, b) => {}; // run on transition from another CreatureStateType
         public Action<CreatureState, CreatureState, Brain> onExit = (s, n, b) => {}; // run on transition to another CreatureStateType
-        public Func<CreatureState, Brain, bool> onUpdate = (s, b) => false; // run on transition to same type, return false if illegal
+        public Func<CreatureState, Brain, bool> onUpdate = (s, b) => true; // run on transition to same type, return false if illegal
         public Func<CreatureState, Brain, bool> onRunCheck = (s, b) => true; // while condition for run behavior
         public Func<CreatureState, Brain, BehaviorNode> onRun; // retrieved on the second frame of RunBehavior()
         public Func<CreatureState, Brain, YieldInstruction> onRunStep; // single step alternative to onRun
@@ -99,10 +99,12 @@ public struct Habit {
 
     private static Dictionary<CreatureStateDetailedType, Node> Nodes = new Dictionary<CreatureStateDetailedType, Node>() {
         [CreatureStateDetailedType.Override] = new Node(CreatureStateDetailedType.Override) {
+            onUpdate = (_, __) => false,
             onRunCheck = (state, _) => state.ControlOverride != null,
         },
 
         [CreatureStateDetailedType.Faint] = new Node(CreatureStateDetailedType.Faint) {
+            onUpdate = (_, __) => false,
             onEnter = (_, brain) => {
                 brain.movement.Idle();
                 brain.movement.SetFainted(true);
@@ -111,13 +113,12 @@ public struct Habit {
         },
 
         [CreatureStateDetailedType.Execute] = new Node(CreatureStateDetailedType.Execute) {
-            onUpdate = (_, __) => true,
             onRun = (state, _) => state.executeCommand?.executeDirective
         },
 
         [CreatureStateDetailedType.Focus] = new Node(CreatureStateDetailedType.Focus) {
             onExit = (state, _, brain) => {
-                if (state.scanActivity?.followerToLead.HasValue == true) {
+                if (state.scanActivity?.followerToLead.HasValidValue == true) {
                     state.scanActivity?.followerToLead.Value?.EndPairCommand(brain.transform);
                 }
             },
@@ -136,16 +137,18 @@ public struct Habit {
                 }
             },
             onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].MaybeRestrictNearby(state, brain, brain.FocusedBehavior),
-        },
+        }.ExitAndEnterOnUpdate(),
 
         [CreatureStateDetailedType.FollowPair] = new Node(CreatureStateDetailedType.FollowPair) {
             onExit = (state, _, __) => {
-                Creature master = state.scanActivity?.characterFocus.Value.GetComponent<Creature>();
+                Transform masterTransform = state.scanActivity?.characterFocus.Value;
+                if (masterTransform == null) return; // destroyed
+                Creature master = masterTransform.GetComponent<Creature>(); // null if Jasmine
                 if (master != null) master.EndPairRequest();
             },
             onRunCheck = (state, _) => state.scanActivity?.characterFocus.IsDestroyed == false,
             onRunStep = (state, brain) => brain.pathfinding.ApproachThenIdle((Vector3)state.scanActivity?.characterFocus.Value.transform.position, brain.movement.personalBubble)
-        },
+        }.ExitAndEnterOnUpdate(),
 
         [CreatureStateDetailedType.Rest] = new Node(CreatureStateDetailedType.Rest) {
             onExit = (_, newState, brain) => {
@@ -175,7 +178,6 @@ public struct Habit {
                 if (newState.detailedType != CreatureStateDetailedType.Rest) 
                     brain.Habitat?.ClearRecentlyVisited();
             },
-            onUpdate = (_, __) => true,
             onRun = (state, brain) => PassiveCommandNodes[(PassiveCommandType)state.scanActivity?.command.type].Run(state, brain)
         },
     };

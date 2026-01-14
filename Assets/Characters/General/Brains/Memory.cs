@@ -114,8 +114,10 @@ public struct ScanActivity : Positioned {
     public Vector3? investigation;
     public Vector2Int? shelter;
 
+    public bool HasValidPosition => type != ScanActivityType.PassiveCommand && !characterFocus.IsDestroyed;
     public Vector3 GetPosition()
-        => type == ScanActivityType.Focus || type == ScanActivityType.FollowPair ? characterFocus.Value.position
+        => characterFocus.HasValue ? characterFocus.Value.position
+        : terrainFocus.HasValue ? (Vector3)Terrain.I.CellCenter(terrainFocus.Value.location)
         : type == ScanActivityType.Investigate ? (Vector3)investigation
         : type == ScanActivityType.Rest ? (Vector3)Terrain.I.CellCenter((Vector2Int)shelter)
         : throw new Exception("Can't get position when in state PassiveComand");
@@ -191,7 +193,7 @@ public struct ScanActivity : Positioned {
     public override string ToString() {
         string result = "command " + command + " activity " + type;
         if (shelter is Vector2Int realShelter) result += " | shelter target: " + realShelter + " at " + Terrain.I.CellCenter(realShelter);
-        if (characterFocus.HasValue) result += " | character target: " + characterFocus.Value.gameObject.name;
+        if (characterFocus.HasValue) result += " | character target: " + characterFocus.Value;
         if (terrainFocus is DesireMessage.Obstacle focus) result += " | terrain target: unblocking " + focus.requestor;
         if (investigation is Vector3 realInvestigation) result += " | investigation target: " + realInvestigation;
         if (followerToLead.HasValue) result += " | follower to lead: " + followerToLead.Value.gameObject.name;

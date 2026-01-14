@@ -17,13 +17,14 @@ public class Will {
             }
 
         } else if (input.controlOverride.IsAdd) {
+            if (state.type == CreatureStateType.Override) return "Can't nest overrides";
             return CreatureState.WithControlOverride(state, input.controlOverride.Value);
 
         } else if (input.controlOverride.IsRemove) {
             return CreatureState.WithoutControlOverride(state);
 
         } else if (input.faint) {
-            if (state.type == CreatureStateType.Override) return "Cannot Faint from Override";
+            if (state.type == CreatureStateType.Override || state.type == CreatureStateType.Faint) return "Cannot Faint from " + state.type;
             else return CreatureState.Fainted();
 
         } else if (input.executeDirective.HasValue) {
@@ -118,6 +119,7 @@ public class Will {
 
     // Returns true if second is better
     public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct, Vector3 position) {
+        if (!oldAct.HasValidPosition) return true;
         if (Disp.FT(position, newAct.GetPosition()).sqrMagnitude < Disp.FT(position, oldAct.GetPosition()).sqrMagnitude) {
             Debug.DrawLine(position, oldAct.GetPosition(), Color.red, 1);
             Debug.DrawLine(position, newAct.GetPosition(), Color.yellow, 1);
@@ -200,8 +202,10 @@ public class Will {
         foreach (Collider2D character in charactersNearby) {
             if ((bool)IsVisibleThreat(team, creaturePosition, character.transform) && (filter?.Invoke(character) != false))
                 if (character.GetComponent<Creature>()?.brainConfig?.hasAttack == true ||
-                        character.GetComponent<PlayerCharacter>() != null)
+                        character.GetComponent<PlayerCharacter>() != null) {
                     threats.Add(character.transform);
+                    Debug.DrawLine(brain.transform.position, character.transform.position, Color.cyan, .25f);
+            }
         }
         if (threats.Count == 0) return Optional<Transform>.Empty();
         return Optional.Of(threats.MinBy(threat => (threat.position - creaturePosition).sqrMagnitude));

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Optional {
     public static Optional<T> Of<T>(T value) {
@@ -25,11 +26,8 @@ public struct Optional<T> {
         }
     }
     // for Unity :)
-    public bool IsDestroyed {
-        get {
-            return HasValue && Value == null;
-        }
-    }
+    public bool IsDestroyed => HasValue && (Value?.Equals(null) ?? true); // Unity can't override value==null in generics
+    public bool HasValidValue => HasValue && (Value?.Equals(null) == false);
 
     private Optional(T value) {
         this.value = value;
