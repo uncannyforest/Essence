@@ -155,7 +155,7 @@ GameObject:
   - component: {fileID: 3814134692195865406}
   - component: {fileID: 3814134692195865396}
   - component: {fileID: 3814134692195865394}
-  - component: {fileID: 3814134692195865405}
+  - component: {fileID: 2251876230400189850}
   - component: {fileID: 3814134692195865407}
   - component: {fileID: 3814134692195865395}
   - component: {fileID: 3814134692195865392}
@@ -222,8 +222,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!60 &3814134692195865405
-PolygonCollider2D:
+--- !u!58 &2251876230400189850
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -236,21 +236,8 @@ PolygonCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
-    oldSize: {x: 0.5, y: 1}
-    newSize: {x: 0.5, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.25, y: 0}
-      - {x: 0, y: 0.25}
-      - {x: -0.25, y: 0}
-      - {x: 0, y: -0.25}
+  serializedVersion: 2
+  m_Radius: 0.25
 --- !u!114 &3814134692195865407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,6 +332,8 @@ MonoBehaviour:
   setAnimatorDirectionDirectly: 0
   snap: 1
   waterSpeed: 0.5
+  animatorDirection:
+    displacement: {x: 0, y: 0}
 --- !u!114 &1183461684614435810
 MonoBehaviour:
   m_ObjectHideFlags: 0

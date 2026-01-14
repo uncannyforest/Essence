@@ -254,6 +254,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!58 &5884145551118979475
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529474584485842260}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!95 &6191505610928773825
 Animator:
   serializedVersion: 3
@@ -290,6 +306,8 @@ MonoBehaviour:
   setAnimatorDirectionDirectly: 1
   snap: 0
   waterSpeed: 2
+  animatorDirection:
+    displacement: {x: 0, y: 0}
 --- !u!114 &7488913179682336263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -501,6 +519,7 @@ PrefabInstance:
     - {fileID: -3810210497216287337, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
     - {fileID: 6081452345897063133, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
     - {fileID: 5192499870006797867, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
+    - {fileID: 4726721645909982166, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9fb341006fe8e4437ba481f491de3ddb, type: 3}
 --- !u!1 &8529474584485842260 stripped
 GameObject:

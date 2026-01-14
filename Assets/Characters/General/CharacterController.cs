@@ -20,7 +20,7 @@ public class CharacterController : MonoBehaviour {
 
     private Terrain terrain;
     [NonSerialized] new public Rigidbody2D rigidbody;
-    [NonSerialized] new public Collider2D collider;
+    [NonSerialized] new public CircleCollider2D collider;
     [NonSerialized] public Character character;
     private Stats stats; // null if player
     [NonSerialized] public Cardboard cardboard; // may be null if setAnimatorDirectionDirectly
@@ -31,11 +31,13 @@ public class CharacterController : MonoBehaviour {
     private Displacement velocityChebyshevSubgridUnit; // just the direction
     private float timeToChebyshevSubgridUnit;
     private float terrainSpeed;
+    private float defaultColliderSize;
 
     void Awake() {
         terrain = GameObject.FindObjectOfType<Terrain>();
         rigidbody = GetComponent<Rigidbody2D>();
-        collider = GetComponent<Collider2D>();
+        collider = GetComponent<CircleCollider2D>();
+        defaultColliderSize = collider.radius;
         character = GetComponent<Character>();
         stats = GetComponent<Stats>();
         cardboard = GetComponentInChildren<Cardboard>();
@@ -136,12 +138,16 @@ public class CharacterController : MonoBehaviour {
         yield return new WaitForFixedUpdate();
         while (true) {
             if (velocityChebyshevSubgridUnit != Displacement.zero) {
+                collider.radius = defaultColliderSize * .25f;
                 Vector2? maybeMove = Move();
                 if (maybeMove is Vector2 move) {
                     rigidbody.MovePosition(move);
                     yield return new WaitForSeconds(timeToChebyshevSubgridUnit);
                 } else yield return new WaitForFixedUpdate();
-            } else yield return new WaitForFixedUpdate();
+            } else {
+                collider.radius = defaultColliderSize;
+                yield return new WaitForFixedUpdate();
+            }
         }
     }
 
