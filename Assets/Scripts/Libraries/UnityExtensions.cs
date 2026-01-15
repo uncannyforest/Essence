@@ -69,6 +69,12 @@ public static class TransformExtensions {
         foreach(Transform child in transform)
                 child.SetLayer(layer);
     }
+
+    public static float Distance<T>(this Transform a, T b) where T : Component
+        => Mathf.Sqrt(Disp.FT(a.position, b.transform.position).sqrMagnitude);
+
+    public static T Nearest<T>(this Transform transform, IEnumerable<T> list) where T : Component
+        => list.MinBy(item => (item.transform.position - transform.position).sqrMagnitude);
 }
 
 public static class VectorExtensions {

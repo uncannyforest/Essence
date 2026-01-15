@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Fauna : MonoBehaviour {
     public float possibilityRate = 1/256f;
+    public float fixedRate = 1;
+    public int maxCreatures = 8;
     public Terrain terrain;
     public Transform parent;
     public Transform player;
@@ -19,11 +21,24 @@ public class Fauna : MonoBehaviour {
     private IEnumerator<YieldInstruction> Repeat() {
         yield return null;
         while (true) {
-            Populate();
-            yield return new WaitForSeconds(GetRepeatRate());
+            Collider2D[] nearbyCreatures = Physics2D.OverlapCircleAll(GameManager.I.AnyPlayer.transform.position,
+                PlayerCharacter.neighborhood * 2, LayerMask.GetMask("Creature", "HealthCreature"));
+            int numCreatures = nearbyCreatures.Length;
+            int followingCreatures = 0;
+            foreach (Collider2D c in nearbyCreatures) {
+                Creature creature = c.GetComponentStrict<Creature>();
+                if (GameManager.I.YourTeam.SameTeam(creature.team) &&
+                        creature.State.scanActivity?.command.type == PassiveCommandType.Follow)
+                    followingCreatures++;
+            }
+            int spawnNumber = maxCreatures - numCreatures + followingCreatures * 2;  // following creatures *increase* spawn count
+            if (spawnNumber > 0) Debug.Log(numCreatures + " creatures nearby, " +
+                followingCreatures + " following player, spawning " + spawnNumber);
+            for (int i = 0; i < spawnNumber; i++) Populate();
+            yield return new WaitForSeconds(fixedRate);
         }
     }
-
+    
     private float GetRepeatRate() {
         int numCreatures = GameObject.FindObjectsOfType<Creature>().Length;
         Debug.Log("Added creature, waiting " + numCreatures * numCreatures * possibilityRate);

@@ -208,6 +208,6 @@ public class Will {
             }
         }
         if (threats.Count == 0) return Optional<Transform>.Empty();
-        return Optional.Of(threats.MinBy(threat => (threat.position - creaturePosition).sqrMagnitude));
+        return Optional.Of(brain.transform.Nearest(threats));
     }
 }

@@ -26,7 +26,10 @@ public class Creature : MonoBehaviour {
     }
     public List<CreatureAction> action = new List<CreatureAction>();
 
-    private const float despawnTime = 128f;
+    private const float despawnTime = 15f;
+    private const int fastestDespawnRadius = 128;
+    private float despawnedQuantity = 0;
+
     public const float neighborhood = 7.5f;
 
     [NonSerialized] public CharacterController controller;
@@ -167,20 +170,27 @@ public class Creature : MonoBehaviour {
         while (true) {
             yield return new WaitForSeconds(despawnTime);
             Collider2D[] playersNearby =
-                Physics2D.OverlapCircleAll(transform.position, PlayerCharacter.neighborhood, LayerMask.GetMask("Player"));
+                Physics2D.OverlapCircleAll(transform.position, fastestDespawnRadius, LayerMask.GetMask("Player"));
             if (playersNearby.Length == 0) {
-                Debug.Log("Despawning " + gameObject + " at " + transform.position);
-                if (creatureShortName == "Bugge") {
-                    this.GetComponentStrict<Anthopoid>().HandleDeath();
-                    yield break;
-                } else {
-                    Destroy(gameObject);
-                    yield break;
-                }
+                despawnedQuantity = 1;
             } else {
-                Debug.Log("Too close to player to despawn " + gameObject + " at " + transform.position);
+                Collider2D nearestPlayer = transform.Nearest(playersNearby);
+                float distance = transform.Distance(nearestPlayer);
+                if (distance <= PlayerCharacter.neighborhood) despawnedQuantity = 0; // reset
+                else despawnedQuantity += (distance - PlayerCharacter.neighborhood)
+                    / (fastestDespawnRadius - PlayerCharacter.neighborhood);
+            }
+
+            if (despawnedQuantity >= 1) {
+                Despawn();
+                yield break;
             }
         }
+    }
+    private void Despawn() {
+        Debug.Log("Despawning " + gameObject + " at " + transform.position);
+        if (creatureShortName == "Bugge") this.GetComponentStrict<Anthopoid>().HandleDeath();
+        else Destroy(gameObject);
     }
 
     void Update() {
