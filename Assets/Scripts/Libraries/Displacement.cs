@@ -56,6 +56,7 @@ public struct Displacement {
     public float x { get => displacement.x; }
     public float y { get => displacement.y; }
     public float sqrMagnitude { get => displacement.sqrMagnitude; }
+    public float magnitude { get => Mathf.Sqrt(sqrMagnitude); }
     public Displacement normalized { get => new Displacement(displacement.normalized); }
 
     public float chebyshevMagnitude {

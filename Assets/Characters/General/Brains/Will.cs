@@ -48,7 +48,7 @@ public class Will {
             if (oldScan.type == ScanActivityType.PassiveCommand || newScan.type == ScanActivityType.PassiveCommand) {
                 return CreatureState.ScanActivity(newScan);
             } else {
-                WhyNot preferNewScan = WeighOptions(oldScan, newScan, input.knowledge.position);
+                WhyNot preferNewScan = WeighOptions(oldScan, newScan, input.knowledge);
                 if (preferNewScan) return CreatureState.ScanActivity(newScan);
                 else return (string)preferNewScan;
             }
@@ -108,7 +108,7 @@ public class Will {
             }
             if (characterFocusActivity is ScanActivity characterFocus) {
                 if (shelterActivity is ScanActivity shelter)
-                    return (bool)WeighOptions(characterFocus, shelter, input.knowledge.position) ? shelter : characterFocus;
+                    return (bool)WeighOptions(characterFocus, shelter, input.knowledge) ? shelter : characterFocus;
                 else return characterFocus;
             } else {
                 if (shelterActivity is ScanActivity shelter) return shelter;
@@ -118,17 +118,31 @@ public class Will {
     }
 
     // Returns true if second is better
-    public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct, Vector3 position) {
+    public static WhyNot WeighOptions(ScanActivity oldAct, ScanActivity newAct, Senses.PersistentProperties knowledge) {
         if (!oldAct.HasValidPosition) return true;
-        if (Disp.FT(position, newAct.GetPosition()).sqrMagnitude < Disp.FT(position, oldAct.GetPosition()).sqrMagnitude) {
-            Debug.DrawLine(position, oldAct.GetPosition(), Color.red, 1);
-            Debug.DrawLine(position, newAct.GetPosition(), Color.yellow, 1);
+        float oldPriority = WeighOptionsPriority(oldAct, knowledge);
+        float newPriority = WeighOptionsPriority(newAct, knowledge);
+        if (newPriority < oldPriority) {
+            Debug.DrawLine(knowledge.position, oldAct.GetPosition(), Color.red, 1);
+            Debug.DrawLine(knowledge.position, newAct.GetPosition(), Color.yellow, 1);
             return true;
         }
-        Debug.DrawLine(position, oldAct.GetPosition(), Color.magenta, 1);
-        Debug.DrawLine(position, newAct.GetPosition(), Color.blue, 1);
-        return "Prefer " + oldAct + " to " + newAct + " because it's closer";
+        Debug.DrawLine(knowledge.position, oldAct.GetPosition(), Color.magenta, 1);
+        Debug.DrawLine(knowledge.position, newAct.GetPosition(), Color.blue, 1);
+        return "Prefer " + oldAct + " (" + oldPriority.ToString(".00") + ") to "
+            + newAct + " (" + newPriority.ToString(".00") + ")";
     }
+
+    // lower is higher priority: range [0, 1]
+    public static float WeighOptionsPriority(ScanActivity activity, Senses.PersistentProperties knowledge) => activity.type switch {
+        ScanActivityType.Focus => activity.characterFocus.HasValue ?
+            Disp.FT(knowledge.position, activity.GetPosition()).magnitude / Creature.neighborhood :
+            Disp.FT(knowledge.position, activity.GetPosition()).magnitude / Creature.neighborhood / 2,
+        ScanActivityType.FollowPair => knowledge.healthFraction * knowledge.healthFraction,
+        ScanActivityType.Investigate => Disp.FT(knowledge.position, activity.GetPosition()).magnitude / Creature.neighborhood,
+        ScanActivityType.Rest => knowledge.resourceFraction / 2,
+        _ => 0
+    };
 
     public static OneOf<ScanActivity, string> DesireClearObstacle(BrainConfig config, ScanActivity state, DesireMessage.Obstacle obstacle) {
         if (obstacle.wallObstacle is Construction wall) {

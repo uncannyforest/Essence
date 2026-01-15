@@ -155,17 +155,23 @@ public struct Senses {
         public BrainConfig config;
         public Vector3 position;
         public int team;
+        public float healthFraction;
+        public float resourceFraction;
 
-        public PersistentProperties(BrainConfig config, Vector3 position, int team) {
+        public PersistentProperties(BrainConfig config, Vector3 position, int team, float health, float resource) {
             this.config = config;
             this.position = position;
             this.team = team;
+            this.healthFraction = health;
+            this.resourceFraction = resource;
         }
         public static PersistentProperties ForCreature(Creature creature) {
             return new PersistentProperties(
                 creature.brainConfig,
                 creature.transform.position,
-                creature.GetComponentStrict<Team>().TeamId);
+                creature.GetComponentStrict<Team>().TeamId,
+                creature.GetComponent<Health>()?.LevelPercent ?? 1, // TODO make Strict when I officially force Health
+                creature.GetComponentStrict<Resource>().LevelPercent);
         }
     }
 

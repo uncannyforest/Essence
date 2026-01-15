@@ -70,6 +70,8 @@ public static class TransformExtensions {
                 child.SetLayer(layer);
     }
 
+    public static float Distance(this Transform a, Vector3 b) 
+        => Mathf.Sqrt(Disp.FT(a.position, b).sqrMagnitude);
     public static float Distance<T>(this Transform a, T b) where T : Component
         => Mathf.Sqrt(Disp.FT(a.position, b.transform.position).sqrMagnitude);
 
