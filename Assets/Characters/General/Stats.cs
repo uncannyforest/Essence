@@ -24,11 +24,12 @@ public class Stats : MonoBehaviour {
             if (value > currentExp + 2)
                 Debug.Log(gameObject.name + " just gained " + (value - currentExp) + " EXP, reaching " + value + " EXP");
             currentExp = value;
-            bool justLeveledUp = currentExp == LevelToExp(Level);
+            bool justLeveledUp = lastLevel != Level;
             if (justLeveledUp) OnLevelUp(true);
         }
     }
     public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / GlobalConfig.I.expToLevelUp)); }
+    private int lastLevel = 1;
     public int Str { get => Mathf.FloorToInt(minStr * Level); }
     public int Def { get => Mathf.FloorToInt(minDef * Level); }
     public float Exe { get => minExe + Mathf.Log(Level, exeIncrEvery); }
@@ -71,6 +72,7 @@ public class Stats : MonoBehaviour {
     }
 
     private void OnLevelUp(bool displayMessage) {
+        lastLevel = Level;
         if (displayMessage && GameManager.I.YourTeam.SameTeam(creature)) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
         if (LeveledUp != null) LeveledUp(this);
         TextMesh levelDisplay = gameObject.GetComponentInChildren<TextMesh>();
