@@ -139,6 +139,7 @@ public class CharacterController : MonoBehaviour {
         while (true) {
             if (velocityChebyshevSubgridUnit != Displacement.zero) {
                 collider.radius = defaultColliderSize * .25f;
+                Debug.DrawLine(transform.position, transform.position + velocityChebyshevSubgridUnit * 8, Color.cyan);
                 Vector2? maybeMove = Move();
                 if (maybeMove is Vector2 move) {
                     rigidbody.MovePosition(move);
