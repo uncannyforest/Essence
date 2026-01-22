@@ -4,8 +4,8 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class PositionProvider {
-    private Transform t;
-    private Vector2? p;
+    public Transform t;
+    public Vector2? p;
     public Vector2 position {
         get {
             if (p is Vector2 realP) return realP;
@@ -18,6 +18,15 @@ public class PositionProvider {
 
     public static implicit operator PositionProvider(Transform transform) => 
         new PositionProvider() { t = transform };
+
+    public override int GetHashCode() {
+        if (p is Vector2 realP) return realP.GetHashCode();
+        else return t.GetHashCode();
+    }
+    public override bool Equals(object obj) {
+        if (obj is PositionProvider pp) return this.t == pp.t && this.p == pp.p;
+        else return false;
+    }
 }
 
 public class Pathfinding {
@@ -32,11 +41,12 @@ public class Pathfinding {
 
     private Displacement RandomVelocity() => Randoms.Direction();
     
-    private Displacement IndexedVelocity(Displacement targetDirection) => targetDirection.normalized;
+    private void MoveIntelligently(PositionProvider target) =>
+        movement.InDirection(FlowFieldRegistry.GetDirection(target, movement.terrainSpeeds, transform.position));
 
     public void MoveTowardWithoutClearingObstacles(Vector3 target) {
         CheckTargetForObstacles(target, 0).MoveNext();
-        movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target)));
+        MoveIntelligently((Vector2)target);
     }
 
     public Func<IEnumerator<YieldInstruction>> Roam;
@@ -58,20 +68,10 @@ public class Pathfinding {
         }
     }
 
-    private Displacement FollowTargetDirection(Vector3 targetPosition) {
-        Displacement toTarget = Disp.FT(transform.position, targetPosition);
-
-        Optional<Transform> nearestThreat = Will.NearestThreat(brain);
-        if (!nearestThreat.HasValue) return toTarget;
-        Displacement toThreat = Disp.FT(transform.position, nearestThreat.Value.position);
-        Displacement toThreatCorrected = toThreat * toTarget.sqrMagnitude / toThreat.sqrMagnitude * general.timidity;
-        return toTarget - toThreatCorrected;
-    }
     public YieldInstruction Follow(Transform followDirective) {
         if (CheckTargetForObstacles(followDirective.position, 0).MoveNext(out YieldInstruction unblockSelf))
             return unblockSelf;
-        Displacement targetDirection = FollowTargetDirection(followDirective.position);
-        movement.InDirection(IndexedVelocity(targetDirection));
+        MoveIntelligently(followDirective);
         return new WaitForSeconds(Random.value * general.reconsiderRateFollow);
     }
 
@@ -89,7 +89,7 @@ public class Pathfinding {
                 movement.Idle();
                 yield break;
             } else {
-                movement.InDirection(IndexedVelocity(Disp.FT(transform.position, target.position)));
+                MoveIntelligently(target);
                 if (distance < movement.Speed * brain.creature.stats.ExeTime) yield return null; // adjust faster when we're close
                 else yield return TypicalWait;
             }
@@ -162,7 +162,7 @@ public class Pathfinding {
                 }
             } else {
                 Land? land = Terrain.I.GetLand(position.Coord);
-                if (land?.IsPassable() == false || (movement.waterSpeed == 0 && land?.IsWatery() == true)) {
+                if (land?.IsPassable() == false || (movement.terrainSpeeds.water == 0 && land?.IsWatery() == true)) {
                     return new DesireMessage.Obstacle() {
                         requestor = brain.creature.GetComponentStrict<Character>(),
                         location = position,

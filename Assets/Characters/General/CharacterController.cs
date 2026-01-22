@@ -14,6 +14,7 @@ public class CharacterController : MonoBehaviour {
     public bool snap = false;
     public Func<Vector2Int, bool> CrossingTile; // return false to cancel
 
+    public PathfindingCost terrainSpeeds;
     public float waterSpeed = 0;
     
     public Displacement animatorDirection;
@@ -59,9 +60,9 @@ public class CharacterController : MonoBehaviour {
     public float Speed { get => terrainSpeed * (stats != null ? stats.Spd : 2); }
     
     private void UpdateTileSpecificParams() {
-        Land land = terrain.GetLand(currentTile) ?? terrain.Depths;
+        terrainSpeed = terrainSpeeds.SpeedAt(currentTile);
 
-        terrainSpeed = (waterSpeed != 0 && land == Land.Water) ? waterSpeed : 1;
+        Land land = terrain.GetLand(currentTile) ?? terrain.Depths;
             
         float elevation = land == Land.Water ? -.375f : land == Land.Ditch ? -.25f : 0;
 
@@ -169,7 +170,7 @@ public class CharacterController : MonoBehaviour {
         }
         Vector2Int newTile = terrain.CellAt(newLocation);
         if (newTile != currentTile) {
-            if (CanCrossTile(newTile)) {
+            if (terrainSpeeds.IsPassable(newTile)) {
                 currentTile = newTile;
                 UpdateTileSpecificParams();
                 bool? continueCrossingTile = CrossingTile?.Invoke(newTile);
@@ -178,12 +179,6 @@ public class CharacterController : MonoBehaviour {
             else return null;
         }
         return newLocation;
-    }
-
-    private bool CanCrossTile(Vector2Int tile) {
-        Land land = terrain.GetLand(tile) ?? terrain.Depths;
-        bool notWaterProhibited = waterSpeed != 0f || land != Land.Water;
-        return notWaterProhibited && land.IsPassable();
     }
 
     public void OrientFurther() {

@@ -368,6 +368,7 @@ GameObject:
   - component: {fileID: 8377938587873387450}
   - component: {fileID: 8377938587873387451}
   - component: {fileID: 8377938587873387448}
+  - component: {fileID: -6479021737248681454}
   m_Layer: 0
   m_Name: WorldLibrary
   m_TagString: Untagged
@@ -580,6 +581,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   possibilityRate: 0.0625
+  fixedRate: 1
+  maxCreatures: 8
   terrain: {fileID: 0}
   parent: {fileID: 8377938587873387449}
   player: {fileID: 0}
@@ -595,3 +598,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b0c898714f844dd875ac7a1f523609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-6479021737248681454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8377938587873387398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9502ce38090f144acabedb1b274dc5c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barrierCost: 255
+  updateTime: 1
+  valuesDebug: []

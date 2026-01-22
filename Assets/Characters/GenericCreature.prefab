@@ -154,6 +154,8 @@ MonoBehaviour:
   body3d: {fileID: 0}
   setAnimatorDirectionDirectly: 0
   snap: 0
+  terrainSpeeds:
+    water: 0
   waterSpeed: 0
   animatorDirection:
     displacement: {x: 0, y: 0}
@@ -174,8 +176,8 @@ MonoBehaviour:
     lureMaxTime: 10
     roamRestingFraction: 0.5
     reconsiderMaxRateRoam: 5
-    reconsiderRateFollow: 2.5
-    reconsiderRateTarget: 2.5
+    reconsiderRateFollow: 0.5
+    reconsiderRateTarget: 0.5
     scanningRate: 1
     scanForFocusWhenFollowing: 1
     hasAttack: 0

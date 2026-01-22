@@ -105,6 +105,10 @@ PrefabInstance:
       propertyPath: personalBubble
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: terrainSpeeds.water
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: icon
       value: 

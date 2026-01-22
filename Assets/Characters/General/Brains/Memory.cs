@@ -97,7 +97,7 @@ public struct CreatureState {
     }
 }
 
-public struct ScanActivity : Positioned {
+public struct ScanActivity {
     public static ScanActivity ForCommand(PassiveCommand command) {
         ScanActivity result = new ScanActivity();
         result.command = command;

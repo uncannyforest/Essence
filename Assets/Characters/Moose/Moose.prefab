@@ -22,6 +22,7 @@ MonoBehaviour:
   itemDropSize: 1
   damageVisual1Time: 0.1
   damageVisual2Time: 0.4
+  skeletonPrefab: {fileID: 0}
   ColorableSprites: []
 --- !u!114 &5288127852346097499
 MonoBehaviour:
@@ -110,6 +111,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
       propertyPath: waterSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2407161138779641919, guid: 68656a24ac59346c687d399d9b94a536, type: 3}
+      propertyPath: terrainSpeeds.water
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2763505932110915963, guid: 68656a24ac59346c687d399d9b94a536, type: 3}

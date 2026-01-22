@@ -82,6 +82,8 @@ public struct Displacement {
             default: return this;
         }
     }
+    public static Displacement FromAngle(float angle) =>
+        new Displacement(Quaternion.Euler(0, 0, angle) * Vector3.right);
 
     override public bool Equals(object obj) {
         if (obj is Displacement d) return this == d;
