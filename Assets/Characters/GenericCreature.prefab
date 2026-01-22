@@ -230,8 +230,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentExp: 0
   minDistanceFromOrigin: 0
-  minStr: 5
-  minDef: 50
+  minStr: 1
+  minDef: 10
   minExe: 2
   exeIncrEvery: 10
   minSpd: 1

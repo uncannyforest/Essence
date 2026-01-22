@@ -9,8 +9,8 @@ using UnityEngine.UI;
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
-    public float minStr = 3;
-    public float minDef = 25;
+    public float minStr = 1;
+    public float minDef = 10;
     public float minExe = 2;
     public float exeIncrEvery = 10;
     public float minSpd = 1f;

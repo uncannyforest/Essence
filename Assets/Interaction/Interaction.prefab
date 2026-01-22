@@ -82,7 +82,7 @@ MonoBehaviour:
   meleeConfig:
     damageCenterDistance: 0.5
     damageRadius: 0.5
-    damage: 15
+    damage: 5
   praxelSelectConfig:
     latency: 0.1
     delay: 0
