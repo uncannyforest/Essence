@@ -305,6 +305,8 @@ MonoBehaviour:
   body3d: {fileID: 3153473203215434008}
   setAnimatorDirectionDirectly: 1
   snap: 0
+  terrainSpeeds:
+    water: 2
   waterSpeed: 2
   animatorDirection:
     displacement: {x: 0, y: 0}
