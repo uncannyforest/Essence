@@ -15,7 +15,6 @@ public class CharacterController : MonoBehaviour {
     public Func<Vector2Int, bool> CrossingTile; // return false to cancel
 
     public PathfindingCost terrainSpeeds;
-    public float waterSpeed = 0;
     
     public Displacement animatorDirection;
 
