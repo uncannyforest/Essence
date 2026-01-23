@@ -580,7 +580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2d80748a7946e59f7612669dc557c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  possibilityRate: 0.0625
+  possibilityRate: 0.03125
   fixedRate: 1
   maxCreatures: 8
   terrain: {fileID: 0}
@@ -611,5 +611,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   barrierCost: 255
-  updateTime: 1
+  transformUpdateTime: 1
+  stationaryUpdateTime: 3
   valuesDebug: []
