@@ -23,9 +23,12 @@ public class GameManager : MonoBehaviour {
             bugges.Add(GameObject.Instantiate(buggePrefab, worldBag));
     }
 
-    public void FountainsLoaded(int team) {
-        if (team == 1) GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().Respawn();
-        if (team == 0) foreach (Bugge bugge in bugges) {
+    public void FountainLoaded(Fountain fountain) {
+        if (fountain.Team == 1) {
+            GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().Respawn();
+            Origin = (Vector2Int)fountain.GetComponentStrict<FeatureHooks>().tile;
+        }
+        if (fountain.Team == 0) foreach (Bugge bugge in bugges) {
             bugge.GetComponentStrict<Anthopoid>().Respawn();
         }
     }
@@ -45,4 +48,7 @@ public class GameManager : MonoBehaviour {
     public Team YourTeam {
         get => YourPlayer.GetComponentStrict<Team>();
     }
+
+    // used for stats
+    public Vector2Int Origin;
 }

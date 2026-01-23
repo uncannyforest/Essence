@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
-    public float minStr = 1;
+    public float minStr = 2;
     public float minDef = 10;
     public float minExe = 2;
     public float exeIncrEvery = 10;
@@ -57,7 +57,7 @@ public class Stats : MonoBehaviour {
     }
 
     public int GetInitLevel(Vector2Int position) {
-        Displacement distanceFromOrigin = Disp.FT(new Vector2Int(Terrain.Dim, Terrain.Dim) / 2, position);
+        Displacement distanceFromOrigin = Disp.FT(GameManager.I.Origin, position);
         return Mathf.Max(0,
             ((int)distanceFromOrigin.sqrMagnitude - minDistanceFromOrigin * minDistanceFromOrigin) /
             (GlobalConfig.I.creatureStartLevelDistance * GlobalConfig.I.creatureStartLevelDistance))

@@ -36,7 +36,7 @@ public class Fountain : MonoBehaviour {
         feature.SerializeFields += Serialize;
         feature.PlayerEntered += HandlePlayerEntered;
         collider = GetComponent<Collider2D>();
-        GameManager.I.FountainsLoaded(Team);
+        GameManager.I.FountainLoaded(this);
     }
 
     int[] Serialize() => new int[] { team };
