@@ -64,6 +64,6 @@ public class FeatureHooks : MonoBehaviour {
     public static int[] SerializeString(string input) =>
         input.ToCharArray().Select(c => (int)c).ToArray();
 
-    public static string DeserializeString(int[] serialized) =>
-        new string(serialized.Select(c => (char)c).ToArray());
+    public static string DeserializeString(int[] serialized, int firstIndex = 0) =>
+        new string(serialized.Skip(firstIndex).Select(c => (char)c).ToArray());
 }

@@ -52,15 +52,22 @@ public class Pathfinding {
     public Func<IEnumerator<YieldInstruction>> Roam;
     public IEnumerator<YieldInstruction> RoamImpl() {
         while (true) {
-            IEnumerator<YieldInstruction> larkStep;
+            IEnumerator<YieldInstruction> reproduceStep = Enumerators.Empty();
+            IEnumerator<YieldInstruction> larkStep = Enumerators.Empty();
             while (true) {
-                if (brain.Lark.ScanForLark().IsValue(out IEnumerator<YieldInstruction> step)) {
-                    larkStep = step;
+                if (brain.reproduction.ScanForAphrodisiac().IsValue(out IEnumerator<YieldInstruction> rStep)) {
+                    reproduceStep = rStep;
+                    break;
+                } else if (brain.Lark.ScanForLark().IsValue(out IEnumerator<YieldInstruction> lStep)) {
+                    larkStep = lStep;
                     break;
                 }
                 if (Random.value < general.roamRestingFraction) movement.Idle();
                 else movement.InDirection(RandomVelocity());
                 yield return new WaitForSeconds(Random.value * general.reconsiderMaxRateRoam);
+            }
+            while (reproduceStep.MoveNext()) {
+                yield return reproduceStep.Current;
             }
             while (larkStep.MoveNext()) {
                 yield return larkStep.Current;

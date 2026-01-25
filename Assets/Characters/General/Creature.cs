@@ -12,8 +12,8 @@ using UnityEngine;
 public class Creature : MonoBehaviour {
     public BrainConfig brainConfig;
     public Species species;
-    public string creatureName;
-    public string creatureShortName;
+    public string creatureName; // this means species name. Individual name is gameobject.name
+    public string creatureShortName; // this means abbreviated species name
     public Sprite icon;
     public Sprite breastplate;
     public string tamingInfoShort = "You cannot tame any";

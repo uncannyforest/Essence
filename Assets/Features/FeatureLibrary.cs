@@ -44,4 +44,5 @@ public class FeatureLibrary : MonoBehaviour {
     public FeatureConfig sprout;
     public FeatureConfig skeleton;
     public FeatureConfig fertilizer;
+    public FeatureConfig egg;
 }

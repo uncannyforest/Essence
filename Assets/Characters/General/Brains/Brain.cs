@@ -84,6 +84,7 @@ public class Brain {
         this.species = species;
         this.general = general;
         pathfinding = new Pathfinding(this);
+        reproduction = new Reproduction(this);
     }
     public Brain InitializeAll() {
         creature = GetComponentStrict<Creature>();
@@ -119,6 +120,7 @@ public class Brain {
         throw new NotImplementedException("Must implement if one can clear obstacles one cannot pass");
     public Habitat Habitat { get; protected set; } = null;
     public Lark Lark { get; protected set; } = Lark.None();
+    public readonly Reproduction reproduction;
 
     virtual public void Melee(Transform target) {
         Health health = target.GetComponentStrict<Health>();

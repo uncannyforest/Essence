@@ -5,6 +5,10 @@ using System.Linq;
 using UnityEngine;
 
 public class Enumerators {
+    public static IEnumerator<YieldInstruction> Empty() {
+        yield break;
+    }
+
     public static IEnumerator<YieldInstruction> Continually(Func<YieldInstruction> action) {
         while (true) {
             yield return action();
