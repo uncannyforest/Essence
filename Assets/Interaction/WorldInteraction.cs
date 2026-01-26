@@ -334,9 +334,10 @@ public class WorldInteraction : MonoBehaviour {
                         terrain.SetUpFeature(coord, Land.Grass, FeatureLibrary.C.woodPile, 5);
                     }
                 } else if (terrain.Feature[coord] is Feature feature) {
-                    int resourceQuantity = feature.ResourceQuantity; // in case needed, retrieve before destroyed
+                    string resourceName = feature.ResourceName; // in case needed, retrieve before destroyed
+                    int resourceQuantity = feature.ResourceQuantity;
                     if (terrain.AttackFeature(coord, 10, 10) && feature.config.isResourcePile)
-                        inventory.Add(feature.config.resourceName, resourceQuantity);
+                        inventory.Add(resourceName, resourceQuantity);
                 } else if (terrain.GetLand(coord) == Land.Grass) {
                     terrain.Land[coord] = Land.Ditch;
                     inventory.Add("soil", sodCost);
@@ -367,6 +368,15 @@ public class WorldInteraction : MonoBehaviour {
                         else TextDisplay.I.ShowMiniText("You don't have enough soil to place pile");
                     } else {
                         TextDisplay.I.ShowMiniText("Cannot place soil there");
+                    }
+                } else if (inventory.resource.Substring(Math.Max(0, inventory.resource.Length - 4)) == " egg") {
+                    if (!FeatureLibrary.C.egg.IsValidTerrain(coord)) {
+                        TextDisplay.I.ShowMiniText("Cannot place egg there");
+                    } else {
+                        FeatureHooks egg = Terrain.I.BuildFeature(coord, FeatureLibrary.C.egg).hooks;
+                        egg.GetComponentStrict<Egg>().Species = inventory.resource.Substring(0, inventory.resource.Length - 4);
+                        egg.GetComponentStrict<Team>().TeamId = GameManager.I.YourTeam.TeamId;
+                        inventory.Clear();
                     }
                 } else if (FeatureLibrary.C.ResourceHasPile(inventory.resource, out FeatureConfig pile)) {
                     Feature? featureAlreadyThere = Terrain.I.Feature[coord];

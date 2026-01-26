@@ -43,6 +43,7 @@ public class Creature : MonoBehaviour {
         team = GetComponent<Team>();
         brain = species.Brain(brainConfig).InitializeAll();
         InitializeActionList(brain);
+        TeamChangedEventHandler(team.TeamId);
         team.changed += TeamChangedEventHandler;
 
         if (serializedData is Data data) DeserializeNow(data);
@@ -169,6 +170,7 @@ public class Creature : MonoBehaviour {
     private IEnumerator<YieldInstruction> MaybeDespawn() {
         while (true) {
             yield return new WaitForSeconds(despawnTime);
+            if (team.TeamId != 0) yield break;
             Collider2D[] playersNearby =
                 Physics2D.OverlapCircleAll(transform.position, fastestDespawnRadius, LayerMask.GetMask("Player"));
             if (playersNearby.Length == 0) {

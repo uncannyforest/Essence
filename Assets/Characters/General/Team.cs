@@ -17,7 +17,7 @@ public class Team : MonoBehaviour {
     public Action<int> changed;
 
     public Color Color {
-        get => new Color(1/16f, 1/2f, 1);
+        get => teamId == 1 ? new Color(1/16f, 1/2f, 1) : new Color(0, 0, 0);
     }
 
     public void OnAttack(Transform assailant) {

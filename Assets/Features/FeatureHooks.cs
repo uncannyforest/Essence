@@ -41,6 +41,10 @@ public class FeatureHooks : MonoBehaviour {
     // int? GetResourceQuantity() { }
     // bool ChangeResourceQuantity(int delta) { }
 
+    // Similarly (get only):
+    [NonSerialized] public Func<string> GetResourceName = () => null;
+    
+
     public bool Place(Vector2Int pos) {
         if (!feature.config.IsValidTerrain(pos)) return false;
         transform.position = Terrain.I.CellCenter(pos).WithZ(GlobalConfig.I.elevation.features);

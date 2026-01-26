@@ -4,13 +4,17 @@ using UnityEngine;
 
 // very similar to Lark, but without much variation between species
 public class Reproduction  {
+    public const float breakTime = 180;
+
     private readonly Brain brain;
+    private float fertileAgainTime = 0;
 
     public Reproduction(Brain brain) {
         this.brain = brain;
     }
 
     virtual public Optional<IEnumerator<YieldInstruction>> ScanForAphrodisiac() {
+        if (Time.time < fertileAgainTime) return Optional.Empty<IEnumerator<YieldInstruction>>();
         Optional<Terrain.Position> target = from v in Radius.Nearby.ClosestTo(brain.transform.position, brain.Habitat.IsAphrodisiac)
                                             select new Terrain.Position(Terrain.Grid.Roof, v);
         if (!target.HasValue) return Optional.Empty<IEnumerator<YieldInstruction>>();
@@ -20,10 +24,14 @@ public class Reproduction  {
     }
 
     private void LayEgg(Terrain.Position tile) {
-        // TODO find valid location first - this is gonna throw errors often
+        if (!FeatureLibrary.C.egg.IsValidTerrain(tile.Coord)) {
+            Debug.LogWarning("Egg position no longer valid");
+            return;
+        }
         Feature f = Terrain.I.BuildFeature(tile.Coord, FeatureLibrary.C.egg);
-        f.hooks.GetComponentStrict<Egg>().species = brain.creature.creatureName;
-        f.hooks.GetComponentStrict<Egg>().Team = 0;
+        f.hooks.GetComponentStrict<Egg>().Species = brain.creature.creatureName;
+        f.hooks.GetComponentStrict<Team>().TeamId = 0;
+        fertileAgainTime = Time.time + breakTime;
     }
 
     private Vector2Int FindIdealNestLocation() {

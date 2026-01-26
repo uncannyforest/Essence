@@ -8,6 +8,7 @@ public struct Feature {
 
     // PROPERTIES
 
+    public string ResourceName => hooks?.GetResourceName() ?? config.resourceName;
     public int ResourceQuantity => hooks?.GetResourceQuantity() ?? config.resourceQuantity;
 
     // SERIALIZATION
