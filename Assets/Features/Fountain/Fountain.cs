@@ -18,7 +18,7 @@ public class Fountain : MonoBehaviour {
     private int enemyPresent = 0;
     private Transform enemy;
     private int friendPresent = 0;
-    private Anthopoid friend;
+    private Team friend;
     private bool lastOutward;
 
     public int Team {
@@ -43,10 +43,10 @@ public class Fountain : MonoBehaviour {
     void Deserialize(int[] fields) => Team = fields[0];
 
     bool HandlePlayerEntered(Anthopoid target) {
-        int playerTeam = target.GetComponentStrict<Team>().TeamId;
-        if (playerTeam == team) {
+        Team playerTeam = target.GetComponentStrict<Team>();
+        if (playerTeam.TeamId == team) {
             friendPresent = 2;
-            friend = target;
+            friend = playerTeam;
             lastOutward = true;
         } else {
             enemyPresent = 2; // Rather than using boolean, we need an extra frame for FixedUpdate to run
@@ -98,7 +98,7 @@ public class Fountain : MonoBehaviour {
     }
 
     private void Teleport() {
-        friend.MoveViaFountain(this);
+        Teleportation.MoveViaFountain(friend, this);
         friendPresent = 0;
     }
 

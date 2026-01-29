@@ -65,7 +65,6 @@ public class Brain {
 
     protected T GetComponent<T>() => species.GetComponent<T>();
     protected T GetComponentStrict<T>() => species.GetComponentStrict<T>();
-    virtual protected void OnHealthReachedZero() => new Senses() { faint = true }.TryUpdateCreature(creature);
     public RunOnce investigationCancel = null;
 
     ///////////////////
@@ -243,6 +242,10 @@ public class Brain {
             return Optional.Of(recipient.transform);
         }
         else return Optional<Transform>.Empty();
+    }
+
+    virtual protected void OnHealthReachedZero() {
+        creature.Despawn();
     }
 
     ////////////////

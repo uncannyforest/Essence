@@ -25,11 +25,11 @@ public class GameManager : MonoBehaviour {
 
     public void FountainLoaded(Fountain fountain) {
         if (fountain.Team == 1) {
-            GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().Respawn();
+            GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().FirstSpawn();
             Origin = (Vector2Int)fountain.GetComponentStrict<FeatureHooks>().tile;
         }
         if (fountain.Team == 0) foreach (Bugge bugge in bugges) {
-            bugge.GetComponentStrict<Anthopoid>().Respawn();
+            bugge.GetComponentStrict<Anthopoid>().FirstSpawn();
         }
     }
 

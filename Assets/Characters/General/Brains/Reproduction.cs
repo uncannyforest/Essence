@@ -14,6 +14,7 @@ public class Reproduction  {
     }
 
     virtual public Optional<IEnumerator<YieldInstruction>> ScanForAphrodisiac() {
+        if (brain.teamId != 0) return Optional<IEnumerator<YieldInstruction>>.Empty(); // TODO breed your own creatures
         if (Time.time < fertileAgainTime) return Optional.Empty<IEnumerator<YieldInstruction>>();
         Optional<Terrain.Position> target = from v in Radius.Nearby.ClosestTo(brain.transform.position, brain.Habitat.IsAphrodisiac)
                                             select new Terrain.Position(Terrain.Grid.Roof, v);

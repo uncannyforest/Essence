@@ -13,22 +13,15 @@ public class Anthopoid : MonoBehaviour {
     [NonSerialized] public CharacterController movement;
 
     void Start() {        
-        health = GetComponent<Health>();
-        health.ReachedZero += HandleDeath;
         movement = GetComponent<CharacterController>();
         movement.CrossingTile += HandleCrossingTile;
+        health = GetComponent<Health>();
+        health.ReachedZero += Respawn;
     }
 
-    public void HandleDeath() {
-        respawnDelayHiddenObject.SetActive(false);
-        Invoke("Respawn", respawnDelay);
-    }
+    public void Respawn() => Teleportation.RespawnToFountain(movement, respawnDelayHiddenObject, respawnDelay);
 
-    public void Respawn() {
-        respawnDelayHiddenObject.SetActive(true);
-        health.Reset();
-        MoveViaFountain(null);
-    }
+    public void FirstSpawn() => Teleportation.Respawn(movement, respawnDelayHiddenObject);
 
     public bool HandleCrossingTile(Vector2Int newTile) {
         if (Terrain.I.Feature[newTile] is Feature feature
@@ -37,22 +30,5 @@ public class Anthopoid : MonoBehaviour {
             return feature.hooks.PlayerEntered(this);
         }
         return true;
-    }
-
-    public void MoveViaFountain(Fountain prev) {
-        Fountain[] teamSpawnPoints = Fountain.FindAllByTeam(GetComponent<Team>().TeamId);
-        int index = 0;
-        if (prev == null) {
-            index = Random.Range(0, teamSpawnPoints.Length);
-        } else {
-            for ( ; index < teamSpawnPoints.Length; index++) {
-                if (teamSpawnPoints[index] == prev) break;
-            }
-            index--;
-            if (index < 0) index = teamSpawnPoints.Length - 1;
-            teamSpawnPoints[index].Teleporting();
-        }
-        transform.position = (Vector2)teamSpawnPoints[index].transform.position;
-        Terrain.I.mapRenderer.Reset();
     }
 }

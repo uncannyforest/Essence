@@ -189,9 +189,10 @@ public class Creature : MonoBehaviour {
             }
         }
     }
-    private void Despawn() {
+    public void Despawn() {
         Debug.Log("Despawning " + gameObject + " at " + transform.position);
-        if (creatureShortName == "Bugge") this.GetComponentStrict<Anthopoid>().HandleDeath();
+        if (creatureShortName == "Bugge") this.GetComponentStrict<Anthopoid>().Respawn();
+        else if (team.TeamId != 0) Teleportation.RespawnToFountain(brain.movement, null, 0);
         else Destroy(gameObject);
     }
 

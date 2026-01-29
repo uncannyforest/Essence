@@ -163,7 +163,7 @@ public class Terrain : MonoBehaviour {
     }
 
     public bool IsFeature(Vector2Int pos, out Feature feature) {
-        if (features[pos.x, pos.y] == null) {
+        if (!InBounds(pos) || features[pos.x, pos.y] == null) {
             feature = default;
             return false;
         } else {
