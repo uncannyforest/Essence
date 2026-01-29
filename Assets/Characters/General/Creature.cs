@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Team))]
 [RequireComponent(typeof(CharacterController))]
@@ -47,7 +48,10 @@ public class Creature : MonoBehaviour {
         team.changed += TeamChangedEventHandler;
 
         if (serializedData is Data data) DeserializeNow(data);
-        else cMaybeDespawn = StartCoroutine(MaybeDespawn());
+        else {
+            gameObject.name = GenerateName() + " " + creatureShortName;
+            cMaybeDespawn = StartCoroutine(MaybeDespawn());
+        }
     }
 
     private void InitializeActionList(Brain brain) {
@@ -57,7 +61,8 @@ public class Creature : MonoBehaviour {
     }
 
     private void TeamChangedEventHandler(int newTeam) {
-        transform.Find("Cardboard/Heart").GetComponentStrict<SpriteRenderer>().color = team.Color;
+        Transform heart = transform.Find("Cardboard/Heart");
+        if (heart != null) heart.GetComponentStrict<SpriteRenderer>().color = team.Color;
     }
 
     public CharacterController OverrideControl(MonoBehaviour source) {
@@ -206,6 +211,41 @@ public class Creature : MonoBehaviour {
             boat.RequestCreatureEnter(this);
     }
 
+    public static string GenerateName() {
+        char[] consonants = "bcdfghjklmnpqrstvwxyz".ToCharArray();
+        char[] vowels = "aeiou".ToCharArray();
+        if (Randoms.CoinFlip) {
+            return (char)(Randoms.InArray(consonants) - 32) + ""
+                + Randoms.InArray(vowels)
+                + Randoms.InArray(consonants)
+                + Randoms.InArray(vowels)
+                + Randoms.InArray(consonants);
+        } else {
+            switch (Random.Range(0, 4)) {
+                case 0:
+                    return (char)(Randoms.InArray(consonants) - 32) + ""
+                        + Randoms.InArray(vowels)
+                        + Randoms.InArray(consonants)
+                        + Randoms.InArray(vowels);
+                case 1:
+                    return (char)(Randoms.InArray(vowels) - 32) + ""
+                        + Randoms.InArray(consonants)
+                        + Randoms.InArray(vowels)
+                        + Randoms.InArray(consonants);
+                case 2: 
+                    return (char)(Randoms.InArray(consonants) - 32) + ""
+                        + Randoms.InArray(vowels)
+                        + Randoms.InArray(vowels)
+                        + Randoms.InArray(consonants);
+                default:
+                    return (char)(Randoms.InArray(vowels) - 32) + ""
+                        + Randoms.InArray(consonants)
+                        + Randoms.InArray(consonants)
+                        + Randoms.InArray(vowels);
+            }
+        }
+    }
+
     [Serializable] public struct Data {
         public int x;
         public int y;
@@ -246,7 +286,7 @@ public class Creature : MonoBehaviour {
         gameObject.name = data.name;
         team.TeamId = data.team;
         Debug.Log("Setting currentExp for saved creature " + gameObject.name);
-        stats.SetExp(data.exp);
+        stats.InitializeExp(data.exp);
         if (data.stationed) Station(data.tile);
     }
 }

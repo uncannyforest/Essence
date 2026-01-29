@@ -5,7 +5,6 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Creature))]
 public class Stats : MonoBehaviour {
     [SerializeField] private int currentExp;
     public int minDistanceFromOrigin;
@@ -18,15 +17,7 @@ public class Stats : MonoBehaviour {
 
     public int Exp {
         get => currentExp;
-        set {
-            if (value < currentExp)
-                throw new ArgumentException("Cannot decrease Exp (" + currentExp + " -> " + value + ")");
-            if (value > currentExp + 2)
-                Debug.Log(gameObject.name + " just gained " + (value - currentExp) + " EXP, reaching " + value + " EXP");
-            currentExp = value;
-            bool justLeveledUp = lastLevel != Level;
-            if (justLeveledUp) OnLevelUp(true);
-        }
+        set => SetExp(value);
     }
     public int Level { get => Mathf.FloorToInt(Mathf.Sqrt(currentExp / GlobalConfig.I.expToLevelUp)); }
     private int lastLevel = 1;
@@ -40,20 +31,20 @@ public class Stats : MonoBehaviour {
 
     public Action<Stats> LeveledUp;
 
-    private Creature creature;
-
     void Start() {
-        creature = GetComponent<Creature>();
-        GameObject levelDisplay = GameObject.Instantiate(GeneralAssetLibrary.P.levelDisplay, transform);
+        InitializeDisplay();
         if (currentExp == 0) InitializeStats(); // if not deserialized from save
         else gameObject.GetComponentInChildren<TextMesh>().text = "" + Level;
     }
 
+    virtual protected void InitializeDisplay() {
+        GameObject levelDisplay = GameObject.Instantiate(GeneralAssetLibrary.P.levelDisplay, transform);
+    }
+
     private void InitializeStats() {
-        gameObject.name = GenerateName() + " " + creature.creatureShortName;
         int initLevel = GetInitLevel(Terrain.I.CellAt(transform.position));
         Debug.Log("Setting currentExp for new creature " + gameObject.name);
-        SetExp(LevelToExp(initLevel));
+        InitializeExp(LevelToExp(initLevel));
     }
 
     public int GetInitLevel(Vector2Int position) {
@@ -63,54 +54,28 @@ public class Stats : MonoBehaviour {
             (GlobalConfig.I.creatureStartLevelDistance * GlobalConfig.I.creatureStartLevelDistance))
             + 1;
     }
+
     public int LevelToExp(int level) => level * level * GlobalConfig.I.expToLevelUp;
 
     // for initialization situations where you're not just incrementing
-    public void SetExp(int exp) {
+    public void InitializeExp(int exp) {
         currentExp = exp;
         OnLevelUp(false);
     }
 
+    virtual public void SetExp(int value) {
+        if (value < currentExp)
+            throw new ArgumentException("Cannot decrease Exp (" + currentExp + " -> " + value + ")");
+        currentExp = value;
+        bool justLeveledUp = lastLevel != Level;
+        if (justLeveledUp) OnLevelUp(true);
+    }
+
     private void OnLevelUp(bool displayMessage) {
         lastLevel = Level;
-        if (displayMessage && GameManager.I.YourTeam.SameTeam(creature)) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
+        if (displayMessage && GameManager.I.YourTeam.SameTeam(this.GetComponentStrict<Creature>())) TextDisplay.I.ShowMiniText(gameObject.name + " just reached level " + Level + "!");
         if (LeveledUp != null) LeveledUp(this);
         TextMesh levelDisplay = gameObject.GetComponentInChildren<TextMesh>();
         if (levelDisplay != null) levelDisplay.text = "" + Level;
-    }
-
-    public static string GenerateName() {
-        char[] consonants = "bcdfghjklmnpqrstvwxyz".ToCharArray();
-        char[] vowels = "aeiou".ToCharArray();
-        if (Randoms.CoinFlip) {
-            return (char)(Randoms.InArray(consonants) - 32) + ""
-                + Randoms.InArray(vowels)
-                + Randoms.InArray(consonants)
-                + Randoms.InArray(vowels)
-                + Randoms.InArray(consonants);
-        } else {
-            switch (Random.Range(0, 4)) {
-                case 0:
-                    return (char)(Randoms.InArray(consonants) - 32) + ""
-                        + Randoms.InArray(vowels)
-                        + Randoms.InArray(consonants)
-                        + Randoms.InArray(vowels);
-                case 1:
-                    return (char)(Randoms.InArray(vowels) - 32) + ""
-                        + Randoms.InArray(consonants)
-                        + Randoms.InArray(vowels)
-                        + Randoms.InArray(consonants);
-                case 2: 
-                    return (char)(Randoms.InArray(consonants) - 32) + ""
-                        + Randoms.InArray(vowels)
-                        + Randoms.InArray(vowels)
-                        + Randoms.InArray(consonants);
-                default:
-                    return (char)(Randoms.InArray(vowels) - 32) + ""
-                        + Randoms.InArray(consonants)
-                        + Randoms.InArray(consonants)
-                        + Randoms.InArray(vowels);
-            }
-        }
     }
 }

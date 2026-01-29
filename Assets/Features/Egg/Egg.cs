@@ -46,7 +46,7 @@ public class Egg : MonoBehaviour {
         Creature prefab = CreatureLibrary.P.BySpeciesName(species);
         Creature newCreature = Instantiate(prefab, transform.position, Quaternion.identity, GameManager.I.worldBag);
         newCreature.GetComponentStrict<Team>().TeamId = team.TeamId;
-        newCreature.GetComponentStrict<Stats>().SetExp(GlobalConfig.I.expToLevelUp);
+        newCreature.GetComponentStrict<Stats>().InitializeExp(GlobalConfig.I.expToLevelUp);
         if (team.SameTeam(GameManager.I.YourTeam)) {
             TextDisplay.I.ShowMiniText(species + " hatched!");
         }

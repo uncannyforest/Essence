@@ -1,25 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class BuggeConfig {
+public class CPUPlayerConfig {
 }
 
 [RequireComponent(typeof(Anthopoid))]
-public class Bugge : Species<BuggeConfig> {
+public class CPUPlayer : Species<CPUPlayerConfig> {
     override public Brain Brain(BrainConfig generalConfig) {
         return new BuggeBrain(this, generalConfig, speciesConfig);
     }
 }
 
 public class BuggeBrain : Brain {
-    private BuggeConfig bugge;
-
-    public BuggeBrain(Bugge species, BrainConfig general, BuggeConfig bugge) : base(species, general) {
-        this.bugge = bugge;
-
+    public BuggeBrain(CPUPlayer species, BrainConfig general, CPUPlayerConfig bugge) : base(species, general) {
         pathfinding.Roam = Roam;
     }
 

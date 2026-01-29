@@ -10,17 +10,17 @@ public class GameManager : MonoBehaviour {
 
     public Transform worldBag;
     public PlayerCharacter playerPrefab;
-    public Bugge buggePrefab;
-    public int numberOfBugges = 1;
+    public CPUPlayer cpuPlayerPrefab;
+    public int numberOfCPUS = 1;
 
     private PlayerCharacter singlePlayer;
-    private List<Bugge> bugges = new List<Bugge>();
+    private List<CPUPlayer> cpuPlayers = new List<CPUPlayer>();
 
     void Awake() {
         singlePlayer = GameObject.Instantiate(playerPrefab, worldBag);
         Debug.Log("SINGLE PLAYER = " + singlePlayer);
-        for (int i = 0; i < numberOfBugges; i++)
-            bugges.Add(GameObject.Instantiate(buggePrefab, worldBag));
+        for (int i = 0; i < numberOfCPUS; i++)
+            cpuPlayers.Add(GameObject.Instantiate(cpuPlayerPrefab, worldBag));
     }
 
     public void FountainLoaded(Fountain fountain) {
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour {
             GameManager.I.YourPlayer.GetComponentStrict<Anthopoid>().FirstSpawn();
             Origin = (Vector2Int)fountain.GetComponentStrict<FeatureHooks>().tile;
         }
-        if (fountain.Team == 0) foreach (Bugge bugge in bugges) {
+        if (fountain.Team == 0) foreach (CPUPlayer bugge in cpuPlayers) {
             bugge.GetComponentStrict<Anthopoid>().FirstSpawn();
         }
     }
