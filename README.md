@@ -12,6 +12,8 @@ View screenshots on my [gamedev portfolio page](https://uncannyforest.com/projec
 
 NPC AI uses a hand-coded state management system managing update messages, similar to Redux.
 
+For pathfinding, NPCs both follow optimal paths using my [Flow Field implementation](https://github.com/uncannyforest/Systems) and send "help" messages when blocked to allies with terraforming ability to unblock them.
+
 Terrain procedurally generated using cellular automata.
 
 Built with Unity 2020.3.14f1.
